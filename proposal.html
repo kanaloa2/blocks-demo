@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -22,74 +21,74 @@
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.5; }
 
 /* App chrome */
-.topnav { background: var(–surface); border-bottom: 0.5px solid var(–border2); display: flex; align-items: center; padding: 0 1.25rem; height: 52px; gap: 2rem; position: sticky; top: 0; z-index: 20; }
-.logo { display: flex; align-items: center; gap: 9px; font-family: ‘Syne’, sans-serif; font-size: 17px; font-weight: 600; color: var(–text); letter-spacing: -0.3px; flex-shrink: 0; text-decoration: none; }
-.logo-mark { width: 28px; height: 28px; background: var(–purple); border-radius: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 5px; }
+.topnav { background: var(--surface); border-bottom: 0.5px solid var(--border2); display: flex; align-items: center; padding: 0 1.25rem; height: 52px; gap: 2rem; position: sticky; top: 0; z-index: 20; }
+.logo { display: flex; align-items: center; gap: 9px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; flex-shrink: 0; text-decoration: none; }
+.logo-mark { width: 28px; height: 28px; background: var(--purple); border-radius: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 5px; }
 .logo-mark span { background: white; border-radius: 1.5px; }
 .logo-mark span:nth-child(2) { opacity: 0.65; } .logo-mark span:nth-child(3) { opacity: 0.65; } .logo-mark span:nth-child(4) { opacity: 0.35; }
 .nav-links { display: flex; gap: 0; flex: 1; }
-.nav-links a { font-family: ‘DM Sans’, sans-serif; font-size: 13px; color: var(–text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
-.nav-links a.active { color: var(–purple); border-bottom-color: var(–purple); font-weight: 500; }
-.nav-links a:hover:not(.active) { color: var(–text); }
+.nav-links a { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
+.nav-links a.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 500; }
+.nav-links a:hover:not(.active) { color: var(--text); }
 .nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-.subnav { font-size: 11px; color: var(–text3); margin-top: 1px; }
-.icon-btn { width: 32px; height: 32px; border-radius: var(–r-sm); border: 0.5px solid var(–border2); background: var(–surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(–text2); }
+.subnav { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.icon-btn { width: 32px; height: 32px; border-radius: var(--r-sm); border: 0.5px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); }
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; cursor: pointer; }
 
 /* Toolbar above proposal */
 .proposal-toolbar {
-background: var(–surface);
-border-bottom: 0.5px solid var(–border2);
-padding: 0.75rem 2rem;
-display: flex;
-align-items: center;
-justify-content: space-between;
-gap: 1rem;
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border2);
+  padding: 0.75rem 2rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
 }
-.toolbar-left { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(–text2); }
-.toolbar-left select { font-family: ‘DM Sans’, sans-serif; font-size: 13px; border: 0.5px solid var(–border2); border-radius: var(–r-sm); padding: 5px 10px; background: var(–surface2); color: var(–text); outline: none; }
+.toolbar-left { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text2); }
+.toolbar-left select { font-family: 'DM Sans', sans-serif; font-size: 13px; border: 0.5px solid var(--border2); border-radius: var(--r-sm); padding: 5px 10px; background: var(--surface2); color: var(--text); outline: none; }
 .toolbar-right { display: flex; gap: 8px; }
-.btn-outline { font-family: ‘DM Sans’, sans-serif; font-size: 12px; padding: 7px 14px; border-radius: var(–r-sm); border: 0.5px solid var(–border2); background: var(–surface); color: var(–text2); cursor: pointer; transition: all 0.12s; display: flex; align-items: center; gap: 6px; }
-.btn-outline:hover { background: var(–surface2); color: var(–text); }
-.btn-print { font-family: ‘Syne’, sans-serif; font-size: 12px; font-weight: 600; padding: 7px 16px; background: var(–purple); color: white; border: none; border-radius: var(–r-sm); cursor: pointer; display: flex; align-items: center; gap: 6px; }
+.btn-outline { font-family: 'DM Sans', sans-serif; font-size: 12px; padding: 7px 14px; border-radius: var(--r-sm); border: 0.5px solid var(--border2); background: var(--surface); color: var(--text2); cursor: pointer; transition: all 0.12s; display: flex; align-items: center; gap: 6px; }
+.btn-outline:hover { background: var(--surface2); color: var(--text); }
+.btn-print { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; padding: 7px 16px; background: var(--purple); color: white; border: none; border-radius: var(--r-sm); cursor: pointer; display: flex; align-items: center; gap: 6px; }
 
 /* Proposal document */
-.proposal-wrap { padding: 2rem; display: flex; justify-content: center; background: var(–bg); min-height: calc(100vh - 104px); }
+.proposal-wrap { padding: 2rem; display: flex; justify-content: center; background: var(--bg); min-height: calc(100vh - 104px); }
 
 .proposal {
-background: white;
-width: 100%;
-max-width: 800px;
-border-radius: var(–r-lg);
-box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06);
-overflow: hidden;
-animation: fadeUp 0.35s ease both;
+  background: white;
+  width: 100%;
+  max-width: 800px;
+  border-radius: var(--r-lg);
+  box-shadow: 0 4px 24px rgba(0,0,0,0.08), 0 0 0 0.5px rgba(0,0,0,0.06);
+  overflow: hidden;
+  animation: fadeUp 0.35s ease both;
 }
 
 @keyframes fadeUp { from { opacity:0; transform:translateY(10px); } to { opacity:1; transform:none; } }
 
 /* Proposal header band */
 .proposal-head {
-background: var(–purple);
-padding: 2.5rem 2.75rem 2rem;
-position: relative;
-overflow: hidden;
+  background: var(--purple);
+  padding: 2.5rem 2.75rem 2rem;
+  position: relative;
+  overflow: hidden;
 }
 .proposal-head::before {
-content: ‘’;
-position: absolute;
-top: -60px; right: -60px;
-width: 240px; height: 240px;
-background: rgba(255,255,255,0.05);
-border-radius: 50%;
+  content: '';
+  position: absolute;
+  top: -60px; right: -60px;
+  width: 240px; height: 240px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
 }
 .proposal-head::after {
-content: ‘’;
-position: absolute;
-bottom: -40px; left: 40%;
-width: 160px; height: 160px;
-background: rgba(255,255,255,0.04);
-border-radius: 50%;
+  content: '';
+  position: absolute;
+  bottom: -40px; left: 40%;
+  width: 160px; height: 160px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
 }
 
 .proposal-head-top { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 1.75rem; position: relative; }
@@ -97,15 +96,15 @@ border-radius: 50%;
 .proposal-logo-mark { width: 24px; height: 24px; background: rgba(255,255,255,0.25); border-radius: 6px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 4px; }
 .proposal-logo-mark span { background: white; border-radius: 1px; }
 .proposal-logo-mark span:nth-child(2) { opacity: 0.6; } .proposal-logo-mark span:nth-child(3) { opacity: 0.6; } .proposal-logo-mark span:nth-child(4) { opacity: 0.3; }
-.proposal-logo-name { font-family: ‘Syne’, sans-serif; font-size: 15px; font-weight: 700; color: white; opacity: 0.9; }
+.proposal-logo-name { font-family: 'Syne', sans-serif; font-size: 15px; font-weight: 700; color: white; opacity: 0.9; }
 .proposal-date { font-size: 11px; color: rgba(255,255,255,0.6); }
 
-.proposal-client-name { font-family: ‘Syne’, sans-serif; font-size: 28px; font-weight: 800; color: white; letter-spacing: -0.8px; line-height: 1.1; position: relative; }
+.proposal-client-name { font-family: 'Syne', sans-serif; font-size: 28px; font-weight: 800; color: white; letter-spacing: -0.8px; line-height: 1.1; position: relative; }
 .proposal-subtitle { font-size: 14px; color: rgba(255,255,255,0.7); margin-top: 6px; position: relative; }
 
 .proposal-head-metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1.5rem; margin-top: 1.75rem; position: relative; }
 .head-metric-label { font-size: 10px; color: rgba(255,255,255,0.55); text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 4px; }
-.head-metric-val { font-family: ‘DM Mono’, monospace; font-size: 20px; font-weight: 500; color: white; }
+.head-metric-val { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; color: white; }
 .head-metric-val.up { color: #9FE1CB; }
 .head-metric-sub { font-size: 10.5px; color: rgba(255,255,255,0.5); margin-top: 3px; }
 
@@ -113,15 +112,15 @@ border-radius: 50%;
 .proposal-body { padding: 2rem 2.75rem; display: flex; flex-direction: column; gap: 2rem; }
 
 .section-title {
-font-family: ‘Syne’, sans-serif;
-font-size: 11px;
-font-weight: 600;
-text-transform: uppercase;
-letter-spacing: 0.8px;
-color: var(–text3);
-margin-bottom: 1rem;
-padding-bottom: 8px;
-border-bottom: 0.5px solid var(–border2);
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text3);
+  margin-bottom: 1rem;
+  padding-bottom: 8px;
+  border-bottom: 0.5px solid var(--border2);
 }
 
 /* Allocation section */
@@ -131,15 +130,15 @@ border-bottom: 0.5px solid var(–border2);
 .donut-wrap { position: relative; width: 180px; height: 180px; flex-shrink: 0; }
 .donut-wrap svg { display: block; }
 .donut-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; pointer-events: none; }
-.donut-center-val { font-family: ‘DM Mono’, monospace; font-size: 22px; font-weight: 500; color: var(–text); }
-.donut-center-label { font-size: 10px; color: var(–text3); margin-top: 2px; }
+.donut-center-val { font-family: 'DM Mono', monospace; font-size: 22px; font-weight: 500; color: var(--text); }
+.donut-center-label { font-size: 10px; color: var(--text3); margin-top: 2px; }
 
 .alloc-legend-full { display: flex; flex-direction: column; gap: 8px; }
 .alloc-leg-row { display: flex; align-items: center; gap: 10px; }
 .alloc-leg-color { width: 10px; height: 10px; border-radius: 2px; flex-shrink: 0; }
-.alloc-leg-name { flex: 1; font-size: 13px; color: var(–text); }
-.alloc-leg-pct { font-family: ‘DM Mono’, monospace; font-size: 13px; font-weight: 500; color: var(–text); }
-.alloc-bar-mini { height: 4px; background: var(–surface3); border-radius: 2px; overflow: hidden; margin-top: 3px; }
+.alloc-leg-name { flex: 1; font-size: 13px; color: var(--text); }
+.alloc-leg-pct { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); }
+.alloc-bar-mini { height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; margin-top: 3px; }
 .alloc-bar-mini-fill { height: 100%; border-radius: 2px; }
 
 /* Performance vs benchmark */
@@ -147,91 +146,91 @@ border-bottom: 0.5px solid var(–border2);
 .perf-bars { display: flex; flex-direction: column; gap: 12px; }
 .perf-bar-row { }
 .perf-bar-label { display: flex; justify-content: space-between; font-size: 12px; margin-bottom: 5px; }
-.perf-bar-name { color: var(–text2); }
-.perf-bar-val { font-family: ‘DM Mono’, monospace; font-weight: 500; }
-.perf-track { height: 8px; background: var(–surface2); border-radius: 4px; overflow: hidden; }
+.perf-bar-name { color: var(--text2); }
+.perf-bar-val { font-family: 'DM Mono', monospace; font-weight: 500; }
+.perf-track { height: 8px; background: var(--surface2); border-radius: 4px; overflow: hidden; }
 .perf-fill { height: 100%; border-radius: 4px; }
 
 /* Risk score */
 .risk-section { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
 .risk-gauge-wrap { display: flex; flex-direction: column; align-items: center; gap: 8px; }
 .risk-details { display: flex; flex-direction: column; gap: 8px; }
-.risk-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(–border); font-size: 12.5px; }
+.risk-detail-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 0.5px solid var(--border); font-size: 12.5px; }
 .risk-detail-row:last-child { border-bottom: none; }
-.risk-detail-label { color: var(–text2); }
-.risk-detail-val { font-family: ‘DM Mono’, monospace; font-weight: 500; color: var(–text); }
+.risk-detail-label { color: var(--text2); }
+.risk-detail-val { font-family: 'DM Mono', monospace; font-weight: 500; color: var(--text); }
 
 /* Holdings table */
 .holdings-table { width: 100%; border-collapse: collapse; }
-.holdings-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(–text3); font-weight: 500; text-align: left; padding: 6px 8px; background: var(–surface2); border-bottom: 0.5px solid var(–border2); }
+.holdings-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); font-weight: 500; text-align: left; padding: 6px 8px; background: var(--surface2); border-bottom: 0.5px solid var(--border2); }
 .holdings-table th:not(:first-child):not(:nth-child(2)) { text-align: right; }
-.holdings-table td { padding: 9px 8px; border-bottom: 0.5px solid var(–border); font-size: 12.5px; vertical-align: middle; }
-.holdings-table td:not(:first-child):not(:nth-child(2)) { text-align: right; font-family: ‘DM Mono’, monospace; font-size: 12px; }
+.holdings-table td { padding: 9px 8px; border-bottom: 0.5px solid var(--border); font-size: 12.5px; vertical-align: middle; }
+.holdings-table td:not(:first-child):not(:nth-child(2)) { text-align: right; font-family: 'DM Mono', monospace; font-size: 12px; }
 .holdings-table tr:last-child td { border-bottom: none; }
 .hold-color { width: 8px; height: 8px; border-radius: 2px; display: inline-block; margin-right: 6px; vertical-align: middle; }
-.hold-name { font-weight: 500; color: var(–text); }
-.hold-type { font-size: 11px; color: var(–text3); }
+.hold-name { font-weight: 500; color: var(--text); }
+.hold-type { font-size: 11px; color: var(--text3); }
 
 /* Disclaimer */
-.disclaimer { background: var(–surface2); border-radius: var(–r-md); padding: 1rem 1.25rem; font-size: 11px; color: var(–text3); line-height: 1.7; }
+.disclaimer { background: var(--surface2); border-radius: var(--r-md); padding: 1rem 1.25rem; font-size: 11px; color: var(--text3); line-height: 1.7; }
 
 /* Signature */
-.signature-section { border-top: 0.5px solid var(–border2); padding-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
+.signature-section { border-top: 0.5px solid var(--border2); padding-top: 1.5rem; display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
 .sig-block { }
-.sig-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(–text3); margin-bottom: 12px; }
-.sig-line { border-bottom: 1px solid var(–text3); margin-bottom: 6px; height: 32px; }
-.sig-name { font-size: 12px; color: var(–text2); }
-.sig-title { font-size: 11px; color: var(–text3); margin-top: 2px; }
+.sig-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); margin-bottom: 12px; }
+.sig-line { border-bottom: 1px solid var(--text3); margin-bottom: 6px; height: 32px; }
+.sig-name { font-size: 12px; color: var(--text2); }
+.sig-title { font-size: 11px; color: var(--text3); margin-top: 2px; }
 
 /* Footer */
 .proposal-footer {
-background: var(–surface2);
-padding: 1rem 2.75rem;
-display: flex;
-align-items: center;
-justify-content: space-between;
-border-top: 0.5px solid var(–border2);
+  background: var(--surface2);
+  padding: 1rem 2.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-top: 0.5px solid var(--border2);
 }
-.footer-logo { display: flex; align-items: center; gap: 6px; font-family: ‘Syne’, sans-serif; font-size: 13px; font-weight: 700; color: var(–text2); }
-.footer-small-mark { width: 16px; height: 16px; background: var(–purple); border-radius: 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px; padding: 3px; }
+.footer-logo { display: flex; align-items: center; gap: 6px; font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 700; color: var(--text2); }
+.footer-small-mark { width: 16px; height: 16px; background: var(--purple); border-radius: 4px; display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px; padding: 3px; }
 .footer-small-mark span { background: white; border-radius: 1px; }
 .footer-small-mark span:nth-child(2) { opacity: 0.6; } .footer-small-mark span:nth-child(3) { opacity: 0.6; } .footer-small-mark span:nth-child(4) { opacity: 0.3; }
-.footer-note { font-size: 10.5px; color: var(–text3); }
+.footer-note { font-size: 10.5px; color: var(--text3); }
 
 @media print {
-.topnav, .proposal-toolbar { display: none !important; }
-.proposal-wrap { padding: 0; background: white; }
-.proposal { border-radius: 0; box-shadow: none; max-width: 100%; }
-body { background: white; }
+  .topnav, .proposal-toolbar { display: none !important; }
+  .proposal-wrap { padding: 0; background: white; }
+  .proposal { border-radius: 0; box-shadow: none; max-width: 100%; }
+  body { background: white; }
 }
 
 @media (max-width: 768px) {
-.topnav { padding: 0 1rem; }
-.nav-links { display: none; }
-.proposal-toolbar { flex-direction: column; align-items: flex-start; gap: 10px; }
-.proposal-wrap { padding: 1rem; }
-.proposal-head { padding: 1.5rem; }
-.proposal-body { padding: 1.25rem 1.5rem; }
-.alloc-section { grid-template-columns: 1fr; }
-.donut-wrap { margin: 0 auto; }
-.risk-section { grid-template-columns: 1fr; }
-.signature-section { grid-template-columns: 1fr; }
-.proposal-head-metrics { grid-template-columns: repeat(2, 1fr); }
-.proposal-footer { flex-direction: column; gap: 8px; text-align: center; }
+  .topnav { padding: 0 1rem; }
+  .nav-links { display: none; }
+  .proposal-toolbar { flex-direction: column; align-items: flex-start; gap: 10px; }
+  .proposal-wrap { padding: 1rem; }
+  .proposal-head { padding: 1.5rem; }
+  .proposal-body { padding: 1.25rem 1.5rem; }
+  .alloc-section { grid-template-columns: 1fr; }
+  .donut-wrap { margin: 0 auto; }
+  .risk-section { grid-template-columns: 1fr; }
+  .signature-section { grid-template-columns: 1fr; }
+  .proposal-head-metrics { grid-template-columns: repeat(2, 1fr); }
+  .proposal-footer { flex-direction: column; gap: 8px; text-align: center; }
 }
 
 /* ── MOBILE HAMBURGER ── */
 .hamburger {
-display: none;
-flex-direction: column;
-gap: 4.5px;
-cursor: pointer;
-padding: 6px;
-border-radius: 6px;
-border: 0.5px solid rgba(0,0,0,0.13);
-background: transparent;
-margin-left: 8px;
-transition: background 0.12s;
+  display: none;
+  flex-direction: column;
+  gap: 4.5px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  border: 0.5px solid rgba(0,0,0,0.13);
+  background: transparent;
+  margin-left: 8px;
+  transition: background 0.12s;
 }
 .hamburger:hover { background: #f0efe9; }
 .hamburger span { display: block; width: 18px; height: 1.5px; background: #181816; border-radius: 2px; transition: all 0.2s ease; }
@@ -240,29 +239,29 @@ transition: background 0.12s;
 .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .mobile-menu {
-display: none;
-position: fixed;
-top: 52px; left: 0; right: 0;
-background: #ffffff;
-border-bottom: 0.5px solid rgba(0,0,0,0.13);
-box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-z-index: 99;
-flex-direction: column;
-padding: 0.5rem 0;
-opacity: 0;
-transform: translateY(-8px);
-transition: transform 0.2s ease, opacity 0.2s ease;
-pointer-events: none;
+  display: none;
+  position: fixed;
+  top: 52px; left: 0; right: 0;
+  background: #ffffff;
+  border-bottom: 0.5px solid rgba(0,0,0,0.13);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 99;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
 }
 .mobile-menu.open { display: flex; opacity: 1; transform: translateY(0); pointer-events: all; }
 .mobile-menu a {
-font-family: ‘DM Sans’, sans-serif;
-font-size: 15px; color: #5c5b57;
-text-decoration: none;
-padding: 12px 1.25rem;
-border-bottom: 0.5px solid rgba(0,0,0,0.08);
-display: flex; align-items: center; justify-content: space-between;
-transition: background 0.1s;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; color: #5c5b57;
+  text-decoration: none;
+  padding: 12px 1.25rem;
+  border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.1s;
 }
 .mobile-menu a:last-child { border-bottom: none; }
 .mobile-menu a:hover { background: #f0efe9; color: #181816; }
@@ -270,7 +269,7 @@ transition: background 0.1s;
 .mobile-menu-arrow { font-size: 12px; color: #9a9994; }
 
 @media (max-width: 900px) {
-.hamburger { display: flex; }
+  .hamburger { display: flex; }
 }
 
 </style>
@@ -361,246 +360,244 @@ transition: background 0.1s;
 <div class="proposal-wrap">
   <div class="proposal" id="proposal">
 
-```
-<!-- Header -->
-<div class="proposal-head">
-  <div class="proposal-head-top">
-    <div class="proposal-logo">
-      <div class="proposal-logo-mark"><span></span><span></span><span></span><span></span></div>
-      <div class="proposal-logo-name">Blocks</div>
-    </div>
-    <div class="proposal-date">Portfolio Proposal · March 14, 2026</div>
-  </div>
-  <div class="proposal-client-name" id="clientName">Smith Family</div>
-  <div class="proposal-subtitle">Growth Composite · Taxable Account · Prepared by James Davidson, CFP</div>
-  <div class="proposal-head-metrics">
-    <div>
-      <div class="head-metric-label">Portfolio Value</div>
-      <div class="head-metric-val" id="headVal">$18.4M</div>
-      <div class="head-metric-sub">as of Mar 14, 2026</div>
-    </div>
-    <div>
-      <div class="head-metric-label">YTD Return</div>
-      <div class="head-metric-val up" id="headYTD">+9.1%</div>
-      <div class="head-metric-sub">vs +8.9% benchmark</div>
-    </div>
-    <div>
-      <div class="head-metric-label">Risk Score</div>
-      <div class="head-metric-val" id="headRisk">65 / 100</div>
-      <div class="head-metric-sub">Moderate-Growth</div>
-    </div>
-    <div>
-      <div class="head-metric-label">Div. Yield</div>
-      <div class="head-metric-val" id="headYield">2.1%</div>
-      <div class="head-metric-sub">trailing 12 months</div>
-    </div>
-  </div>
-</div>
-
-<!-- Body -->
-<div class="proposal-body">
-
-  <!-- Allocation -->
-  <div>
-    <div class="section-title">Portfolio Allocation</div>
-    <div class="alloc-section">
-      <div class="donut-wrap">
-        <svg viewBox="0 0 180 180" width="180" height="180">
-          <!-- Donut segments drawn by JS -->
-          <g id="donutG" transform="rotate(-90 90 90)"></g>
-          <circle cx="90" cy="90" r="52" fill="white"/>
-        </svg>
-        <div class="donut-center">
-          <div class="donut-center-val">5</div>
-          <div class="donut-center-label">blocks</div>
+    <!-- Header -->
+    <div class="proposal-head">
+      <div class="proposal-head-top">
+        <div class="proposal-logo">
+          <div class="proposal-logo-mark"><span></span><span></span><span></span><span></span></div>
+          <div class="proposal-logo-name">Blocks</div>
         </div>
+        <div class="proposal-date">Portfolio Proposal · March 14, 2026</div>
       </div>
-      <div class="alloc-legend-full" id="allocLegend"></div>
-    </div>
-  </div>
-
-  <!-- Performance -->
-  <div>
-    <div class="section-title">Performance vs Benchmark</div>
-    <div class="perf-bars">
-      <div class="perf-bar-row">
-        <div class="perf-bar-label">
-          <span class="perf-bar-name">Smith Family Portfolio</span>
-          <span class="perf-bar-val" style="color:var(--teal);">+9.1%</span>
+      <div class="proposal-client-name" id="clientName">Smith Family</div>
+      <div class="proposal-subtitle">Growth Composite · Taxable Account · Prepared by James Davidson, CFP</div>
+      <div class="proposal-head-metrics">
+        <div>
+          <div class="head-metric-label">Portfolio Value</div>
+          <div class="head-metric-val" id="headVal">$18.4M</div>
+          <div class="head-metric-sub">as of Mar 14, 2026</div>
         </div>
-        <div class="perf-track"><div class="perf-fill" style="width:68%;background:var(--purple);"></div></div>
-      </div>
-      <div class="perf-bar-row">
-        <div class="perf-bar-label">
-          <span class="perf-bar-name">S&amp;P 500 Benchmark</span>
-          <span class="perf-bar-val" style="color:var(--text2);">+8.9%</span>
+        <div>
+          <div class="head-metric-label">YTD Return</div>
+          <div class="head-metric-val up" id="headYTD">+9.1%</div>
+          <div class="head-metric-sub">vs +8.9% benchmark</div>
         </div>
-        <div class="perf-track"><div class="perf-fill" style="width:66%;background:var(--surface3);"></div></div>
-      </div>
-      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem;">
-        <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px;">
-          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;">1Y Return</div>
-          <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--teal);">+14.2%</div>
-          <div style="font-size:11px;color:var(--text3);">vs +12.8% bench</div>
+        <div>
+          <div class="head-metric-label">Risk Score</div>
+          <div class="head-metric-val" id="headRisk">65 / 100</div>
+          <div class="head-metric-sub">Moderate-Growth</div>
         </div>
-        <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px;">
-          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;">3Y Annualized</div>
-          <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--teal);">+11.7%</div>
-          <div style="font-size:11px;color:var(--text3);">vs +10.1% bench</div>
-        </div>
-        <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px;">
-          <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;">Alpha</div>
-          <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--teal);">+1.6%</div>
-          <div style="font-size:11px;color:var(--text3);">annualized 3Y</div>
+        <div>
+          <div class="head-metric-label">Div. Yield</div>
+          <div class="head-metric-val" id="headYield">2.1%</div>
+          <div class="head-metric-sub">trailing 12 months</div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Risk -->
-  <div>
-    <div class="section-title">Risk Profile</div>
-    <div class="risk-section">
-      <div class="risk-gauge-wrap">
-        <svg width="200" height="110" viewBox="0 0 200 110">
-          <defs>
-            <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#B83232"/>
-              <stop offset="40%" stop-color="#D4B800"/>
-              <stop offset="70%" stop-color="#1D9E75"/>
-              <stop offset="100%" stop-color="#2E7D32"/>
-            </linearGradient>
-          </defs>
-          <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#e8e7e0" stroke-width="14" stroke-linecap="round"/>
-          <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" opacity="0.85"/>
-          <!-- needle at 65% = moderate-growth -->
-          <line x1="100" y1="100" x2="152" y2="44" stroke="#181816" stroke-width="2.5" stroke-linecap="round"/>
-          <circle cx="100" cy="100" r="5" fill="#181816"/>
-          <text x="100" y="84" text-anchor="middle" font-family="DM Mono,monospace" font-size="18" font-weight="500" fill="#181816">65</text>
-          <text x="20" y="114" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#B83232">Low</text>
-          <text x="100" y="114" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#181816">Moderate</text>
-          <text x="180" y="114" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#2E7D32">High</text>
-        </svg>
-        <div style="font-size:12px;color:var(--text2);text-align:center;">Moderate-Growth Risk Profile<br><span style="font-size:11px;color:var(--text3);">Suitable for long-horizon investors</span></div>
+    <!-- Body -->
+    <div class="proposal-body">
+
+      <!-- Allocation -->
+      <div>
+        <div class="section-title">Portfolio Allocation</div>
+        <div class="alloc-section">
+          <div class="donut-wrap">
+            <svg viewBox="0 0 180 180" width="180" height="180">
+              <!-- Donut segments drawn by JS -->
+              <g id="donutG" transform="rotate(-90 90 90)"></g>
+              <circle cx="90" cy="90" r="52" fill="white"/>
+            </svg>
+            <div class="donut-center">
+              <div class="donut-center-val">5</div>
+              <div class="donut-center-label">blocks</div>
+            </div>
+          </div>
+          <div class="alloc-legend-full" id="allocLegend"></div>
+        </div>
       </div>
-      <div class="risk-details">
-        <div class="risk-detail-row"><span class="risk-detail-label">Sharpe Ratio</span><span class="risk-detail-val" style="color:var(--teal);">1.42</span></div>
-        <div class="risk-detail-row"><span class="risk-detail-label">Weighted Beta</span><span class="risk-detail-val">0.88</span></div>
-        <div class="risk-detail-row"><span class="risk-detail-label">Annualized Volatility</span><span class="risk-detail-val">13.8%</span></div>
-        <div class="risk-detail-row"><span class="risk-detail-label">Max Drawdown (3Y)</span><span class="risk-detail-val" style="color:var(--coral);">−8.4%</span></div>
-        <div class="risk-detail-row"><span class="risk-detail-label">Downside Capture</span><span class="risk-detail-val" style="color:var(--teal);">82%</span></div>
-        <div class="risk-detail-row"><span class="risk-detail-label">Upside Capture</span><span class="risk-detail-val" style="color:var(--teal);">108%</span></div>
+
+      <!-- Performance -->
+      <div>
+        <div class="section-title">Performance vs Benchmark</div>
+        <div class="perf-bars">
+          <div class="perf-bar-row">
+            <div class="perf-bar-label">
+              <span class="perf-bar-name">Smith Family Portfolio</span>
+              <span class="perf-bar-val" style="color:var(--teal);">+9.1%</span>
+            </div>
+            <div class="perf-track"><div class="perf-fill" style="width:68%;background:var(--purple);"></div></div>
+          </div>
+          <div class="perf-bar-row">
+            <div class="perf-bar-label">
+              <span class="perf-bar-name">S&amp;P 500 Benchmark</span>
+              <span class="perf-bar-val" style="color:var(--text2);">+8.9%</span>
+            </div>
+            <div class="perf-track"><div class="perf-fill" style="width:66%;background:var(--surface3);"></div></div>
+          </div>
+          <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-top:1rem;">
+            <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px;">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;">1Y Return</div>
+              <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--teal);">+14.2%</div>
+              <div style="font-size:11px;color:var(--text3);">vs +12.8% bench</div>
+            </div>
+            <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px;">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;">3Y Annualized</div>
+              <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--teal);">+11.7%</div>
+              <div style="font-size:11px;color:var(--text3);">vs +10.1% bench</div>
+            </div>
+            <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px;">
+              <div style="font-size:10px;color:var(--text3);margin-bottom:4px;text-transform:uppercase;letter-spacing:0.4px;">Alpha</div>
+              <div style="font-family:'DM Mono',monospace;font-size:18px;font-weight:500;color:var(--teal);">+1.6%</div>
+              <div style="font-size:11px;color:var(--text3);">annualized 3Y</div>
+            </div>
+          </div>
+        </div>
       </div>
+
+      <!-- Risk -->
+      <div>
+        <div class="section-title">Risk Profile</div>
+        <div class="risk-section">
+          <div class="risk-gauge-wrap">
+            <svg width="200" height="110" viewBox="0 0 200 110">
+              <defs>
+                <linearGradient id="rg" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#B83232"/>
+                  <stop offset="40%" stop-color="#D4B800"/>
+                  <stop offset="70%" stop-color="#1D9E75"/>
+                  <stop offset="100%" stop-color="#2E7D32"/>
+                </linearGradient>
+              </defs>
+              <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="#e8e7e0" stroke-width="14" stroke-linecap="round"/>
+              <path d="M20 100 A80 80 0 0 1 180 100" fill="none" stroke="url(#rg)" stroke-width="14" stroke-linecap="round" opacity="0.85"/>
+              <!-- needle at 65% = moderate-growth -->
+              <line x1="100" y1="100" x2="152" y2="44" stroke="#181816" stroke-width="2.5" stroke-linecap="round"/>
+              <circle cx="100" cy="100" r="5" fill="#181816"/>
+              <text x="100" y="84" text-anchor="middle" font-family="DM Mono,monospace" font-size="18" font-weight="500" fill="#181816">65</text>
+              <text x="20" y="114" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#B83232">Low</text>
+              <text x="100" y="114" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#181816">Moderate</text>
+              <text x="180" y="114" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" fill="#2E7D32">High</text>
+            </svg>
+            <div style="font-size:12px;color:var(--text2);text-align:center;">Moderate-Growth Risk Profile<br><span style="font-size:11px;color:var(--text3);">Suitable for long-horizon investors</span></div>
+          </div>
+          <div class="risk-details">
+            <div class="risk-detail-row"><span class="risk-detail-label">Sharpe Ratio</span><span class="risk-detail-val" style="color:var(--teal);">1.42</span></div>
+            <div class="risk-detail-row"><span class="risk-detail-label">Weighted Beta</span><span class="risk-detail-val">0.88</span></div>
+            <div class="risk-detail-row"><span class="risk-detail-label">Annualized Volatility</span><span class="risk-detail-val">13.8%</span></div>
+            <div class="risk-detail-row"><span class="risk-detail-label">Max Drawdown (3Y)</span><span class="risk-detail-val" style="color:var(--coral);">−8.4%</span></div>
+            <div class="risk-detail-row"><span class="risk-detail-label">Downside Capture</span><span class="risk-detail-val" style="color:var(--teal);">82%</span></div>
+            <div class="risk-detail-row"><span class="risk-detail-label">Upside Capture</span><span class="risk-detail-val" style="color:var(--teal);">108%</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Holdings -->
+      <div>
+        <div class="section-title">Top Holdings Breakdown</div>
+        <table class="holdings-table">
+          <thead>
+            <tr>
+              <th>Block / Holding</th>
+              <th>Type</th>
+              <th>Allocation</th>
+              <th>YTD</th>
+              <th>Div. Yield</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr style="background:var(--purple-lt);">
+              <td><span class="hold-color" style="background:#534AB7;"></span><span class="hold-name">Core Equity Block</span></td>
+              <td><span class="hold-type">Block</span></td>
+              <td><strong>40%</strong></td>
+              <td style="color:var(--teal);">+11.2%</td>
+              <td>1.8%</td>
+            </tr>
+            <tr>
+              <td style="padding-left:24px;color:var(--text2);">Microsoft Corp</td>
+              <td><span class="hold-type">US Equity</span></td>
+              <td>8.2%</td>
+              <td style="color:var(--teal);">+14.1%</td>
+              <td>0.8%</td>
+            </tr>
+            <tr>
+              <td style="padding-left:24px;color:var(--text2);">Apple Inc</td>
+              <td><span class="hold-type">US Equity</span></td>
+              <td>7.6%</td>
+              <td style="color:var(--coral);">−2.4%</td>
+              <td>0.5%</td>
+            </tr>
+            <tr>
+              <td style="padding-left:24px;color:var(--text2);">Johnson &amp; Johnson</td>
+              <td><span class="hold-type">US Equity</span></td>
+              <td>6.4%</td>
+              <td style="color:var(--teal);">+4.2%</td>
+              <td>3.1%</td>
+            </tr>
+            <tr style="background:var(--teal-lt);">
+              <td><span class="hold-color" style="background:#0F6E56;"></span><span class="hold-name">Short Duration Bonds Block</span></td>
+              <td><span class="hold-type">Block</span></td>
+              <td><strong>25%</strong></td>
+              <td style="color:var(--teal);">+2.1%</td>
+              <td>4.8%</td>
+            </tr>
+            <tr style="background:#FAECE7;">
+              <td><span class="hold-color" style="background:#C94E28;"></span><span class="hold-name">Healthcare Block</span></td>
+              <td><span class="hold-type">Block</span></td>
+              <td><strong>20%</strong></td>
+              <td style="color:var(--teal);">+3.6%</td>
+              <td>1.9%</td>
+            </tr>
+            <tr style="background:#E1F5EE;">
+              <td><span class="hold-color" style="background:#1D9E75;"></span><span class="hold-name">International Equity Block</span></td>
+              <td><span class="hold-type">Block</span></td>
+              <td><strong>10%</strong></td>
+              <td style="color:var(--teal);">+5.4%</td>
+              <td>2.4%</td>
+            </tr>
+            <tr style="background:#F1EFE8;">
+              <td><span class="hold-color" style="background:#B4B2A9;"></span><span class="hold-name">Cash</span></td>
+              <td><span class="hold-type">Cash</span></td>
+              <td><strong>5%</strong></td>
+              <td style="color:var(--text3);">—</td>
+              <td>5.1%</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="disclaimer">
+        <strong>Important disclosures:</strong> This proposal has been prepared by James Davidson, CFP using the Blocks AI-assisted portfolio construction platform. Past performance does not guarantee future results. All allocations are subject to market risk and may fluctuate in value. This document is intended for informational purposes only and does not constitute investment advice. Please review your Investment Policy Statement and consult with your advisor before making investment decisions.
+      </div>
+
+      <!-- Signature -->
+      <div class="signature-section">
+        <div class="sig-block">
+          <div class="sig-label">Advisor approval</div>
+          <div class="sig-line"></div>
+          <div class="sig-name">James Davidson, CFP</div>
+          <div class="sig-title">Senior Portfolio Advisor · Blocks Platform</div>
+        </div>
+        <div class="sig-block">
+          <div class="sig-label">Client acknowledgment</div>
+          <div class="sig-line"></div>
+          <div class="sig-name">Smith Family Representative</div>
+          <div class="sig-title">Date: ___________________________</div>
+        </div>
+      </div>
+
     </div>
-  </div>
 
-  <!-- Holdings -->
-  <div>
-    <div class="section-title">Top Holdings Breakdown</div>
-    <table class="holdings-table">
-      <thead>
-        <tr>
-          <th>Block / Holding</th>
-          <th>Type</th>
-          <th>Allocation</th>
-          <th>YTD</th>
-          <th>Div. Yield</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr style="background:var(--purple-lt);">
-          <td><span class="hold-color" style="background:#534AB7;"></span><span class="hold-name">Core Equity Block</span></td>
-          <td><span class="hold-type">Block</span></td>
-          <td><strong>40%</strong></td>
-          <td style="color:var(--teal);">+11.2%</td>
-          <td>1.8%</td>
-        </tr>
-        <tr>
-          <td style="padding-left:24px;color:var(--text2);">Microsoft Corp</td>
-          <td><span class="hold-type">US Equity</span></td>
-          <td>8.2%</td>
-          <td style="color:var(--teal);">+14.1%</td>
-          <td>0.8%</td>
-        </tr>
-        <tr>
-          <td style="padding-left:24px;color:var(--text2);">Apple Inc</td>
-          <td><span class="hold-type">US Equity</span></td>
-          <td>7.6%</td>
-          <td style="color:var(--coral);">−2.4%</td>
-          <td>0.5%</td>
-        </tr>
-        <tr>
-          <td style="padding-left:24px;color:var(--text2);">Johnson &amp; Johnson</td>
-          <td><span class="hold-type">US Equity</span></td>
-          <td>6.4%</td>
-          <td style="color:var(--teal);">+4.2%</td>
-          <td>3.1%</td>
-        </tr>
-        <tr style="background:var(--teal-lt);">
-          <td><span class="hold-color" style="background:#0F6E56;"></span><span class="hold-name">Short Duration Bonds Block</span></td>
-          <td><span class="hold-type">Block</span></td>
-          <td><strong>25%</strong></td>
-          <td style="color:var(--teal);">+2.1%</td>
-          <td>4.8%</td>
-        </tr>
-        <tr style="background:#FAECE7;">
-          <td><span class="hold-color" style="background:#C94E28;"></span><span class="hold-name">Healthcare Block</span></td>
-          <td><span class="hold-type">Block</span></td>
-          <td><strong>20%</strong></td>
-          <td style="color:var(--teal);">+3.6%</td>
-          <td>1.9%</td>
-        </tr>
-        <tr style="background:#E1F5EE;">
-          <td><span class="hold-color" style="background:#1D9E75;"></span><span class="hold-name">International Equity Block</span></td>
-          <td><span class="hold-type">Block</span></td>
-          <td><strong>10%</strong></td>
-          <td style="color:var(--teal);">+5.4%</td>
-          <td>2.4%</td>
-        </tr>
-        <tr style="background:#F1EFE8;">
-          <td><span class="hold-color" style="background:#B4B2A9;"></span><span class="hold-name">Cash</span></td>
-          <td><span class="hold-type">Cash</span></td>
-          <td><strong>5%</strong></td>
-          <td style="color:var(--text3);">—</td>
-          <td>5.1%</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Disclaimer -->
-  <div class="disclaimer">
-    <strong>Important disclosures:</strong> This proposal has been prepared by James Davidson, CFP using the Blocks AI-assisted portfolio construction platform. Past performance does not guarantee future results. All allocations are subject to market risk and may fluctuate in value. This document is intended for informational purposes only and does not constitute investment advice. Please review your Investment Policy Statement and consult with your advisor before making investment decisions.
-  </div>
-
-  <!-- Signature -->
-  <div class="signature-section">
-    <div class="sig-block">
-      <div class="sig-label">Advisor approval</div>
-      <div class="sig-line"></div>
-      <div class="sig-name">James Davidson, CFP</div>
-      <div class="sig-title">Senior Portfolio Advisor · Blocks Platform</div>
+    <!-- Footer -->
+    <div class="proposal-footer">
+      <div class="footer-logo">
+        <div class="footer-small-mark"><span></span><span></span><span></span><span></span></div>
+        Blocks
+      </div>
+      <div class="footer-note">AI-assisted portfolio construction · blocks-demo.netlify.app · © 2026 Blocks</div>
+      <div class="footer-note">Confidential · Page 1 of 1</div>
     </div>
-    <div class="sig-block">
-      <div class="sig-label">Client acknowledgment</div>
-      <div class="sig-line"></div>
-      <div class="sig-name">Smith Family Representative</div>
-      <div class="sig-title">Date: ___________________________</div>
-    </div>
-  </div>
-
-</div>
-
-<!-- Footer -->
-<div class="proposal-footer">
-  <div class="footer-logo">
-    <div class="footer-small-mark"><span></span><span></span><span></span><span></span></div>
-    Blocks
-  </div>
-  <div class="footer-note">AI-assisted portfolio construction · blocks-demo.netlify.app · © 2026 Blocks</div>
-  <div class="footer-note">Confidential · Page 1 of 1</div>
-</div>
-```
 
   </div>
 </div>
@@ -675,7 +672,6 @@ function shareProposal() {
 drawDonut();
 renderLegend();
 </script>
-
 </div><!-- close content col -->
 </div><!-- close shell grid -->
 </body>
