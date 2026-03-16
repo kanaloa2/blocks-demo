@@ -1,0 +1,1316 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blocks — AI-Assisted Portfolio Construction</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #f7f6f2;
+  --surface: #ffffff;
+  --surface2: #f0efe9;
+  --surface3: #e8e6de;
+  --text: #16150f;
+  --text2: #5a5950;
+  --text3: #9a988f;
+  --purple: #4a41aa;
+  --purple-lt: #EEEDFE;
+  --purple-md: #AFA9EC;
+  --purple-dk: #332d80;
+  --teal: #0d6650;
+  --teal-lt: #ddf2ea;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.13);
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  font-size: 16px;
+  line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── NAV ── */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2.5rem;
+  height: 60px;
+  background: rgba(247,246,242,0.92);
+  backdrop-filter: blur(12px);
+  border-bottom: 0.5px solid var(--border2);
+  transition: background 0.2s;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  text-decoration: none;
+  letter-spacing: -0.4px;
+}
+
+.nav-logo-mark {
+  width: 30px; height: 30px;
+  background: var(--purple);
+  border-radius: 8px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 3px;
+  padding: 6px;
+}
+.nav-logo-mark span { background: white; border-radius: 1.5px; }
+.nav-logo-mark span:nth-child(2) { opacity: 0.6; }
+.nav-logo-mark span:nth-child(3) { opacity: 0.6; }
+.nav-logo-mark span:nth-child(4) { opacity: 0.3; }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+.nav-links a {
+  font-size: 14px;
+  color: var(--text2);
+  text-decoration: none;
+  transition: color 0.15s;
+}
+.nav-links a:hover { color: var(--text); }
+
+.nav-cta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.btn-ghost {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13.5px;
+  color: var(--text2);
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  border-radius: 8px;
+  padding: 7px 16px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.btn-ghost:hover { background: var(--surface2); color: var(--text); }
+
+.btn-primary {
+  font-family: 'Syne', sans-serif;
+  font-size: 13.5px;
+  font-weight: 600;
+  color: white;
+  background: var(--purple);
+  border: none;
+  border-radius: 8px;
+  padding: 8px 18px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+  letter-spacing: 0.1px;
+}
+.btn-primary:hover { background: var(--purple-dk); }
+
+/* ── HERO ── */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 8rem 2rem 5rem;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Subtle geometric background */
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(83,74,183,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(83,74,183,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+
+.hero-glow {
+  position: absolute;
+  top: -200px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 600px;
+  background: radial-gradient(ellipse, rgba(74,65,170,0.07) 0%, transparent 70%);
+}
+
+.hero-float-block {
+  position: absolute;
+  border-radius: 10px;
+  opacity: 0.18;
+}
+
+.hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  background: var(--purple-lt);
+  color: var(--purple);
+  border: 0.5px solid var(--purple-md);
+  border-radius: 20px;
+  padding: 5px 14px;
+  margin-bottom: 1.75rem;
+  letter-spacing: 0.2px;
+  animation: fadeUp 0.5s ease both;
+}
+
+.hero-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(3rem, 6vw, 5.5rem);
+  font-weight: 800;
+  color: var(--text);
+  letter-spacing: -2px;
+  line-height: 1.0;
+  max-width: 900px;
+  margin-bottom: 1.5rem;
+  animation: fadeUp 0.5s 0.08s ease both;
+}
+
+.hero-title .accent { color: var(--purple); }
+
+.hero-sub {
+  font-size: clamp(1rem, 1.8vw, 1.2rem);
+  color: var(--text2);
+  max-width: 560px;
+  line-height: 1.7;
+  margin-bottom: 2.5rem;
+  font-weight: 300;
+  animation: fadeUp 0.5s 0.16s ease both;
+}
+
+.hero-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 4rem;
+  animation: fadeUp 0.5s 0.24s ease both;
+}
+
+.btn-hero {
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 600;
+  color: white;
+  background: var(--purple);
+  border: none;
+  border-radius: 10px;
+  padding: 13px 28px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+  letter-spacing: 0.1px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.btn-hero:hover { background: var(--purple-dk); transform: translateY(-1px); }
+
+.btn-hero-ghost {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  color: var(--text2);
+  background: transparent;
+  border: 0.5px solid var(--border2);
+  border-radius: 10px;
+  padding: 13px 24px;
+  cursor: pointer;
+  text-decoration: none;
+  transition: all 0.15s;
+}
+.btn-hero-ghost:hover { background: var(--surface); color: var(--text); }
+
+/* Dashboard preview */
+.hero-preview {
+  width: 100%;
+  max-width: 900px;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 0.5px solid var(--border2);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.10), 0 0 0 0.5px rgba(0,0,0,0.06);
+  overflow: hidden;
+  animation: fadeUp 0.6s 0.32s ease both;
+  position: relative;
+}
+
+.preview-bar {
+  background: var(--surface2);
+  border-bottom: 0.5px solid var(--border);
+  padding: 10px 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.preview-dot {
+  width: 10px; height: 10px;
+  border-radius: 50%;
+}
+
+.preview-url {
+  flex: 1;
+  background: var(--surface);
+  border: 0.5px solid var(--border2);
+  border-radius: 6px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-family: 'DM Mono', monospace;
+  color: var(--text3);
+  text-align: center;
+  max-width: 300px;
+  margin: 0 auto;
+}
+
+.preview-inner {
+  padding: 1.25rem;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.preview-card {
+  background: var(--surface2);
+  border-radius: 10px;
+  padding: 12px 14px;
+  border: 0.5px solid var(--border);
+}
+
+.preview-card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--text2);
+  margin-bottom: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.preview-metric {
+  font-family: 'DM Mono', monospace;
+  font-size: 22px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.preview-metric.up { color: var(--teal); }
+.preview-metric.down { color: #C94E28; }
+
+.preview-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+
+.preview-bars { display: flex; flex-direction: column; gap: 7px; margin-top: 4px; }
+.preview-bar-row { display: flex; align-items: center; gap: 8px; }
+.preview-bar-label { font-size: 10px; color: var(--text2); width: 70px; flex-shrink: 0; }
+.preview-bar-track { flex: 1; height: 4px; background: var(--surface3); border-radius: 2px; overflow: hidden; }
+.preview-bar-fill { height: 100%; border-radius: 2px; }
+.preview-bar-val { font-family: 'DM Mono', monospace; font-size: 10px; color: var(--text); width: 28px; text-align: right; }
+
+.preview-ai {
+  grid-column: 1 / -1;
+  background: var(--purple-lt);
+  border: 0.5px solid var(--purple-md);
+  border-radius: 10px;
+  padding: 10px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.preview-ai-spark { font-size: 13px; color: var(--purple); flex-shrink: 0; margin-top: 1px; }
+.preview-ai-text { font-size: 11.5px; color: var(--text); line-height: 1.5; }
+.preview-ai-text strong { color: var(--purple); }
+
+/* ── SECTION BASE ── */
+section {
+  padding: 6rem 2rem;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+.section-label {
+  font-size: 11px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--purple);
+  margin-bottom: 1rem;
+}
+
+.section-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(2rem, 3.5vw, 3rem);
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin-bottom: 1.25rem;
+  max-width: 680px;
+}
+
+.section-sub {
+  font-size: 1.05rem;
+  color: var(--text2);
+  max-width: 560px;
+  line-height: 1.75;
+  font-weight: 300;
+}
+
+/* ── PROBLEM / SOLUTION ── */
+.problem-section {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 5rem;
+  align-items: center;
+}
+
+.problem-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.problem-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  background: var(--surface);
+  border-radius: 12px;
+  border: 0.5px solid var(--border2);
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.problem-icon {
+  width: 32px; height: 32px;
+  border-radius: 8px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.problem-icon.red { background: #FCEBEB; }
+.problem-icon.amber { background: #FEF3DC; }
+.problem-icon.orange { background: #FAECE7; }
+
+.problem-item h4 {
+  font-size: 13.5px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 3px;
+}
+
+.problem-item p {
+  font-size: 12.5px;
+  color: var(--text2);
+  line-height: 1.5;
+}
+
+.solution-card {
+  background: var(--purple);
+  border-radius: 20px;
+  padding: 2.5rem;
+  color: white;
+  position: relative;
+  overflow: hidden;
+}
+
+.solution-card::before {
+  content: '';
+  position: absolute;
+  top: -80px; right: -80px;
+  width: 260px; height: 260px;
+  background: rgba(255,255,255,0.05);
+  border-radius: 50%;
+}
+
+.solution-card::after {
+  content: '';
+  position: absolute;
+  bottom: -60px; left: -40px;
+  width: 200px; height: 200px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+
+.solution-card-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.6rem;
+  font-weight: 700;
+  letter-spacing: -0.5px;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  position: relative;
+}
+
+.solution-card-body {
+  font-size: 14px;
+  opacity: 0.85;
+  line-height: 1.75;
+  margin-bottom: 1.75rem;
+  position: relative;
+}
+
+.solution-points {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+}
+
+.solution-point {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 13.5px;
+}
+
+.solution-check {
+  width: 18px; height: 18px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px;
+  flex-shrink: 0;
+}
+
+/* ── HOW IT WORKS ── */
+.how-section { text-align: center; }
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  margin-top: 3.5rem;
+  position: relative;
+}
+
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 38px;
+  left: calc(16.66% + 24px);
+  right: calc(16.66% + 24px);
+  height: 1px;
+  background: linear-gradient(90deg, var(--purple-md), var(--purple-md));
+  opacity: 0.4;
+}
+
+.step {
+  background: var(--surface);
+  border-radius: 16px;
+  border: 0.5px solid var(--border2);
+  padding: 2rem 1.5rem;
+  text-align: left;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.step:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.09);
+}
+
+.step-num {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  background: var(--purple-lt);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'DM Mono', monospace;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--purple);
+  margin-bottom: 1.25rem;
+}
+
+.step-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  margin-bottom: 0.6rem;
+}
+
+.step-body {
+  font-size: 13.5px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+.step-tag {
+  display: inline-block;
+  margin-top: 1rem;
+  font-size: 11px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  background: var(--purple-lt);
+  color: var(--purple);
+  font-weight: 500;
+}
+
+/* ── FEATURES ── */
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.25rem;
+  margin-top: 3.5rem;
+}
+
+.feature-card {
+  background: var(--surface);
+  border-radius: 14px;
+  border: 0.5px solid var(--border2);
+  padding: 1.75rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.feature-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.08);
+}
+
+.feature-icon {
+  width: 40px; height: 40px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  margin-bottom: 1.125rem;
+  font-size: 18px;
+}
+
+.feature-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  letter-spacing: -0.2px;
+  margin-bottom: 0.5rem;
+}
+
+.feature-body {
+  font-size: 13px;
+  color: var(--text2);
+  line-height: 1.65;
+}
+
+/* ── WAITLIST ── */
+.waitlist-section {
+  max-width: 1100px;
+  margin: 0 auto;
+  padding: 0 2rem 6rem;
+}
+
+.waitlist-inner {
+  background: var(--purple);
+  border-radius: 24px;
+  padding: 4rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.waitlist-inner::before {
+  content: '';
+  position: absolute;
+  top: -120px; right: -120px;
+  width: 400px; height: 400px;
+  background: rgba(255,255,255,0.04);
+  border-radius: 50%;
+}
+
+.waitlist-inner::after {
+  content: '';
+  position: absolute;
+  bottom: -80px; left: -60px;
+  width: 300px; height: 300px;
+  background: rgba(255,255,255,0.03);
+  border-radius: 50%;
+}
+
+.waitlist-title {
+  font-family: 'Syne', sans-serif;
+  font-size: clamp(1.8rem, 3vw, 2.75rem);
+  font-weight: 800;
+  color: white;
+  letter-spacing: -1px;
+  line-height: 1.15;
+  margin-bottom: 1rem;
+  position: relative;
+}
+
+.waitlist-sub {
+  font-size: 1rem;
+  color: rgba(255,255,255,0.75);
+  max-width: 480px;
+  margin: 0 auto 2.5rem;
+  line-height: 1.7;
+  position: relative;
+}
+
+.waitlist-form {
+  display: flex;
+  gap: 10px;
+  max-width: 480px;
+  margin: 0 auto;
+  position: relative;
+}
+
+.waitlist-input {
+  flex: 1;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  padding: 13px 18px;
+  border-radius: 10px;
+  border: none;
+  background: rgba(255,255,255,0.15);
+  color: white;
+  outline: none;
+  backdrop-filter: blur(8px);
+  transition: background 0.15s;
+}
+
+.waitlist-input::placeholder { color: rgba(255,255,255,0.5); }
+.waitlist-input:focus { background: rgba(255,255,255,0.22); }
+
+.waitlist-btn {
+  font-family: 'Syne', sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 13px 24px;
+  border-radius: 10px;
+  border: none;
+  background: white;
+  color: var(--purple);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.15s;
+  letter-spacing: 0.1px;
+}
+.waitlist-btn:hover { background: var(--purple-lt); }
+
+.waitlist-note {
+  font-size: 12px;
+  color: rgba(255,255,255,0.5);
+  margin-top: 1rem;
+  position: relative;
+}
+
+/* ── FOOTER ── */
+footer {
+  border-top: 0.5px solid var(--border2);
+  padding: 2rem 2.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 100%;
+}
+
+.footer-logo {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: 'Syne', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+
+.footer-mark {
+  width: 22px; height: 22px;
+  background: var(--purple);
+  border-radius: 5px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 2px;
+  padding: 4px;
+}
+.footer-mark span { background: white; border-radius: 1px; }
+.footer-mark span:nth-child(2) { opacity: 0.6; }
+.footer-mark span:nth-child(3) { opacity: 0.6; }
+.footer-mark span:nth-child(4) { opacity: 0.3; }
+
+.footer-note { font-size: 12px; color: var(--text3); }
+
+/* ── DIVIDER ── */
+.full-divider {
+  height: 0.5px;
+  background: var(--border2);
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ── ANIMATIONS ── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.reveal {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.55s ease, transform 0.55s ease;
+}
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* stagger children */
+.reveal-group > * {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 0.45s ease, transform 0.45s ease;
+}
+.reveal-group.visible > *:nth-child(1) { opacity:1; transform:none; transition-delay: 0.05s; }
+.reveal-group.visible > *:nth-child(2) { opacity:1; transform:none; transition-delay: 0.12s; }
+.reveal-group.visible > *:nth-child(3) { opacity:1; transform:none; transition-delay: 0.19s; }
+.reveal-group.visible > *:nth-child(4) { opacity:1; transform:none; transition-delay: 0.26s; }
+.reveal-group.visible > *:nth-child(5) { opacity:1; transform:none; transition-delay: 0.33s; }
+.reveal-group.visible > *:nth-child(6) { opacity:1; transform:none; transition-delay: 0.40s; }
+
+/* ── RESPONSIVE ── */
+@media (max-width: 768px) {
+  /* Nav */
+  nav { padding: 0 1.25rem; height: 54px; }
+  .nav-links { display: none; }
+  .nav-cta .btn-ghost { display: none; }
+  .btn-primary { display: none; }
+
+  /* Hero — fix clipping */
+  .hero { padding: 6rem 1.25rem 3rem; min-height: auto; }
+  .hero-title {
+    font-size: clamp(1.75rem, 8.5vw, 2.8rem);
+    letter-spacing: -0.5px;
+    margin-bottom: 1.25rem;
+    word-break: normal;
+    overflow-wrap: normal;
+  }
+  .hero-actions { flex-direction: column; width: 100%; gap: 10px; }
+  .btn-hero, .btn-hero-ghost { width: 100%; justify-content: center; text-align: center; }
+  .hero-float-block { display: none; }
+  .hero-preview { border-radius: 12px; }
+  .preview-inner { grid-template-columns: 1fr; }
+  .preview-metric { font-size: 18px; }
+
+  /* Sections */
+  section { padding: 3.5rem 1.25rem; }
+  .full-divider { margin: 0 1.25rem; }
+
+  /* Problem / Solution */
+  .problem-section { grid-template-columns: 1fr; gap: 2.5rem; }
+  .solution-card { padding: 1.75rem; }
+  .solution-card-title { font-size: 1.3rem; }
+
+  /* Steps */
+  .steps { grid-template-columns: 1fr; gap: 1rem; }
+  .steps::before { display: none; }
+
+  /* Features */
+  .features-grid { grid-template-columns: 1fr; gap: 1rem; }
+
+  /* Waitlist */
+  .waitlist-inner { padding: 2.5rem 1.5rem; border-radius: 16px; }
+  .waitlist-form { flex-direction: column; }
+  .waitlist-btn { width: 100%; }
+
+  /* Footer */
+  footer { flex-direction: column; gap: 12px; text-align: center; padding: 1.5rem; }
+}
+
+@media (max-width: 480px) {
+  .hero-title { letter-spacing: -0.5px; font-size: clamp(1.6rem, 8vw, 2.4rem); }
+  .waitlist-inner { padding: 2rem 1.25rem; }
+}
+
+/* ── MOBILE HAMBURGER MENU ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4.5px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: var(--r-sm);
+  border: 0.5px solid var(--border2);
+  background: transparent;
+  margin-left: auto;
+  transition: background 0.12s;
+}
+.hamburger:hover { background: var(--surface2); }
+.hamburger span {
+  display: block;
+  width: 18px;
+  height: 1.5px;
+  background: var(--text);
+  border-radius: 2px;
+  transition: all 0.2s ease;
+}
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 54px;
+  left: 0; right: 0;
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border2);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 99;
+  flex-direction: column;
+  padding: 0.75rem 0;
+  transform: translateY(-8px);
+  opacity: 0;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+}
+.mobile-menu.open {
+  display: flex;
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: all;
+}
+.mobile-menu a {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  color: var(--text2);
+  text-decoration: none;
+  padding: 11px 1.5rem;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: background 0.1s;
+}
+.mobile-menu a:last-child { border-bottom: none; }
+.mobile-menu a:hover { background: var(--surface2); color: var(--text); }
+.mobile-menu a.active { color: var(--purple); font-weight: 500; }
+.mobile-menu a .menu-arrow { font-size: 12px; color: var(--text3); }
+.mobile-menu-cta {
+  padding: 0.875rem 1.5rem;
+  display: flex;
+  gap: 8px;
+  border-top: 0.5px solid var(--border2);
+  margin-top: 4px;
+}
+
+@media (max-width: 768px) {
+  .hamburger { display: flex; }
+}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a href="index.html" class="nav-logo">
+    <div class="nav-logo-mark"><span></span><span></span><span></span><span></span></div>
+    Blocks
+  </a>
+  <div class="nav-links">
+    <a href="#how-it-works">How it works</a>
+    <a href="#features">Features</a>
+    <a href="#waitlist">Early access</a>
+  </div>
+  <div class="nav-cta">
+    <a href="dashboard.html" class="btn-ghost">View demo</a>
+    <a href="#waitlist" class="btn-primary">Get early access</a>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleMenu()" aria-label="Menu">
+    <span></span><span></span><span></span>
+  </button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="index.html" class="active">Home <span class="menu-arrow">›</span></a>
+  <a href="#how-it-works" onclick="closeMenu()">How it works <span class="menu-arrow">›</span></a>
+  <a href="#features" onclick="closeMenu()">Features <span class="menu-arrow">›</span></a>
+  <a href="dashboard.html">View demo <span class="menu-arrow">›</span></a>
+  <div class="mobile-menu-cta">
+    <a href="#waitlist" onclick="closeMenu()" style="flex:1;background:var(--purple);color:white;border-radius:8px;padding:11px 16px;text-align:center;font-family:'Syne',sans-serif;font-weight:600;font-size:14px;border-bottom:none;">Get early access</a>
+  </div>
+</div>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+    <div class="hero-glow"></div>
+    <!-- Floating block decorations -->
+    <div class="hero-float-block" style="width:48px;height:48px;background:#534AB7;top:18%;left:8%;transform:rotate(12deg);"></div>
+    <div class="hero-float-block" style="width:28px;height:28px;background:#1D9E75;top:28%;left:11%;transform:rotate(-6deg);"></div>
+    <div class="hero-float-block" style="width:36px;height:36px;background:#534AB7;top:18%;right:9%;transform:rotate(-14deg);"></div>
+    <div class="hero-float-block" style="width:20px;height:20px;background:#D85A30;top:32%;right:13%;transform:rotate(8deg);"></div>
+    <div class="hero-float-block" style="width:56px;height:56px;background:#534AB7;bottom:22%;left:5%;transform:rotate(6deg);opacity:0.1;"></div>
+    <div class="hero-float-block" style="width:32px;height:32px;background:#BA7517;bottom:28%;right:7%;transform:rotate(-10deg);"></div>
+  </div>
+
+  <div class="hero-badge">✦ &nbsp;Now in private beta</div>
+
+  <h1 class="hero-title">
+    Portfolio construction,<br><span class="accent">reimagined.</span>
+  </h1>
+
+  <p class="hero-sub">
+    Whether you build portfolios yourself or outsource to a UMA — Blocks gives you a smarter third option. AI-powered construction that keeps you in control, at a fraction of the cost.
+  </p>
+
+  <div class="hero-actions">
+    <a href="dashboard.html" class="btn-hero">
+      See the demo
+      <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </a>
+    <a href="#waitlist" class="btn-hero-ghost">Request early access</a>
+  </div>
+
+  <!-- Mini dashboard preview -->
+  <div class="hero-preview">
+    <div class="preview-bar">
+      <div class="preview-dot" style="background:#FF5F56;"></div>
+      <div class="preview-dot" style="background:#FFBD2E;"></div>
+      <div class="preview-dot" style="background:#27C93F;"></div>
+      <div class="preview-url">blocks-demo.netlify.app</div>
+    </div>
+    <div class="preview-inner">
+      <div class="preview-card">
+        <div class="preview-card-title">Portfolio value</div>
+        <div class="preview-metric">$482,310</div>
+        <div class="preview-sub">across all blocks</div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-card-title">YTD return</div>
+        <div class="preview-metric up">+11.4%</div>
+        <div class="preview-sub">vs 8.9% benchmark</div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-card-title">Allocation</div>
+        <div class="preview-bars">
+          <div class="preview-bar-row">
+            <div class="preview-bar-label">US Equities</div>
+            <div class="preview-bar-track"><div class="preview-bar-fill" style="width:80%;background:#534AB7;"></div></div>
+            <div class="preview-bar-val">40%</div>
+          </div>
+          <div class="preview-bar-row">
+            <div class="preview-bar-label">Fixed Income</div>
+            <div class="preview-bar-track"><div class="preview-bar-fill" style="width:50%;background:#1D9E75;"></div></div>
+            <div class="preview-bar-val">25%</div>
+          </div>
+          <div class="preview-bar-row">
+            <div class="preview-bar-label">International</div>
+            <div class="preview-bar-track"><div class="preview-bar-fill" style="width:40%;background:#D85A30;"></div></div>
+            <div class="preview-bar-val">20%</div>
+          </div>
+        </div>
+      </div>
+      <div class="preview-card">
+        <div class="preview-card-title">Client sentiment</div>
+        <div class="preview-metric down">28 — Fear</div>
+        <div class="preview-sub">Low sentiment ▼ 7pts</div>
+      </div>
+      <div class="preview-ai">
+        <div class="preview-ai-spark">✦</div>
+        <div class="preview-ai-text"><strong>AI insight:</strong> US Equities has drifted +3.1% above target. Consider trimming large-cap tech. Rebalance suggested in 3 days.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROBLEM / SOLUTION -->
+<div class="full-divider"></div>
+<section>
+  <div class="problem-section">
+    <div class="reveal">
+      <div class="section-label">The problem</div>
+      <h2 class="section-title">Two bad options. Advisors deserve better.</h2>
+      <p class="section-sub">Advisors today face an uncomfortable tradeoff: spend hours doing it yourself, or outsource and give up control — and a big chunk of your margin.</p>
+      <div class="problem-list reveal-group">
+        <div class="problem-item">
+          <div class="problem-icon amber">💸</div>
+          <div>
+            <h4>Outsourcing is expensive</h4>
+            <p>A typical UMA or TAMP charges 20–40bps on AUM. On a $200M book, that's $400,000–$800,000 a year — for a model you didn't build and can't easily customize.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-icon red">⏱</div>
+          <div>
+            <h4>Doing it yourself takes too long</h4>
+            <p>Building portfolios in-house means hours of manual screening, disconnected spreadsheets, and the same grunt work repeated for every new client or rebalance.</p>
+          </div>
+        </div>
+        <div class="problem-item">
+          <div class="problem-icon orange">🔔</div>
+          <div>
+            <h4>Either way, drift goes unnoticed</h4>
+            <p>Client portfolios silently drift from targets. By the time it's caught — whether you're DIY or outsourced — rebalancing costs are higher and clients are already exposed.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="reveal">
+      <div class="solution-card">
+        <div class="solution-card-title">Blocks is the third option.</div>
+        <div class="solution-card-body">
+          If you outsource today, Blocks can replace your TAMP or UMA — and put that 20–40bps back in your pocket while giving you full control over what goes in each portfolio. If you already build in-house, Blocks replaces the spreadsheets and manual screening with AI that does the grunt work in seconds — so you spend your time on judgment, not research.
+        </div>
+        <div class="solution-points">
+          <div class="solution-point">
+            <div class="solution-check">✓</div>
+            Replaces TAMP/UMA at a fraction of the cost
+          </div>
+          <div class="solution-point">
+            <div class="solution-check">✓</div>
+            AI screens thousands of securities in seconds
+          </div>
+          <div class="solution-point">
+            <div class="solution-check">✓</div>
+            Your models, your blocks, your intellectual property
+          </div>
+          <div class="solution-point">
+            <div class="solution-check">✓</div>
+            Reusable blocks scale across your entire client book
+          </div>
+          <div class="solution-point">
+            <div class="solution-check">✓</div>
+            AI surfaces insights — you approve every action
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- HOW IT WORKS -->
+<section id="how-it-works">
+  <div class="how-section reveal">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title" style="margin:0 auto 0.5rem;text-align:center;">From idea to portfolio in three steps.</h2>
+    <p class="section-sub" style="margin:0 auto;text-align:center;">Blocks turns a natural language description into a fully constructed, monitored portfolio — with the advisor in control at every step.</p>
+  </div>
+
+  <div class="steps reveal-group">
+    <div class="step">
+      <div class="step-num">01</div>
+      <div class="step-title">Describe your block</div>
+      <div class="step-body">Type what you're looking for in plain English — "defensive dividend payers with low volatility" or "high-growth tech, profitable only." No query language, no filters to hunt through.</div>
+      <div class="step-tag">✦ Natural language screening</div>
+    </div>
+    <div class="step">
+      <div class="step-num">02</div>
+      <div class="step-title">Review AI candidates</div>
+      <div class="step-body">Blocks returns a ranked list of securities scored on your criteria — with AI-generated rationale for each. Accept, reject, or adjust. You're always the final decision-maker.</div>
+      <div class="step-tag">✦ AI-scored + explained</div>
+    </div>
+    <div class="step">
+      <div class="step-num">03</div>
+      <div class="step-title">Assemble portfolios</div>
+      <div class="step-body">Combine blocks into client portfolios. The AI watches for drift, flags correlation issues, and suggests rebalancing trades — while you stay focused on client relationships.</div>
+      <div class="step-tag">✦ Continuous monitoring</div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- FEATURES -->
+<section id="features">
+  <div class="reveal">
+    <div class="section-label">Features</div>
+    <h2 class="section-title">Everything an advisor needs. Nothing they don't.</h2>
+    <p class="section-sub">Built specifically for the portfolio construction workflow — not adapted from generic financial software.</p>
+  </div>
+
+  <div class="features-grid reveal-group">
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#EEEDFE;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="3" width="6" height="6" rx="1.5" fill="#534AB7"/>
+          <rect x="11" y="3" width="6" height="6" rx="1.5" fill="#534AB7" opacity="0.5"/>
+          <rect x="3" y="11" width="6" height="6" rx="1.5" fill="#534AB7" opacity="0.5"/>
+          <rect x="11" y="11" width="6" height="6" rx="1.5" fill="#534AB7" opacity="0.25"/>
+        </svg>
+      </div>
+      <div class="feature-title">Block Library</div>
+      <div class="feature-body">Build a reusable library of curated investment blocks. Use them across any client portfolio, update once and propagate everywhere.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#E1F5EE;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="10" cy="10" r="7" stroke="#0F6E56" stroke-width="1.5" fill="none"/>
+          <path d="M7 10l2 2 4-4" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="feature-title">AI Security Screening</div>
+      <div class="feature-body">Describe what you want in plain English. The AI screens thousands of securities in seconds and returns a ranked, annotated shortlist.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#FEF3DC;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M10 3v14M3 10h14" stroke="#A06010" stroke-width="1.5" stroke-linecap="round"/>
+          <circle cx="10" cy="10" r="3" fill="#A06010" opacity="0.3"/>
+        </svg>
+      </div>
+      <div class="feature-title">Drift Monitoring</div>
+      <div class="feature-body">Automatic alerts when portfolios drift from their target allocation. Catch it early, before rebalancing costs compound.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#FAECE7;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <path d="M4 14l4-4 3 3 5-6" stroke="#C94E28" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="feature-title">Client Sentiment Tracking</div>
+      <div class="feature-body">Monitor client sentiment in real time. Know when clients are fearful before they call — and have a plan ready.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#EEEDFE;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <rect x="3" y="6" width="14" height="10" rx="2" stroke="#534AB7" stroke-width="1.5" fill="none"/>
+          <path d="M7 6V5a3 3 0 016 0v1" stroke="#534AB7" stroke-width="1.5" stroke-linecap="round"/>
+        </svg>
+      </div>
+      <div class="feature-title">Advisor-Controlled AI</div>
+      <div class="feature-body">The AI suggests, you approve. Every trade, every rebalance, every change requires explicit advisor sign-off before execution.</div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon" style="background:#E1F5EE;">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+          <circle cx="7" cy="8" r="3" stroke="#0F6E56" stroke-width="1.5" fill="none"/>
+          <circle cx="14" cy="6" r="2.5" stroke="#0F6E56" stroke-width="1.5" fill="none"/>
+          <path d="M2 16c0-2.5 2-4 5-4s5 1.5 5 4" stroke="#0F6E56" stroke-width="1.5" stroke-linecap="round" fill="none"/>
+        </svg>
+      </div>
+      <div class="feature-title">Multi-Client Management</div>
+      <div class="feature-body">Manage an entire book of business from one dashboard. See all clients, all composites, and all signals in one place.</div>
+    </div>
+  </div>
+</section>
+
+<div class="full-divider"></div>
+
+<!-- WAITLIST -->
+<div class="waitlist-section" id="waitlist">
+  <div class="waitlist-inner reveal">
+    <div class="waitlist-title">Be first to build<br>with Blocks.</div>
+    <div class="waitlist-sub">We're onboarding a select group of advisors for our private beta. Join the waitlist to get early access and shape the product.</div>
+    <form class="waitlist-form" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="waitlistForm">
+      <input type="hidden" name="form-name" value="waitlist">
+      <input type="hidden" name="bot-field" style="display:none;">
+      <input class="waitlist-input" type="email" name="email" placeholder="your@email.com" id="waitlistEmail" required>
+      <button class="waitlist-btn" type="submit">Join waitlist</button>
+    </form>
+    <div class="waitlist-note" id="waitlistNote">No spam. No pressure. Just early access.</div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-logo">
+    <div class="footer-mark"><span></span><span></span><span></span><span></span></div>
+    Blocks
+  </div>
+  <div class="footer-note">© 2026 Blocks. AI-assisted portfolio construction. All rights reserved.</div>
+  <a href="dashboard.html" class="btn-ghost" style="font-size:12px;">View demo →</a>
+</footer>
+
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.12 });
+
+document.querySelectorAll('.reveal, .reveal-group').forEach(el => observer.observe(el));
+
+// Mobile menu
+function toggleMenu() {
+  const menu = document.getElementById('mobileMenu');
+  const btn = document.getElementById('hamburger');
+  menu.classList.toggle('open');
+  btn.classList.toggle('open');
+  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+}
+function closeMenu() {
+  document.getElementById('mobileMenu').classList.remove('open');
+  document.getElementById('hamburger').classList.remove('open');
+  document.body.style.overflow = '';
+}
+
+document.querySelectorAll('.reveal, .reveal-group').forEach(el => observer.observe(el));
+
+// Waitlist form - Netlify Forms
+const form = document.getElementById('waitlistForm');
+form.addEventListener('submit', async function(e) {
+  e.preventDefault();
+  const email = document.getElementById('waitlistEmail').value;
+  const note = document.getElementById('waitlistNote');
+  const btn = form.querySelector('.waitlist-btn');
+
+  btn.textContent = 'Sending…';
+  btn.disabled = true;
+
+  try {
+    const formData = new FormData(form);
+    await fetch('/', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams(formData).toString()
+    });
+    btn.textContent = '✓ You\'re on the list!';
+    btn.style.background = '#E1F5EE';
+    btn.style.color = '#0F6E56';
+    note.textContent = 'Thanks! We\'ll be in touch when your spot is ready.';
+    note.style.color = 'rgba(255,255,255,0.9)';
+    document.getElementById('waitlistEmail').disabled = true;
+  } catch(err) {
+    btn.textContent = 'Try again';
+    btn.disabled = false;
+    note.textContent = 'Something went wrong — please try again.';
+  }
+});
+</script>
+</body>
+</html>

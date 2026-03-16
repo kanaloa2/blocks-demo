@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blocks — Portfolio Assembly</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f6f5f2; --surface: #ffffff; --surface2: #f0efe9; --surface3: #e8e7e0;
+  --text: #181816; --text2: #5c5b57; --text3: #9a9994;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.13);
+  --purple: #534AB7; --purple-lt: #EEEDFE; --purple-md: #AFA9EC;
+  --teal: #0F6E56; --teal-lt: #E1F5EE;
+  --coral: #C94E28; --coral-lt: #FAECE7;
+  --amber: #A06010; --amber-lt: #FEF3DC;
+  --red: #B83232; --red-lt: #FCEBEB;
+  --green: #2E7D32; --green-lt: #EAF3DE;
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.07);
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.5; min-width: 1100px; }
+
+/* Nav */
+.topnav { background: var(--surface); border-bottom: 0.5px solid var(--border2); display: flex; align-items: center; padding: 0 1.25rem; height: 52px; gap: 2rem; position: sticky; top: 0; z-index: 20; }
+.logo { display: flex; align-items: center; gap: 9px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; flex-shrink: 0; text-decoration: none; }
+.logo-mark { width: 28px; height: 28px; background: var(--purple); border-radius: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 5px; }
+.logo-mark span { background: white; border-radius: 1.5px; }
+.logo-mark span:nth-child(2) { opacity: 0.65; } .logo-mark span:nth-child(3) { opacity: 0.65; } .logo-mark span:nth-child(4) { opacity: 0.35; }
+.subnav { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.nav-links { display: flex; gap: 0; flex: 1; }
+.nav-links a { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
+.nav-links a.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 500; }
+.nav-links a:hover:not(.active) { color: var(--text); }
+.nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.icon-btn { width: 32px; height: 32px; border-radius: var(--r-sm); border: 0.5px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; cursor: pointer; }
+
+/* Shell */
+.shell { display: grid; grid-template-columns: 68px 1fr; min-height: calc(100vh - 52px); }
+.sidenav { background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
+.sidenav-item { width: 44px; height: 44px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; }
+.sidenav-item:hover { background: var(--surface2); color: var(--text2); }
+.sidenav-item.active { background: var(--purple-lt); color: var(--purple); }
+
+/* Three-panel layout */
+.assembly-layout {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  height: calc(100vh - 52px);
+  overflow: hidden;
+}
+
+/* Left: Block Library */
+.block-library {
+  background: var(--surface);
+  border-right: 0.5px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.panel-header {
+  padding: 1.125rem 1.25rem 0.875rem;
+  border-bottom: 0.5px solid var(--border);
+  flex-shrink: 0;
+}
+.panel-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+.panel-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
+.block-list { flex: 1; overflow-y: auto; padding: 0.75rem; display: flex; flex-direction: column; gap: 6px; }
+
+.library-block {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--r-md);
+  border: 0.5px solid var(--border2);
+  background: var(--surface);
+  cursor: pointer;
+  transition: all 0.15s;
+  user-select: none;
+}
+.library-block:hover { background: var(--surface2); border-color: var(--border2); transform: translateX(2px); }
+.library-block.added { background: var(--purple-lt); border-color: var(--purple-md); }
+.library-block.added .block-add-btn { background: var(--purple); color: white; border-color: var(--purple); }
+
+.lib-icon { width: 32px; height: 32px; border-radius: 8px; display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 5px; flex-shrink: 0; }
+.lib-icon span { border-radius: 1px; }
+.lib-info { flex: 1; min-width: 0; }
+.lib-name { font-size: 12.5px; font-weight: 500; color: var(--text); }
+.lib-stats { font-size: 10.5px; color: var(--text3); margin-top: 2px; }
+
+.block-add-btn {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 0.5px solid var(--border2);
+  background: var(--surface);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px; font-weight: 300;
+  color: var(--text3);
+  flex-shrink: 0;
+  transition: all 0.12s;
+}
+
+/* Center: Canvas */
+.assembly-canvas {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+.canvas-header {
+  background: var(--surface);
+  border-bottom: 0.5px solid var(--border2);
+  padding: 0.875rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.client-selector {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.client-label { font-size: 11px; color: var(--text3); }
+.client-select {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 500;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r-sm);
+  padding: 5px 10px;
+  background: var(--surface);
+  color: var(--text);
+  outline: none;
+  cursor: pointer;
+}
+
+.canvas-body { flex: 1; overflow-y: auto; padding: 1.25rem; display: flex; flex-direction: column; gap: 1rem; }
+
+/* Drop zone */
+.drop-zone {
+  border: 1.5px dashed var(--purple-md);
+  border-radius: var(--r-lg);
+  padding: 2rem;
+  text-align: center;
+  color: var(--text3);
+  font-size: 13px;
+  background: var(--purple-lt);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 100px;
+}
+.drop-zone.visible { display: flex; }
+.drop-zone-icon { font-size: 24px; opacity: 0.5; }
+
+/* Portfolio blocks in canvas */
+.canvas-blocks { display: flex; flex-direction: column; gap: 8px; }
+.canvas-block {
+  background: var(--surface);
+  border-radius: var(--r-lg);
+  border: 0.5px solid var(--border2);
+  box-shadow: var(--shadow);
+  padding: 0.875rem 1.125rem;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  animation: slideIn 0.2s ease both;
+}
+@keyframes slideIn { from { opacity:0; transform: translateX(-10px); } to { opacity:1; transform: none; } }
+
+.canvas-block-icon { width: 36px; height: 36px; border-radius: 9px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 6px; flex-shrink: 0; }
+.canvas-block-icon span { border-radius: 1px; }
+.canvas-block-info { flex: 1; min-width: 0; }
+.canvas-block-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.canvas-block-sub { font-size: 11px; color: var(--text3); margin-top: 2px; }
+
+.alloc-control { display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
+.alloc-slider { width: 100px; accent-color: var(--purple); cursor: pointer; }
+.alloc-input {
+  font-family: 'DM Mono', monospace;
+  font-size: 14px;
+  font-weight: 500;
+  width: 52px;
+  text-align: center;
+  border: 0.5px solid var(--border2);
+  border-radius: var(--r-sm);
+  padding: 4px 6px;
+  background: var(--surface2);
+  color: var(--text);
+  outline: none;
+}
+.alloc-input:focus { border-color: var(--purple-md); background: var(--surface); }
+
+.remove-btn {
+  width: 24px; height: 24px; border-radius: 50%;
+  border: 0.5px solid var(--border2);
+  background: transparent;
+  color: var(--text3);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: 13px;
+  transition: all 0.12s; flex-shrink: 0;
+}
+.remove-btn:hover { background: var(--red-lt); color: var(--red); border-color: #F09595; }
+
+/* Allocation bar */
+.alloc-bar-wrap { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1rem 1.25rem; flex-shrink: 0; }
+.alloc-bar-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text3); font-weight: 500; margin-bottom: 8px; display: flex; justify-content: space-between; }
+.alloc-bar-total { font-family: 'DM Mono', monospace; }
+.alloc-bar-total.over { color: var(--coral); }
+.alloc-bar-total.full { color: var(--teal); }
+.alloc-bar-track { height: 10px; background: var(--surface3); border-radius: 5px; overflow: hidden; display: flex; gap: 1px; }
+.alloc-bar-seg { height: 100%; transition: width 0.25s ease; border-radius: 2px; }
+.alloc-legend { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+.alloc-leg-item { display: flex; align-items: center; gap: 5px; font-size: 11px; color: var(--text2); }
+.alloc-leg-dot { width: 8px; height: 8px; border-radius: 2px; flex-shrink: 0; }
+
+.canvas-footer {
+  background: var(--surface);
+  border-top: 0.5px solid var(--border2);
+  padding: 0.875rem 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-shrink: 0;
+}
+
+.warning-msg { font-size: 12px; color: var(--coral); display: flex; align-items: center; gap: 6px; }
+.warning-msg.hidden { visibility: hidden; }
+.save-portfolio-btn {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px; font-weight: 600;
+  padding: 9px 22px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: var(--purple);
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex; align-items: center; gap: 8px;
+}
+.save-portfolio-btn:hover { background: #3d3498; }
+.save-portfolio-btn:disabled { opacity: 0.4; cursor: default; }
+
+/* Right: Stats panel */
+.stats-panel {
+  background: var(--surface);
+  border-left: 0.5px solid var(--border2);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+}
+.stats-section { padding: 1.125rem 1.25rem; border-bottom: 0.5px solid var(--border); }
+.stats-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); margin-bottom: 10px; text-transform: uppercase; letter-spacing: 0.3px; }
+
+.stat-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; }
+.stat-label { font-size: 12px; color: var(--text2); }
+.stat-val { font-family: 'DM Mono', monospace; font-size: 12.5px; font-weight: 500; color: var(--text); }
+.stat-val.up { color: var(--teal); }
+.stat-val.warn { color: var(--amber); }
+.stat-val.down { color: var(--coral); }
+
+.risk-meter { margin: 8px 0; }
+.risk-track { height: 6px; background: var(--surface3); border-radius: 3px; overflow: hidden; }
+.risk-fill { height: 100%; border-radius: 3px; transition: width 0.3s ease, background 0.3s ease; }
+.risk-labels { display: flex; justify-content: space-between; font-size: 10px; color: var(--text3); margin-top: 4px; }
+
+.ai-insight-box { background: var(--purple-lt); border: 0.5px solid var(--purple-md); border-radius: var(--r-md); padding: 10px 12px; font-size: 12px; color: var(--text); line-height: 1.6; display: flex; gap: 7px; }
+
+.empty-stats { padding: 2rem 1.25rem; text-align: center; color: var(--text3); font-size: 12.5px; line-height: 1.6; }
+
+/* Success modal */
+.modal-overlay { position: fixed; inset: 0; background: rgba(24,24,22,0.45); backdrop-filter: blur(4px); z-index: 200; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.2s ease; }
+.modal-overlay.visible { opacity: 1; pointer-events: all; }
+.modal { background: var(--surface); border-radius: 18px; box-shadow: 0 24px 80px rgba(0,0,0,0.18); width: 420px; max-width: calc(100vw - 2rem); transform: translateY(16px) scale(0.98); transition: transform 0.25s ease, opacity 0.25s ease; opacity: 0; padding: 3rem 2rem; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1rem; }
+.modal-overlay.visible .modal { transform: translateY(0) scale(1); opacity: 1; }
+.modal-icon { width: 64px; height: 64px; border-radius: 50%; background: var(--teal-lt); display: flex; align-items: center; justify-content: center; font-size: 28px; margin: 0 auto; }
+.modal-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+.modal-sub { font-size: 13px; color: var(--text2); line-height: 1.65; max-width: 320px; }
+.modal-btn { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; padding: 10px 28px; border-radius: var(--r-sm); border: none; background: var(--purple); color: white; cursor: pointer; margin-top: 0.5rem; }
+@keyframes checkPop { 0%{transform:scale(0.5);opacity:0;} 70%{transform:scale(1.15);} 100%{transform:scale(1);opacity:1;} }
+.modal-icon.pop { animation: checkPop 0.4s ease both; }
+
+/* Responsive */
+@media (max-width: 900px) {
+  body { min-width: 0; }
+  .topnav { padding: 0 1rem; }
+  .nav-links { display: none; }
+  .subnav { display: none; }
+  .shell { grid-template-columns: 1fr; }
+  .sidenav { display: none; }
+  .assembly-layout { grid-template-columns: 1fr; height: auto; overflow: visible; }
+  .assembly-canvas { overflow: visible; }
+  .stats-panel { border-left: none; border-top: 0.5px solid var(--border2); }
+}
+
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── MOBILE HAMBURGER ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4.5px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  border: 0.5px solid rgba(0,0,0,0.13);
+  background: transparent;
+  margin-left: 8px;
+  transition: background 0.12s;
+}
+.hamburger:hover { background: #f0efe9; }
+.hamburger span { display: block; width: 18px; height: 1.5px; background: #181816; border-radius: 2px; transition: all 0.2s ease; }
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 52px; left: 0; right: 0;
+  background: #ffffff;
+  border-bottom: 0.5px solid rgba(0,0,0,0.13);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 99;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+}
+.mobile-menu.open { display: flex; opacity: 1; transform: translateY(0); pointer-events: all; }
+.mobile-menu a {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; color: #5c5b57;
+  text-decoration: none;
+  padding: 12px 1.25rem;
+  border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.1s;
+}
+.mobile-menu a:last-child { border-bottom: none; }
+.mobile-menu a:hover { background: #f0efe9; color: #181816; }
+.mobile-menu a.m-active { color: #534AB7; font-weight: 500; }
+.mobile-menu-arrow { font-size: 12px; color: #9a9994; }
+
+@media (max-width: 900px) {
+  .hamburger { display: flex; }
+}
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div style="display:flex;flex-direction:column;">
+    <a href="index.html" class="logo">
+      <div class="logo-mark"><span></span><span></span><span></span><span></span></div>
+      Blocks
+    </a>
+    <div class="subnav">AI-assisted portfolio construction</div>
+  </div>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="clients.html">Clients</a>
+    <a href="blocks-builder.html">Block Library</a>
+    <a href="composites.html">Composites</a>
+    <a href="signals.html">Signals</a>
+    <a href="assembly.html" class="active">Build</a>
+    <a href="proposal.html">Proposal</a>
+  </div>
+  <div class="nav-right">
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--teal);display:block;"></span>
+      Live
+    </div>
+    <div class="icon-btn">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5C5.01 1.5 3 3.51 3 6v3l-1 1.5h11L12 9V6c0-2.49-2.01-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6 12a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+    </div>
+    <div class="avatar">JD</div>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="dashboard.html" class="" onclick="closeMobileMenu()">Dashboard <span class="mobile-menu-arrow">›</span></a>
+  <a href="clients.html" class="" onclick="closeMobileMenu()">Clients <span class="mobile-menu-arrow">›</span></a>
+  <a href="blocks-builder.html" class="" onclick="closeMobileMenu()">Block Library <span class="mobile-menu-arrow">›</span></a>
+  <a href="composites.html" class="" onclick="closeMobileMenu()">Composites <span class="mobile-menu-arrow">›</span></a>
+  <a href="signals.html" class="" onclick="closeMobileMenu()">Signals <span class="mobile-menu-arrow">›</span></a>
+  <a href="assembly.html" class="m-active" onclick="closeMobileMenu()">Build <span class="mobile-menu-arrow">›</span></a>
+  <a href="proposal.html" class="" onclick="closeMobileMenu()">Proposal <span class="mobile-menu-arrow">›</span></a>
+</div>
+
+<div class="shell">
+  <nav class="sidenav">
+    <div class="sidenav-item" onclick="location.href='dashboard.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="10" y="2" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="2" y="10" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="10" y="10" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.25"/></svg>
+      Dash
+    </div>
+    <div class="sidenav-item" onclick="location.href='clients.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M3 15c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+      Clients
+    </div>
+    <div class="sidenav-item active">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="10.5" y="2.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="2.5" y="10.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="10.5" y="10.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+      Blocks
+    </div>
+    <div class="sidenav-item" onclick="location.href='composites.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M3 5h12M3 13h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Comps
+    </div>
+    <div class="sidenav-item" onclick="location.href='assembly.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="5.5" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="2" y="10" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="4" y="2" width="10" height="2.5" rx="1" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/></svg>
+      Build
+    </div>
+    <div class="sidenav-item" onclick="location.href='proposal.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Proposal
+    </div>
+  </nav>
+
+  <div class="assembly-layout">
+
+    <!-- LEFT: Block Library -->
+    <div class="block-library">
+      <div class="panel-header">
+        <div class="panel-title">Block Library</div>
+        <div class="panel-sub">Click a block to add it to the portfolio</div>
+      </div>
+      <div class="block-list" id="blockList">
+        <!-- Populated by JS -->
+      </div>
+    </div>
+
+    <!-- CENTER: Assembly Canvas -->
+    <div class="assembly-canvas">
+      <div class="canvas-header">
+        <div class="client-selector">
+          <span class="client-label">Building portfolio for</span>
+          <select class="client-select" id="clientSelect" onchange="updateStats()">
+            <option>Smith Family</option>
+            <option>Jones Family</option>
+            <option>Lee Family</option>
+            <option>Patel Family</option>
+            <option>Williams Family</option>
+            <option>Kim Family</option>
+          </select>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span style="font-size:11px;color:var(--text3);" id="blockCount">0 blocks</span>
+          <button onclick="clearAll()" style="font-size:11px;color:var(--coral);background:none;border:none;cursor:pointer;padding:4px 8px;border-radius:var(--r-sm);" id="clearBtn">Clear all</button>
+        </div>
+      </div>
+
+      <div class="canvas-body">
+        <div class="drop-zone visible" id="dropZone">
+          <div class="drop-zone-icon">⬡</div>
+          <div style="font-weight:500;color:var(--purple);">Select blocks from the library</div>
+          <div style="font-size:12px;">Click any block on the left to add it to this portfolio</div>
+        </div>
+
+        <div class="canvas-blocks" id="canvasBlocks"></div>
+
+        <div class="alloc-bar-wrap" id="allocBarWrap" style="display:none;">
+          <div class="alloc-bar-label">
+            <span>Allocation</span>
+            <span class="alloc-bar-total" id="allocTotal">0%</span>
+          </div>
+          <div class="alloc-bar-track" id="allocBarTrack"></div>
+          <div class="alloc-legend" id="allocLegend"></div>
+        </div>
+      </div>
+
+      <div class="canvas-footer">
+        <div class="warning-msg hidden" id="warningMsg">⚠ Allocations must total 100%</div>
+        <button class="save-portfolio-btn" id="saveBtn" onclick="savePortfolio()" disabled>
+          Save Portfolio
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Stats -->
+    <div class="stats-panel" id="statsPanel">
+      <div class="empty-stats" id="emptyStats">
+        <div style="font-size:24px;margin-bottom:8px;">📊</div>
+        Add blocks to see portfolio analytics
+      </div>
+      <div id="statsContent" style="display:none;">
+        <div class="stats-section">
+          <div class="stats-title">Portfolio Metrics</div>
+          <div class="stat-row"><span class="stat-label">Est. dividend yield</span><span class="stat-val up" id="statYield">—</span></div>
+          <div class="stat-row"><span class="stat-label">Weighted beta</span><span class="stat-val" id="statBeta">—</span></div>
+          <div class="stat-row"><span class="stat-label">Est. 3Y return</span><span class="stat-val up" id="statReturn">—</span></div>
+          <div class="stat-row"><span class="stat-label">Holdings count</span><span class="stat-val" id="statHoldings">—</span></div>
+        </div>
+        <div class="stats-section">
+          <div class="stats-title">Risk Profile</div>
+          <div class="risk-meter">
+            <div class="risk-track"><div class="risk-fill" id="riskFill" style="width:50%;background:var(--amber);"></div></div>
+            <div class="risk-labels"><span>Conservative</span><span>Aggressive</span></div>
+          </div>
+          <div class="stat-row" style="margin-top:4px;"><span class="stat-label">Risk score</span><span class="stat-val" id="statRisk">—</span></div>
+        </div>
+        <div class="stats-section" id="aiInsightSection">
+          <div class="stats-title">AI Insight</div>
+          <div class="ai-insight-box">
+            <span style="color:var(--purple);flex-shrink:0;">✦</span>
+            <span id="aiInsightText">Add more blocks to generate an AI insight.</span>
+          </div>
+        </div>
+        <div class="stats-section">
+          <div class="stats-title">Correlation Check</div>
+          <div id="correlationRows" style="display:flex;flex-direction:column;gap:5px;"></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- Save success modal -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-icon pop" id="modalIcon">✓</div>
+    <div class="modal-title" id="modalTitle">Portfolio saved</div>
+    <div class="modal-sub" id="modalSub">The portfolio has been assigned and is ready for review.</div>
+    <div style="display:flex;gap:10px;margin-top:0.5rem;">
+      <button class="modal-btn" onclick="location.href='clients.html'" style="background:var(--surface2);color:var(--text);border:0.5px solid var(--border2);">View Clients</button>
+      <button class="modal-btn" onclick="closeModal()">Done</button>
+    </div>
+  </div>
+</div>
+
+<script>
+const BLOCKS = [
+  { id:'core',    name:'Core Equity',         sub:'Large-cap US equities · 23 holdings',  color:'#EEEDFE', spotColor:'#534AB7', yield:1.8,  beta:0.95, ret:16.1, holdings:23, risk:65 },
+  { id:'intl',    name:'International Equity', sub:'Developed markets · 18 holdings',      color:'#E1F5EE', spotColor:'#0F6E56', yield:2.4,  beta:0.82, ret:5.6,  holdings:18, risk:58 },
+  { id:'tech',    name:'Tech & Innovation',    sub:'High-growth technology · 15 holdings', color:'#EEEDFE', spotColor:'#534AB7', yield:0.4,  beta:1.38, ret:18.1, holdings:15, risk:80 },
+  { id:'health',  name:'Healthcare',           sub:'Defensive healthcare · 12 holdings',   color:'#FAECE7', spotColor:'#C94E28', yield:1.9,  beta:0.71, ret:3.6,  holdings:12, risk:42 },
+  { id:'bonds',   name:'Short Duration Bonds', sub:'Investment grade · 8 holdings',        color:'#FEF3DC', spotColor:'#A06010', yield:4.8,  beta:0.12, ret:3.0,  holdings:8,  risk:15 },
+  { id:'reit',    name:'Real Estate (REIT)',   sub:'Diversified REITs · 10 holdings',      color:'#FCEBEB', spotColor:'#B83232', yield:4.2,  beta:0.88, ret:7.2,  holdings:10, risk:52 },
+];
+
+const BLOCK_COLORS = ['#534AB7','#0F6E56','#D85A30','#BA7517','#B83232','#1D9E75'];
+const portfolio = {}; // id -> allocation %
+
+function renderLibrary() {
+  const el = document.getElementById('blockList');
+  el.innerHTML = BLOCKS.map(b => `
+    <div class="library-block ${portfolio[b.id] !== undefined ? 'added' : ''}" id="lib-${b.id}" onclick="toggleBlock('${b.id}')">
+      <div class="lib-icon" style="background:${b.color};">
+        <span style="background:${b.spotColor};border-radius:1px;"></span>
+        <span style="background:${b.spotColor};opacity:0.55;border-radius:1px;"></span>
+        <span style="background:${b.spotColor};opacity:0.55;border-radius:1px;"></span>
+        <span style="background:${b.spotColor};opacity:0.25;border-radius:1px;"></span>
+      </div>
+      <div class="lib-info">
+        <div class="lib-name">${b.name}</div>
+        <div class="lib-stats">${b.sub}</div>
+      </div>
+      <div class="block-add-btn">${portfolio[b.id] !== undefined ? '✓' : '+'}</div>
+    </div>
+  `).join('');
+}
+
+function toggleBlock(id) {
+  if (portfolio[id] !== undefined) {
+    removeBlock(id);
+  } else {
+    addBlock(id);
+  }
+}
+
+function addBlock(id) {
+  if (portfolio[id] !== undefined) return;
+  portfolio[id] = suggestAlloc();
+  renderAll();
+}
+
+function removeBlock(id) {
+  delete portfolio[id];
+  renderAll();
+}
+
+function suggestAlloc() {
+  const count = Object.keys(portfolio).length;
+  const remaining = 100 - Object.values(portfolio).reduce((a,b)=>a+b,0);
+  return Math.max(5, Math.min(remaining, Math.round(remaining / Math.max(1, 1))));
+}
+
+function renderCanvas() {
+  const ids = Object.keys(portfolio);
+  const dropZone = document.getElementById('dropZone');
+  const canvasBlocks = document.getElementById('canvasBlocks');
+  const allocBarWrap = document.getElementById('allocBarWrap');
+  const blockCount = document.getElementById('blockCount');
+
+  dropZone.classList.toggle('visible', ids.length === 0);
+  allocBarWrap.style.display = ids.length > 0 ? 'block' : 'none';
+  blockCount.textContent = `${ids.length} block${ids.length !== 1 ? 's' : ''}`;
+
+  canvasBlocks.innerHTML = ids.map((id, i) => {
+    const b = BLOCKS.find(x => x.id === id);
+    const color = BLOCK_COLORS[i % BLOCK_COLORS.length];
+    return `
+      <div class="canvas-block" id="cblock-${id}">
+        <div class="canvas-block-icon" style="background:${b.color};">
+          <span style="background:${b.spotColor};border-radius:1px;"></span>
+          <span style="background:${b.spotColor};opacity:0.55;border-radius:1px;"></span>
+          <span style="background:${b.spotColor};opacity:0.55;border-radius:1px;"></span>
+          <span style="background:${b.spotColor};opacity:0.25;border-radius:1px;"></span>
+        </div>
+        <div class="canvas-block-info">
+          <div class="canvas-block-name">${b.name}</div>
+          <div class="canvas-block-sub">${b.sub}</div>
+        </div>
+        <div class="alloc-control">
+          <input type="range" min="1" max="100" step="1" value="${portfolio[id]}" class="alloc-slider"
+            oninput="updateAlloc('${id}', this.value)" style="accent-color:${b.spotColor};">
+          <input type="number" min="1" max="100" value="${portfolio[id]}" class="alloc-input"
+            oninput="updateAlloc('${id}', this.value)" id="inp-${id}">
+          <span style="font-size:12px;color:var(--text3);">%</span>
+        </div>
+        <button class="remove-btn" onclick="removeBlock('${id}')">✕</button>
+      </div>
+    `;
+  }).join('');
+
+  renderAllocBar();
+}
+
+function renderAllocBar() {
+  const ids = Object.keys(portfolio);
+  const total = ids.reduce((s, id) => s + (portfolio[id] || 0), 0);
+  const track = document.getElementById('allocBarTrack');
+  const legend = document.getElementById('allocLegend');
+  const totalEl = document.getElementById('allocTotal');
+  const warning = document.getElementById('warningMsg');
+  const saveBtn = document.getElementById('saveBtn');
+
+  totalEl.textContent = total + '%';
+  totalEl.className = 'alloc-bar-total ' + (total > 100 ? 'over' : total === 100 ? 'full' : '');
+
+  track.innerHTML = ids.map((id, i) => {
+    const b = BLOCKS.find(x => x.id === id);
+    const w = Math.min(100, ((portfolio[id] || 0) / 100) * 100);
+    return `<div class="alloc-bar-seg" style="width:${w}%;background:${b.spotColor};flex-shrink:0;"></div>`;
+  }).join('');
+
+  legend.innerHTML = ids.map((id, i) => {
+    const b = BLOCKS.find(x => x.id === id);
+    return `<div class="alloc-leg-item"><div class="alloc-leg-dot" style="background:${b.spotColor};"></div>${b.name} ${portfolio[id]}%</div>`;
+  }).join('');
+
+  warning.className = total !== 100 && ids.length > 0 ? 'warning-msg' : 'warning-msg hidden';
+  saveBtn.disabled = total !== 100 || ids.length === 0;
+}
+
+function updateAlloc(id, val) {
+  portfolio[id] = Math.max(1, Math.min(100, parseInt(val) || 0));
+  const slider = document.querySelector(`#cblock-${id} .alloc-slider`);
+  const input = document.getElementById(`inp-${id}`);
+  if (slider) slider.value = portfolio[id];
+  if (input) input.value = portfolio[id];
+  renderAllocBar();
+  updateStats();
+}
+
+function clearAll() {
+  Object.keys(portfolio).forEach(k => delete portfolio[k]);
+  renderAll();
+}
+
+function renderAll() {
+  renderLibrary();
+  renderCanvas();
+  updateStats();
+}
+
+function updateStats() {
+  const ids = Object.keys(portfolio);
+  const statsContent = document.getElementById('statsContent');
+  const emptyStats = document.getElementById('emptyStats');
+
+  if (ids.length === 0) {
+    statsContent.style.display = 'none';
+    emptyStats.style.display = 'block';
+    return;
+  }
+  statsContent.style.display = 'block';
+  emptyStats.style.display = 'none';
+
+  const total = ids.reduce((s, id) => s + (portfolio[id] || 0), 0);
+  if (total === 0) return;
+
+  let yieldW = 0, betaW = 0, retW = 0, holdingsSum = 0, riskW = 0;
+  ids.forEach(id => {
+    const b = BLOCKS.find(x => x.id === id);
+    const w = portfolio[id] / total;
+    yieldW += b.yield * w;
+    betaW += b.beta * w;
+    retW += b.ret * w;
+    holdingsSum += b.holdings;
+    riskW += b.risk * w;
+  });
+
+  document.getElementById('statYield').textContent = yieldW.toFixed(1) + '%';
+  document.getElementById('statBeta').textContent = betaW.toFixed(2);
+  document.getElementById('statReturn').textContent = '+' + retW.toFixed(1) + '%';
+  document.getElementById('statHoldings').textContent = holdingsSum;
+  document.getElementById('statRisk').textContent = Math.round(riskW) + ' / 100';
+
+  const riskFill = document.getElementById('riskFill');
+  riskFill.style.width = riskW + '%';
+  riskFill.style.background = riskW < 35 ? 'var(--teal)' : riskW < 60 ? 'var(--amber)' : 'var(--coral)';
+
+  // AI insight
+  let insight = '';
+  if (ids.length === 1) insight = 'Add more blocks to diversify and reduce single-block concentration risk.';
+  else if (betaW > 1.1) insight = `Weighted beta of ${betaW.toFixed(2)} is elevated. Consider adding Short Duration Bonds or Healthcare to reduce volatility.`;
+  else if (yieldW < 1.5) insight = `Low dividend yield of ${yieldW.toFixed(1)}%. Consider adding Short Duration Bonds or REITs for income.`;
+  else if (riskW > 65) insight = `Risk score of ${Math.round(riskW)} is high. This mix is suitable for long-horizon growth clients only.`;
+  else insight = `Well-balanced portfolio with beta ${betaW.toFixed(2)}, yield ${yieldW.toFixed(1)}%, and estimated 3Y return of +${retW.toFixed(1)}%. Suitable for moderate-to-growth clients.`;
+  document.getElementById('aiInsightText').textContent = insight;
+
+  // Correlation
+  const corrEl = document.getElementById('correlationRows');
+  const pairs = [];
+  if (portfolio['core'] && portfolio['tech']) pairs.push({ label: 'Core ↔ Tech', val: 0.88, warn: true });
+  if (portfolio['core'] && portfolio['intl']) pairs.push({ label: 'Core ↔ Intl', val: 0.72, warn: false });
+  if (portfolio['bonds'] && portfolio['core']) pairs.push({ label: 'Bonds ↔ Core', val: 0.12, warn: false });
+  if (portfolio['health'] && portfolio['core']) pairs.push({ label: 'Healthcare ↔ Core', val: 0.44, warn: false });
+  if (pairs.length === 0) pairs.push({ label: 'Add more blocks to see correlation', val: null, warn: false });
+
+  corrEl.innerHTML = pairs.map(p => `
+    <div style="display:flex;justify-content:space-between;align-items:center;padding:4px 0;font-size:12px;">
+      <span style="color:var(--text2);">${p.label}</span>
+      ${p.val !== null ? `<span style="font-family:'DM Mono',monospace;font-weight:500;color:${p.warn ? 'var(--coral)' : 'var(--teal)'};">${p.val}${p.warn ? ' ⚠' : ' ✓'}</span>` : ''}
+    </div>
+  `).join('');
+}
+
+function savePortfolio() {
+  const client = document.getElementById('clientSelect').value;
+  document.getElementById('modalTitle').textContent = 'Portfolio saved';
+  document.getElementById('modalSub').textContent = `${client}'s portfolio has been assembled and saved. It's ready for review and proposal generation.`;
+  const icon = document.getElementById('modalIcon');
+  icon.classList.remove('pop');
+  void icon.offsetWidth;
+  icon.classList.add('pop');
+  const overlay = document.getElementById('modalOverlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('visible'));
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.remove('visible');
+  setTimeout(() => { overlay.style.display = 'none'; document.body.style.overflow = ''; }, 220);
+}
+
+// Pre-load with a starter portfolio
+['core','bonds','health'].forEach(id => { portfolio[id] = id==='core'?50:id==='bonds'?30:20; });
+renderAll();
+</script>
+</body>
+</html>

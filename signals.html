@@ -1,0 +1,792 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Blocks — Signals</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+:root {
+  --bg: #f6f5f2; --surface: #ffffff; --surface2: #f0efe9; --surface3: #e8e7e0;
+  --text: #181816; --text2: #5c5b57; --text3: #9a9994;
+  --border: rgba(0,0,0,0.08); --border2: rgba(0,0,0,0.13);
+  --purple: #534AB7; --purple-lt: #EEEDFE; --purple-md: #AFA9EC;
+  --teal: #0F6E56; --teal-lt: #E1F5EE;
+  --coral: #C94E28; --coral-lt: #FAECE7;
+  --amber: #A06010; --amber-lt: #FEF3DC;
+  --red: #B83232; --red-lt: #FCEBEB;
+  --green: #2E7D32; --green-lt: #EAF3DE;
+  --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.07);
+}
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.5; min-width: 1100px; }
+.topnav { background: var(--surface); border-bottom: 0.5px solid var(--border2); display: flex; align-items: center; padding: 0 1.25rem; height: 52px; gap: 2rem; position: sticky; top: 0; z-index: 20; }
+.logo { display: flex; align-items: center; gap: 9px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; flex-shrink: 0; text-decoration: none; }
+.logo-mark { width: 28px; height: 28px; background: var(--purple); border-radius: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 5px; }
+.logo-mark span { background: white; border-radius: 1.5px; }
+.logo-mark span:nth-child(2) { opacity: 0.65; } .logo-mark span:nth-child(3) { opacity: 0.65; } .logo-mark span:nth-child(4) { opacity: 0.35; }
+.subnav { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.nav-links { display: flex; gap: 0; flex: 1; }
+.nav-links a { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
+.nav-links a.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 500; }
+.nav-links a:hover:not(.active) { color: var(--text); }
+.nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.icon-btn { width: 32px; height: 32px; border-radius: var(--r-sm); border: 0.5px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; cursor: pointer; }
+.shell { display: grid; grid-template-columns: 68px 1fr; min-height: calc(100vh - 52px); }
+.sidenav { background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
+.sidenav-item { width: 44px; height: 44px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; }
+.sidenav-item:hover { background: var(--surface2); color: var(--text2); }
+.sidenav-item.active { background: var(--purple-lt); color: var(--purple); }
+.ai-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: var(--purple-lt); color: var(--purple); border-radius: 20px; padding: 3px 9px; font-weight: 500; }
+.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; display: inline-block; white-space: nowrap; }
+.mono { font-family: 'DM Mono', monospace; }
+.up { color: var(--teal); } .down { color: var(--coral); }
+@keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+.page-content { padding: 1.5rem; }
+.page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; }
+.page-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+.page-sub { font-size: 12px; color: var(--text3); margin-top: 3px; }
+
+/* Market pulse row */
+.pulse-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 1.25rem; animation: fadeUp 0.3s 0.04s ease both; }
+.pulse-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 0.875rem 1rem; }
+.pulse-label { font-size: 10px; color: var(--text3); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; }
+.pulse-val { font-family: 'DM Mono', monospace; font-size: 18px; font-weight: 500; color: var(--text); }
+.pulse-val.red { color: var(--red); }
+.pulse-val.amber { color: var(--amber); }
+.pulse-val.green { color: var(--teal); }
+.pulse-change { font-size: 11px; margin-top: 3px; font-family: 'DM Mono', monospace; }
+
+/* Three column layout */
+.signals-grid { display: grid; grid-template-columns: 1fr 1fr 340px; gap: 1.25rem; }
+
+.section-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; animation: fadeUp 0.3s ease both; }
+.section-card:nth-child(1) { animation-delay: 0.08s; }
+.section-card:nth-child(2) { animation-delay: 0.12s; }
+.section-card:nth-child(3) { animation-delay: 0.16s; }
+
+.section-head { display: flex; align-items: center; justify-content: space-between; padding: 1rem 1.25rem; border-bottom: 0.5px solid var(--border2); }
+.section-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); }
+.section-body { padding: 1rem 1.25rem; display: flex; flex-direction: column; gap: 10px; }
+
+/* Signal items */
+.signal-item { display: flex; align-items: flex-start; gap: 12px; padding: 10px 12px; border-radius: var(--r-md); border: 0.5px solid var(--border); transition: background 0.12s; cursor: pointer; }
+.signal-item:hover { background: var(--surface2); }
+
+.signal-icon { width: 32px; height: 32px; border-radius: var(--r-sm); display: flex; align-items: center; justify-content: center; font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+.signal-icon.warn { background: var(--amber-lt); }
+.signal-icon.danger { background: var(--red-lt); }
+.signal-icon.ok { background: var(--teal-lt); }
+.signal-icon.info { background: var(--purple-lt); }
+
+.signal-content { flex: 1; min-width: 0; }
+.signal-title { font-size: 12.5px; font-weight: 500; color: var(--text); margin-bottom: 3px; }
+.signal-body { font-size: 11.5px; color: var(--text2); line-height: 1.5; }
+.signal-meta { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+.signal-time { font-size: 10.5px; color: var(--text3); }
+
+/* Sector heatmap */
+.sector-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.sector-cell { border-radius: var(--r-sm); padding: 10px; text-align: center; }
+.sector-name { font-size: 10px; font-weight: 500; margin-bottom: 4px; }
+.sector-val { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; }
+
+/* AI recommendations */
+.rec-item { background: var(--surface2); border-radius: var(--r-md); padding: 12px; display: flex; flex-direction: column; gap: 8px; }
+.rec-header { display: flex; align-items: center; justify-content: space-between; }
+.rec-title { font-size: 12.5px; font-weight: 500; color: var(--text); line-height: 1.4; }
+.rec-body { font-size: 11.5px; color: var(--text2); line-height: 1.5; }
+.rec-action { display: flex; gap: 6px; }
+.rec-btn { font-family: 'DM Sans', sans-serif; font-size: 11px; padding: 5px 10px; border-radius: var(--r-sm); cursor: pointer; font-weight: 500; transition: all 0.12s; }
+.rec-btn-primary { background: var(--purple); color: white; border: none; }
+.rec-btn-primary:hover { opacity: 0.88; }
+.rec-btn-ghost { background: transparent; color: var(--text2); border: 0.5px solid var(--border2); }
+.rec-btn-ghost:hover { background: var(--surface3); }
+
+/* Responsive */
+@media (max-width: 900px) {
+  body { min-width: 0; }
+  .topnav { padding: 0 1rem; }
+  .nav-links { display: none; }
+  .subnav { display: none; }
+  .shell { grid-template-columns: 1fr; }
+  .sidenav { display: none; }
+  .page-content { padding: 1rem; }
+  .pulse-row { grid-template-columns: repeat(2, 1fr); }
+  .signals-grid { grid-template-columns: 1fr; }
+  .page-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+}
+
+/* ── APPROVAL MODAL ── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(24,24,22,0.45);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s ease;
+}
+.modal-overlay.visible {
+  opacity: 1;
+  pointer-events: all;
+}
+.modal {
+  background: var(--surface);
+  border-radius: 18px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.18);
+  width: 520px;
+  max-width: calc(100vw - 2rem);
+  transform: translateY(16px) scale(0.98);
+  transition: transform 0.25s ease, opacity 0.25s ease;
+  opacity: 0;
+  overflow: hidden;
+}
+.modal-overlay.visible .modal {
+  transform: translateY(0) scale(1);
+  opacity: 1;
+}
+.modal-header {
+  padding: 1.5rem 1.5rem 1rem;
+  border-bottom: 0.5px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.modal-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+  line-height: 1.3;
+}
+.modal-sub {
+  font-size: 12px;
+  color: var(--text3);
+  margin-top: 4px;
+}
+.modal-close {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 0.5px solid var(--border2);
+  background: var(--surface2);
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text2);
+  flex-shrink: 0;
+  transition: background 0.12s;
+}
+.modal-close:hover { background: var(--surface3); }
+.modal-body { padding: 1.25rem 1.5rem; display: flex; flex-direction: column; gap: 1rem; }
+.modal-trades {
+  background: var(--surface2);
+  border-radius: var(--r-md);
+  overflow: hidden;
+}
+.modal-trade-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 14px;
+  border-bottom: 0.5px solid var(--border);
+  gap: 12px;
+}
+.modal-trade-row:last-child { border-bottom: none; }
+.trade-tick { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; width: 48px; flex-shrink: 0; }
+.trade-name { font-size: 12px; color: var(--text2); flex: 1; }
+.trade-action { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; flex-shrink: 0; }
+.trade-amount { font-family: 'DM Mono', monospace; font-size: 12px; font-weight: 500; width: 72px; text-align: right; flex-shrink: 0; }
+.modal-rationale {
+  background: var(--purple-lt);
+  border: 0.5px solid var(--purple-md);
+  border-radius: var(--r-md);
+  padding: 10px 14px;
+  font-size: 12.5px;
+  color: var(--text);
+  line-height: 1.6;
+  display: flex;
+  gap: 8px;
+  align-items: flex-start;
+}
+.modal-checkbox-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text2);
+}
+.modal-footer {
+  padding: 1rem 1.5rem 1.5rem;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  border-top: 0.5px solid var(--border);
+}
+.modal-btn-cancel {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 13px;
+  padding: 9px 20px;
+  border-radius: var(--r-sm);
+  border: 0.5px solid var(--border2);
+  background: transparent;
+  color: var(--text2);
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.modal-btn-cancel:hover { background: var(--surface2); }
+.modal-btn-approve {
+  font-family: 'Syne', sans-serif;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 9px 24px;
+  border-radius: var(--r-sm);
+  border: none;
+  background: var(--purple);
+  color: white;
+  cursor: pointer;
+  transition: all 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.modal-btn-approve:hover { background: #3d3498; }
+
+/* Success state */
+.modal-success {
+  padding: 3rem 2rem;
+  text-align: center;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+.success-icon {
+  width: 60px; height: 60px;
+  border-radius: 50%;
+  background: var(--teal-lt);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px;
+  margin: 0 auto;
+}
+.success-title {
+  font-family: 'Syne', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.3px;
+}
+.success-sub { font-size: 13px; color: var(--text2); line-height: 1.6; max-width: 320px; }
+
+@keyframes checkPop {
+  0% { transform: scale(0.5); opacity: 0; }
+  70% { transform: scale(1.15); }
+  100% { transform: scale(1); opacity: 1; }
+}
+.success-icon.animate { animation: checkPop 0.4s ease both; }
+
+/* ── MOBILE HAMBURGER ── */
+.hamburger {
+  display: none;
+  flex-direction: column;
+  gap: 4.5px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  border: 0.5px solid rgba(0,0,0,0.13);
+  background: transparent;
+  margin-left: 8px;
+  transition: background 0.12s;
+}
+.hamburger:hover { background: #f0efe9; }
+.hamburger span { display: block; width: 18px; height: 1.5px; background: #181816; border-radius: 2px; transition: all 0.2s ease; }
+.hamburger.open span:nth-child(1) { transform: translateY(6px) rotate(45deg); }
+.hamburger.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+.hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
+
+.mobile-menu {
+  display: none;
+  position: fixed;
+  top: 52px; left: 0; right: 0;
+  background: #ffffff;
+  border-bottom: 0.5px solid rgba(0,0,0,0.13);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 99;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  opacity: 0;
+  transform: translateY(-8px);
+  transition: transform 0.2s ease, opacity 0.2s ease;
+  pointer-events: none;
+}
+.mobile-menu.open { display: flex; opacity: 1; transform: translateY(0); pointer-events: all; }
+.mobile-menu a {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; color: #5c5b57;
+  text-decoration: none;
+  padding: 12px 1.25rem;
+  border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: space-between;
+  transition: background 0.1s;
+}
+.mobile-menu a:last-child { border-bottom: none; }
+.mobile-menu a:hover { background: #f0efe9; color: #181816; }
+.mobile-menu a.m-active { color: #534AB7; font-weight: 500; }
+.mobile-menu-arrow { font-size: 12px; color: #9a9994; }
+
+@media (max-width: 900px) {
+  .hamburger { display: flex; }
+}
+
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+  <div style="display:flex;flex-direction:column;">
+    <a href="index.html" class="logo">
+      <div class="logo-mark"><span></span><span></span><span></span><span></span></div>
+      Blocks
+    </a>
+    <div class="subnav">AI-assisted portfolio construction</div>
+  </div>
+  <div class="nav-links">
+    <a href="dashboard.html">Dashboard</a>
+    <a href="clients.html">Clients</a>
+    <a href="blocks-builder.html">Block Library</a>
+    <a href="composites.html">Composites</a>
+    <a href="signals.html" class="active">Signals</a>
+    <a href="assembly.html">Build</a>
+    <a href="proposal.html">Proposals</a>
+  </div>
+  <div class="nav-right">
+    <div style="display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);">
+      <span style="width:6px;height:6px;border-radius:50%;background:var(--teal);display:block;"></span>
+      Last synced 2m ago
+    </div>
+    <div class="icon-btn">
+      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5C5.01 1.5 3 3.51 3 6v3l-1 1.5h11L12 9V6c0-2.49-2.01-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6 12a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
+    </div>
+    <div class="avatar">JD</div>
+  </div>
+  <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
+</nav>
+
+<div class="mobile-menu" id="mobileMenu">
+  <a href="dashboard.html" class="" onclick="closeMobileMenu()">Dashboard <span class="mobile-menu-arrow">›</span></a>
+  <a href="clients.html" class="" onclick="closeMobileMenu()">Clients <span class="mobile-menu-arrow">›</span></a>
+  <a href="blocks-builder.html" class="" onclick="closeMobileMenu()">Block Library <span class="mobile-menu-arrow">›</span></a>
+  <a href="composites.html" class="" onclick="closeMobileMenu()">Composites <span class="mobile-menu-arrow">›</span></a>
+  <a href="signals.html" class="m-active" onclick="closeMobileMenu()">Signals <span class="mobile-menu-arrow">›</span></a>
+  <a href="assembly.html" class="" onclick="closeMobileMenu()">Build <span class="mobile-menu-arrow">›</span></a>
+  <a href="proposal.html" class="" onclick="closeMobileMenu()">Proposal <span class="mobile-menu-arrow">›</span></a>
+</div>
+
+<div class="shell">
+  <nav class="sidenav">
+    <div class="sidenav-item" onclick="location.href='dashboard.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="2" width="6" height="6" rx="1.5" fill="currentColor"/><rect x="10" y="2" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="2" y="10" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.5"/><rect x="10" y="10" width="6" height="6" rx="1.5" fill="currentColor" opacity="0.25"/></svg>
+      Dash
+    </div>
+    <div class="sidenav-item" onclick="location.href='clients.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><circle cx="9" cy="6" r="3" stroke="currentColor" stroke-width="1.4" fill="none"/><path d="M3 15c0-3.314 2.686-6 6-6s6 2.686 6 6" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" fill="none"/></svg>
+      Clients
+    </div>
+    <div class="sidenav-item" onclick="location.href='blocks-builder.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2.5" y="2.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="10.5" y="2.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="2.5" y="10.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="10.5" y="10.5" width="5" height="5" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/></svg>
+      Blocks
+    </div>
+    <div class="sidenav-item" onclick="location.href='composites.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><path d="M3 9h12M3 5h12M3 13h8" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>
+      Comps
+    </div>
+    <div class="sidenav-item" onclick="location.href='assembly.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="2" y="5.5" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="2" y="10" width="14" height="3" rx="1" stroke="currentColor" stroke-width="1.3" fill="none"/><rect x="4" y="2" width="10" height="2.5" rx="1" stroke="currentColor" stroke-width="1.2" fill="none" opacity="0.5"/></svg>
+      Build
+    </div>
+    <div class="sidenav-item" onclick="location.href='proposal.html'">
+      <svg width="18" height="18" viewBox="0 0 18 18" fill="none"><rect x="3" y="2" width="12" height="14" rx="1.5" stroke="currentColor" stroke-width="1.3" fill="none"/><path d="M6 6h6M6 9h6M6 12h4" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/></svg>
+      Proposal
+    </div>
+  </nav>
+
+  <div class="page-content">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Signals</div>
+        <div class="page-sub">Market intelligence · Updated March 14, 2026 · 9:32am ET</div>
+      </div>
+      <div class="ai-chip">✦ AI monitored · 14 active signals</div>
+    </div>
+
+    <!-- Market pulse -->
+    <div class="pulse-row">
+      <div class="pulse-card">
+        <div class="pulse-label">Fear &amp; Greed</div>
+        <div class="pulse-val red">28</div>
+        <div class="pulse-change down">▼ 7pts this week</div>
+      </div>
+      <div class="pulse-card">
+        <div class="pulse-label">S&amp;P 500</div>
+        <div class="pulse-val">5,614</div>
+        <div class="pulse-change down">−0.9% today</div>
+      </div>
+      <div class="pulse-card">
+        <div class="pulse-label">10Y Treasury</div>
+        <div class="pulse-val">4.31%</div>
+        <div class="pulse-change up">▲ 4bps</div>
+      </div>
+      <div class="pulse-card">
+        <div class="pulse-label">VIX</div>
+        <div class="pulse-val amber">22.4</div>
+        <div class="pulse-change" style="color:var(--amber);">▲ Elevated</div>
+      </div>
+      <div class="pulse-card">
+        <div class="pulse-label">USD Index</div>
+        <div class="pulse-val">104.2</div>
+        <div class="pulse-change up">▲ 0.3%</div>
+      </div>
+    </div>
+
+    <div class="signals-grid">
+
+      <!-- AI Signals -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-title">AI-Generated Signals</div>
+          <div class="ai-chip">✦ 6 new today</div>
+        </div>
+        <div class="section-body">
+          <div class="signal-item">
+            <div class="signal-icon danger">⚠</div>
+            <div class="signal-content">
+              <div class="signal-title">Broad sentiment deterioration</div>
+              <div class="signal-body">Fear &amp; Greed Index at 28, down 7pts in a week. Oversold oscillator at −8.2. Historically, readings below 25 have preceded mean-reversion rallies within 30–60 days.</div>
+              <div class="signal-meta">
+                <span class="tag" style="background:var(--red-lt);color:var(--red);">High priority</span>
+                <span class="signal-time">Today 8:15am</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item">
+            <div class="signal-icon warn">📊</div>
+            <div class="signal-content">
+              <div class="signal-title">Tech sector correlation rising</div>
+              <div class="signal-body">Correlation between US Equities and Tech &amp; Innovation blocks has risen to 0.88 over 90 days. Concentrated risk in Growth composite — consider sector rotation.</div>
+              <div class="signal-meta">
+                <span class="tag" style="background:var(--amber-lt);color:var(--amber);">Watch</span>
+                <span class="signal-time">Today 7:42am</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item">
+            <div class="signal-icon info">📈</div>
+            <div class="signal-content">
+              <div class="signal-title">Short duration bonds outperforming</div>
+              <div class="signal-body">Short Duration block up 2.1% MTD vs −0.4% for long duration. Yield curve flattening suggests continued outperformance. Consider increasing allocation in Income composite.</div>
+              <div class="signal-meta">
+                <span class="tag" style="background:var(--purple-lt);color:var(--purple);">Opportunity</span>
+                <span class="signal-time">Yesterday 4:30pm</span>
+              </div>
+            </div>
+          </div>
+          <div class="signal-item">
+            <div class="signal-icon ok">✓</div>
+            <div class="signal-content">
+              <div class="signal-title">Healthcare block defensive holding</div>
+              <div class="signal-body">Healthcare block down only 0.3% vs S&amp;P −0.9% today. In current fear environment, defensive positioning is providing expected downside protection.</div>
+              <div class="signal-meta">
+                <span class="tag" style="background:var(--teal-lt);color:var(--teal);">Confirming</span>
+                <span class="signal-time">Today 9:10am</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Sector heatmap -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-title">Sector Performance</div>
+          <div style="font-size:11px;color:var(--text3);">Today · MTD · YTD</div>
+        </div>
+        <div class="section-body">
+          <div style="display:flex;gap:8px;margin-bottom:4px;">
+            <div class="tag" style="background:var(--surface2);color:var(--text2);cursor:pointer;" onclick="selectPeriod(this,'Today')">Today</div>
+            <div class="tag" style="background:var(--purple-lt);color:var(--purple);cursor:pointer;" onclick="selectPeriod(this,'MTD')">MTD</div>
+            <div class="tag" style="background:var(--surface2);color:var(--text2);cursor:pointer;" onclick="selectPeriod(this,'YTD')">YTD</div>
+          </div>
+          <div class="sector-grid" id="sectorGrid">
+            <div class="sector-cell" style="background:#E1F5EE;"><div class="sector-name" style="color:#085041;">Healthcare</div><div class="sector-val" style="color:var(--teal);">+1.2%</div></div>
+            <div class="sector-cell" style="background:#E1F5EE;opacity:0.7;"><div class="sector-name" style="color:#085041;">Utilities</div><div class="sector-val" style="color:var(--teal);">+0.8%</div></div>
+            <div class="sector-cell" style="background:#EAF3DE;"><div class="sector-name" style="color:#27500A;">Financials</div><div class="sector-val" style="color:var(--teal);">+0.4%</div></div>
+            <div class="sector-cell" style="background:#F1EFE8;"><div class="sector-name" style="color:#5F5E5A;">Real Estate</div><div class="sector-val" style="color:var(--text2);">−0.1%</div></div>
+            <div class="sector-cell" style="background:#F1EFE8;"><div class="sector-name" style="color:#5F5E5A;">Materials</div><div class="sector-val" style="color:var(--text2);">−0.3%</div></div>
+            <div class="sector-cell" style="background:#FAECE7;opacity:0.8;"><div class="sector-name" style="color:#712B13;">Energy</div><div class="sector-val" style="color:var(--coral);">−0.6%</div></div>
+            <div class="sector-cell" style="background:#FAECE7;"><div class="sector-name" style="color:#712B13;">Cons. Disc.</div><div class="sector-val" style="color:var(--coral);">−1.1%</div></div>
+            <div class="sector-cell" style="background:#FCEBEB;opacity:0.8;"><div class="sector-name" style="color:#791F1F;">Industrials</div><div class="sector-val" style="color:var(--red);">−1.4%</div></div>
+            <div class="sector-cell" style="background:#FCEBEB;"><div class="sector-name" style="color:#791F1F;">Technology</div><div class="sector-val" style="color:var(--red);">−1.8%</div></div>
+          </div>
+
+          <div style="margin-top:1rem;">
+            <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.4px;">Key Economic Calendar</div>
+            <div style="display:flex;flex-direction:column;gap:6px;">
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--surface2);border-radius:var(--r-sm);">
+                <div>
+                  <div style="font-size:12px;font-weight:500;color:var(--text);">CPI Report</div>
+                  <div style="font-size:11px;color:var(--text3);">Core inflation YoY</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:11px;color:var(--text3);">Mar 19</div>
+                  <span class="tag" style="background:var(--red-lt);color:var(--red);">High impact</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--surface2);border-radius:var(--r-sm);">
+                <div>
+                  <div style="font-size:12px;font-weight:500;color:var(--text);">Fed Meeting</div>
+                  <div style="font-size:11px;color:var(--text3);">Rate decision + projections</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:11px;color:var(--text3);">Mar 20</div>
+                  <span class="tag" style="background:var(--red-lt);color:var(--red);">High impact</span>
+                </div>
+              </div>
+              <div style="display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--surface2);border-radius:var(--r-sm);">
+                <div>
+                  <div style="font-size:12px;font-weight:500;color:var(--text);">Jobs Report</div>
+                  <div style="font-size:11px;color:var(--text3);">Non-farm payrolls</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:11px;color:var(--text3);">Apr 4</div>
+                  <span class="tag" style="background:var(--amber-lt);color:var(--amber);">Med impact</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- AI recommendations panel -->
+      <div class="section-card">
+        <div class="section-head">
+          <div class="section-title">AI Recommendations</div>
+          <div class="ai-chip">✦ 3 pending</div>
+        </div>
+        <div class="section-body">
+          <div class="rec-item">
+            <div class="rec-header">
+              <span class="tag" style="background:var(--red-lt);color:var(--red);">Urgent</span>
+              <span style="font-size:10.5px;color:var(--text3);">Affects 4 clients</span>
+            </div>
+            <div class="rec-title">De-risk Growth composite — shift 5% to Short Duration</div>
+            <div class="rec-body">Fear index at 28, VIX elevated at 22.4, and tech correlation at 0.88. Risk-adjusted case for reducing equity exposure is strong.</div>
+            <div class="rec-action">
+              <button class="rec-btn rec-btn-primary" onclick="openModal('derisk')">Review &amp; Approve</button>
+              <button class="rec-btn rec-btn-ghost" onclick="dismissRec(this)">Dismiss</button>
+            </div>
+          </div>
+
+          <div class="rec-item">
+            <div class="rec-header">
+              <span class="tag" style="background:var(--amber-lt);color:var(--amber);">Suggested</span>
+              <span style="font-size:10.5px;color:var(--text3);">Affects 2 clients</span>
+            </div>
+            <div class="rec-title">Rebalance Smith &amp; Patel portfolios — drift exceeds threshold</div>
+            <div class="rec-body">Both portfolios are >4% above target allocation in equities. Trades are ready to execute pending advisor approval.</div>
+            <div class="rec-action">
+              <button class="rec-btn rec-btn-primary" onclick="openModal('rebalance')">Review &amp; Approve</button>
+              <button class="rec-btn rec-btn-ghost" onclick="dismissRec(this)">Dismiss</button>
+            </div>
+          </div>
+
+          <div class="rec-item">
+            <div class="rec-header">
+              <span class="tag" style="background:var(--purple-lt);color:var(--purple);">Opportunity</span>
+              <span style="font-size:10.5px;color:var(--text3);">All composites</span>
+            </div>
+            <div class="rec-title">Add Healthcare block to Growth composite</div>
+            <div class="rec-body">Healthcare outperforming in current environment (+1.2% today vs −0.9% S&amp;P). Adds defensiveness without reducing long-term return potential.</div>
+            <div class="rec-action">
+              <button class="rec-btn rec-btn-primary" onclick="location.href='blocks-builder.html'">Open Block Builder ↗</button>
+              <button class="rec-btn rec-btn-ghost" onclick="dismissRec(this)">Dismiss</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- APPROVAL MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal" id="modal">
+
+    <!-- Content view -->
+    <div id="modalContent">
+      <div class="modal-header">
+        <div>
+          <div class="modal-title" id="modalTitle">Approve AI Recommendation</div>
+          <div class="modal-sub" id="modalSub">Review proposed trades before confirming</div>
+        </div>
+        <div class="modal-close" onclick="closeModal()">✕</div>
+      </div>
+      <div class="modal-body">
+        <div class="modal-trades" id="modalTrades"></div>
+        <div class="modal-rationale">
+          <span style="color:var(--purple);flex-shrink:0;">✦</span>
+          <span id="modalRationale"></span>
+        </div>
+        <label class="modal-checkbox-row">
+          <input type="checkbox" checked style="accent-color:var(--purple);width:14px;height:14px;">
+          I have reviewed these trades and approve execution on behalf of affected clients.
+        </label>
+      </div>
+      <div class="modal-footer">
+        <button class="modal-btn-cancel" onclick="closeModal()">Cancel</button>
+        <button class="modal-btn-approve" id="approveBtn" onclick="confirmApproval()">
+          <span>Confirm approval</span>
+          <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Success view -->
+    <div class="modal-success" id="modalSuccess">
+      <div class="success-icon" id="successIcon">✓</div>
+      <div class="success-title" id="successTitle">Trades approved</div>
+      <div class="success-sub" id="successSub">Your instructions have been logged. Trades will execute at next market open.</div>
+      <button class="modal-btn-approve" onclick="closeModal()" style="margin-top:0.5rem;">Done</button>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function selectPeriod(el, period) {
+  el.parentElement.querySelectorAll('.tag').forEach(t => {
+    t.style.background = 'var(--surface2)';
+    t.style.color = 'var(--text2)';
+  });
+  el.style.background = 'var(--purple-lt)';
+  el.style.color = 'var(--purple)';
+}
+
+function dismissRec(btn) {
+  const item = btn.closest('.rec-item');
+  item.style.transition = 'opacity 0.3s, transform 0.3s';
+  item.style.opacity = '0';
+  item.style.transform = 'translateX(12px)';
+  setTimeout(() => item.remove(), 300);
+}
+
+const MODALS = {
+  derisk: {
+    title: 'De-risk Growth Composite',
+    sub: 'Shift 5% from Core Equity to Short Duration Bonds · 4 client portfolios affected',
+    trades: [
+      { tick: 'CORE', name: 'Core Equity Block', action: 'Reduce', actionStyle: 'background:var(--red-lt);color:var(--red);', amount: '−5.0%', amountStyle: 'color:var(--coral);' },
+      { tick: 'SDUR', name: 'Short Duration Bonds Block', action: 'Increase', actionStyle: 'background:var(--teal-lt);color:var(--teal);', amount: '+5.0%', amountStyle: 'color:var(--teal);' },
+      { tick: 'CASH', name: 'Cash position', action: 'Hold', actionStyle: 'background:var(--surface3);color:var(--text2);', amount: '—', amountStyle: 'color:var(--text3);' },
+    ],
+    rationale: 'AI rationale: Fear & Greed at 28, VIX at 22.4, and 90-day tech correlation at 0.88. Historically, reducing equity exposure by 3–6% during fear readings below 30 has improved risk-adjusted returns over the following quarter.',
+    successTitle: 'De-risk approved',
+    successSub: 'Growth composite will shift 5% to Short Duration across 4 client portfolios at next market open.',
+  },
+  rebalance: {
+    title: 'Rebalance Smith & Patel Portfolios',
+    sub: 'Equity drift correction · 2 client portfolios · estimated 6 trades total',
+    trades: [
+      { tick: 'MSFT', name: 'Microsoft Corp — Smith Family', action: 'Sell', actionStyle: 'background:var(--red-lt);color:var(--red);', amount: '−$42,000', amountStyle: 'color:var(--coral);' },
+      { tick: 'AAPL', name: 'Apple Inc — Smith Family', action: 'Sell', actionStyle: 'background:var(--red-lt);color:var(--red);', amount: '−$28,000', amountStyle: 'color:var(--coral);' },
+      { tick: 'VXUS', name: 'Vanguard Intl ETF — Patel Family', action: 'Buy', actionStyle: 'background:var(--teal-lt);color:var(--teal);', amount: '+$115,000', amountStyle: 'color:var(--teal);' },
+      { tick: 'BND', name: 'Vanguard Bond ETF — Patel Family', action: 'Buy', actionStyle: 'background:var(--teal-lt);color:var(--teal);', amount: '+$89,000', amountStyle: 'color:var(--teal);' },
+    ],
+    rationale: 'AI rationale: Smith Family at 4.2% drift, Patel Family at 4.8% drift — both exceeding the 3.0% threshold. Proposed trades bring both portfolios back to target allocation within 0.2% tolerance.',
+    successTitle: 'Rebalance approved',
+    successSub: 'Smith and Patel Family portfolios will be rebalanced across 6 trades at next market open.',
+  }
+};
+
+let currentModal = null;
+
+function openModal(type) {
+  const data = MODALS[type];
+  currentModal = type;
+
+  document.getElementById('modalTitle').textContent = data.title;
+  document.getElementById('modalSub').textContent = data.sub;
+  document.getElementById('modalRationale').textContent = data.rationale;
+
+  const tradesEl = document.getElementById('modalTrades');
+  tradesEl.innerHTML = data.trades.map(t => `
+    <div class="modal-trade-row">
+      <div class="trade-tick">${t.tick}</div>
+      <div class="trade-name">${t.name}</div>
+      <div class="trade-action" style="${t.actionStyle}">${t.action}</div>
+      <div class="trade-amount" style="${t.amountStyle}">${t.amount}</div>
+    </div>
+  `).join('');
+
+  // Reset to content view
+  document.getElementById('modalContent').style.display = 'block';
+  document.getElementById('modalSuccess').style.display = 'none';
+
+  const overlay = document.getElementById('modalOverlay');
+  overlay.style.display = 'flex';
+  requestAnimationFrame(() => overlay.classList.add('visible'));
+  document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+  const overlay = document.getElementById('modalOverlay');
+  overlay.classList.remove('visible');
+  setTimeout(() => {
+    overlay.style.display = 'none';
+    document.body.style.overflow = '';
+  }, 220);
+}
+
+function handleOverlayClick(e) {
+  if (e.target === document.getElementById('modalOverlay')) closeModal();
+}
+
+function confirmApproval() {
+  const btn = document.getElementById('approveBtn');
+  btn.innerHTML = '<div class="spin-circle" style="width:14px;height:14px;border:2px solid rgba(255,255,255,0.35);border-top-color:white;border-radius:50%;animation:spin 0.7s linear infinite;"></div>';
+  btn.disabled = true;
+
+  setTimeout(() => {
+    const data = MODALS[currentModal];
+    document.getElementById('modalContent').style.display = 'none';
+
+    const successEl = document.getElementById('modalSuccess');
+    successEl.style.display = 'flex';
+    document.getElementById('successTitle').textContent = data.successTitle;
+    document.getElementById('successSub').textContent = data.successSub;
+
+    const icon = document.getElementById('successIcon');
+    icon.classList.remove('animate');
+    void icon.offsetWidth; // reflow to restart animation
+    icon.classList.add('animate');
+
+    btn.innerHTML = '<span>Confirm approval</span><svg width="14" height="14" viewBox="0 0 14 14" fill="none"><path d="M2.5 7h9M8 3.5L11.5 7 8 10.5" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    btn.disabled = false;
+  }, 1200);
+}
+
+// Add keyframe for spinner inline
+const style = document.createElement('style');
+style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+document.head.appendChild(style);
+</script>
+</body>
+</html>
