@@ -1233,12 +1233,10 @@ footer {
   <div class="waitlist-inner reveal">
     <div class="waitlist-title">Be first to build<br>with Blocks.</div>
     <div class="waitlist-sub">We're onboarding a select group of advisors for our private beta. Join the waitlist to get early access and shape the product.</div>
-    <form class="waitlist-form" name="waitlist" method="POST" data-netlify="true" netlify-honeypot="bot-field" id="waitlistForm">
-      <input type="hidden" name="form-name" value="waitlist">
-      <input type="hidden" name="bot-field" style="display:none;">
-      <input class="waitlist-input" type="email" name="email" placeholder="your@email.com" id="waitlistEmail" required>
-      <button class="waitlist-btn" type="submit">Join waitlist</button>
-    </form>
+    <div class="waitlist-form">
+      <input class="waitlist-input" type="email" placeholder="your@email.com" id="waitlistEmail">
+      <button class="waitlist-btn" onclick="openTally()">Join waitlist</button>
+    </div>
     <div class="waitlist-note" id="waitlistNote">No spam. No pressure. Just early access.</div>
   </div>
 </div>
@@ -1281,35 +1279,18 @@ function closeMenu() {
 
 document.querySelectorAll('.reveal, .reveal-group').forEach(el => observer.observe(el));
 
-// Waitlist form - Netlify Forms
-const form = document.getElementById('waitlistForm');
-form.addEventListener('submit', async function(e) {
-  e.preventDefault();
+// Tally waitlist
+function openTally() {
   const email = document.getElementById('waitlistEmail').value;
-  const note = document.getElementById('waitlistNote');
-  const btn = form.querySelector('.waitlist-btn');
+  // Pass prefilled email to Tally if provided
+  const base = 'https://tally.so/r/OD0PDg';
+  const url = email ? `${base}?email=${encodeURIComponent(email)}` : base;
+  window.open(url, '_blank');
+}
 
-  btn.textContent = 'Sending…';
-  btn.disabled = true;
-
-  try {
-    const formData = new FormData(form);
-    await fetch('/', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-      body: new URLSearchParams(formData).toString()
-    });
-    btn.textContent = '✓ You\'re on the list!';
-    btn.style.background = '#E1F5EE';
-    btn.style.color = '#0F6E56';
-    note.textContent = 'Thanks! We\'ll be in touch when your spot is ready.';
-    note.style.color = 'rgba(255,255,255,0.9)';
-    document.getElementById('waitlistEmail').disabled = true;
-  } catch(err) {
-    btn.textContent = 'Try again';
-    btn.disabled = false;
-    note.textContent = 'Something went wrong — please try again.';
-  }
+// Allow pressing Enter in the email field
+document.getElementById('waitlistEmail').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') openTally();
 });
 </script>
 </body>
