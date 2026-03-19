@@ -646,17 +646,20 @@ body {
 .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .mobile-menu {
-  display: none;
+  visibility: hidden;
+  opacity: 0;
   position: fixed;
   top: 52px; left: 0; right: 0;
   background: #ffffff;
   border-bottom: 0.5px solid rgba(0,0,0,0.13);
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  z-index: 999;
+  z-index: 99999;
+  display: flex;
   flex-direction: column;
   padding: 0.5rem 0;
+  pointer-events: none;
 }
-.mobile-menu.open { display: flex; }
+.mobile-menu.open { visibility: visible; opacity: 1; pointer-events: all; }
 .mobile-menu a {
   font-family: 'DM Sans', sans-serif;
   font-size: 15px; color: #5c5b57;
