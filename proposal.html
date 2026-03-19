@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N55JYVPMX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-6N55JYVPMX');
 </script>
 <meta charset="UTF-8">
@@ -215,7 +214,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 .shell { display: grid; grid-template-columns: 68px 1fr; min-height: calc(100vh - 52px); }
 .sidenav { background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
-.sidenav-item { width: 44px; height: 44px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; }
+.sidenav-item { width: 64px; height: 52px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; text-align: center; line-height: 1.2; }
 .sidenav-item:hover { background: var(--surface2); color: var(--text2); }
 .sidenav-item.active { background: var(--purple-lt); color: var(--purple); }
 
@@ -254,32 +253,30 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .mobile-menu {
-  display: none;
   position: fixed;
   top: 52px; left: 0; right: 0;
   background: #ffffff;
   border-bottom: 0.5px solid rgba(0,0,0,0.13);
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  z-index: 99;
+  z-index: 999;
   flex-direction: column;
   padding: 0.5rem 0;
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  pointer-events: none;
+  display: flex;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
-.mobile-menu.open { display: flex; opacity: 1; transform: translateY(0); pointer-events: all; }
+.mobile-menu.open { max-height: 500px; }
 .mobile-menu a {
   font-family: 'DM Sans', sans-serif;
   font-size: 15px; color: #5c5b57;
   text-decoration: none;
-  padding: 12px 1.25rem;
+  padding: 13px 1.25rem;
   border-bottom: 0.5px solid rgba(0,0,0,0.08);
   display: flex; align-items: center; justify-content: space-between;
-  transition: background 0.1s;
 }
 .mobile-menu a:last-child { border-bottom: none; }
-.mobile-menu a:hover { background: #f0efe9; color: #181816; }
+.mobile-menu a:active { background: #f0efe9; }
 .mobile-menu a.m-active { color: #534AB7; font-weight: 500; }
 .mobile-menu-arrow { font-size: 12px; color: #9a9994; }
 
@@ -629,7 +626,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         <div class="footer-small-mark"><span></span><span></span><span></span><span></span></div>
         Blocks
       </div>
-      <div class="footer-note">AI-assisted portfolio construction · kanaloa2.github.io/blocks-demo · © 2026 Blocks</div>
+      <div class="footer-note">AI-assisted portfolio construction · blocks-demo.netlify.app · © 2026 Blocks</div>
       <div class="footer-note">Confidential · Page 1 of 1</div>
     </div>
 

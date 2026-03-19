@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N55JYVPMX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-6N55JYVPMX');
 </script>
 <meta charset="UTF-8">
@@ -896,48 +895,37 @@ footer {
 .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .mobile-menu {
-  display: none;
   position: fixed;
-  top: 54px;
-  left: 0; right: 0;
-  background: var(--surface);
-  border-bottom: 0.5px solid var(--border2);
+  top: 60px; left: 0; right: 0;
+  background: #ffffff;
+  border-bottom: 0.5px solid rgba(0,0,0,0.13);
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  z-index: 99;
+  z-index: 999;
   flex-direction: column;
-  padding: 0.75rem 0;
-  transform: translateY(-8px);
-  opacity: 0;
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  pointer-events: none;
-}
-.mobile-menu.open {
+  padding: 0.5rem 0;
   display: flex;
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: all;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
+.mobile-menu.open { max-height: 600px; }
 .mobile-menu a {
   font-family: 'DM Sans', sans-serif;
-  font-size: 15px;
-  color: var(--text2);
+  font-size: 15px; color: #5c5b57;
   text-decoration: none;
-  padding: 11px 1.5rem;
-  border-bottom: 0.5px solid var(--border);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  transition: background 0.1s;
+  padding: 13px 1.5rem;
+  border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: space-between;
 }
 .mobile-menu a:last-child { border-bottom: none; }
-.mobile-menu a:hover { background: var(--surface2); color: var(--text); }
-.mobile-menu a.active { color: var(--purple); font-weight: 500; }
-.mobile-menu a .menu-arrow { font-size: 12px; color: var(--text3); }
+.mobile-menu a:active { background: #f0efe9; }
+.mobile-menu a.active { color: #4a41aa; font-weight: 500; }
+.mobile-menu-arrow { font-size: 12px; color: #9a9994; }
 .mobile-menu-cta {
   padding: 0.875rem 1.5rem;
   display: flex;
   gap: 8px;
-  border-top: 0.5px solid var(--border2);
+  border-top: 0.5px solid rgba(0,0,0,0.08);
   margin-top: 4px;
 }
 
@@ -1108,7 +1096,7 @@ footer {
           </div>
           <div class="solution-point">
             <div class="solution-check">✓</div>
-            AI screens thousands of securities
+            AI screens thousands of securities in seconds
           </div>
           <div class="solution-point">
             <div class="solution-check">✓</div>
@@ -1280,16 +1268,18 @@ document.querySelectorAll('.reveal, .reveal-group').forEach(el => observer.obser
 
 // Mobile menu
 function toggleMenu() {
-  const menu = document.getElementById('mobileMenu');
-  const btn = document.getElementById('hamburger');
+  var menu = document.getElementById('mobileMenu');
+  var btn = document.getElementById('hamburger');
+  if (!menu) return;
   menu.classList.toggle('open');
-  btn.classList.toggle('open');
-  document.body.style.overflow = menu.classList.contains('open') ? 'hidden' : '';
+  if (btn) btn.classList.toggle('open');
 }
 function closeMenu() {
-  document.getElementById('mobileMenu').classList.remove('open');
-  document.getElementById('hamburger').classList.remove('open');
-  document.body.style.overflow = '';
+  var menu = document.getElementById('mobileMenu');
+  var btn = document.getElementById('hamburger');
+  if (!menu) return;
+  menu.classList.remove('open');
+  if (btn) btn.classList.remove('open');
 }
 
 document.querySelectorAll('.reveal, .reveal-group').forEach(el => observer.observe(el));

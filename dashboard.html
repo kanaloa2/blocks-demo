@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en">
 <head>
 <!-- Google tag (gtag.js) -->
@@ -18,213 +17,213 @@
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
-–bg: #f6f5f2;
-–surface: #ffffff;
-–surface2: #f0efe9;
-–surface3: #e8e7e0;
-–text: #181816;
-–text2: #5c5b57;
-–text3: #9a9994;
-–border: rgba(0,0,0,0.08);
-–border2: rgba(0,0,0,0.13);
-–purple: #534AB7;
-–purple-lt: #EEEDFE;
-–purple-md: #AFA9EC;
-–teal: #0F6E56;
-–teal-lt: #E1F5EE;
-–coral: #C94E28;
-–coral-lt: #FAECE7;
-–amber: #A06010;
-–amber-lt: #FEF3DC;
-–red: #B83232;
-–red-lt: #FCEBEB;
-–green: #2E7D32;
-–green-lt: #EAF3DE;
-–r-sm: 6px;
-–r-md: 10px;
-–r-lg: 14px;
-–shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.07);
+  --bg: #f6f5f2;
+  --surface: #ffffff;
+  --surface2: #f0efe9;
+  --surface3: #e8e7e0;
+  --text: #181816;
+  --text2: #5c5b57;
+  --text3: #9a9994;
+  --border: rgba(0,0,0,0.08);
+  --border2: rgba(0,0,0,0.13);
+  --purple: #534AB7;
+  --purple-lt: #EEEDFE;
+  --purple-md: #AFA9EC;
+  --teal: #0F6E56;
+  --teal-lt: #E1F5EE;
+  --coral: #C94E28;
+  --coral-lt: #FAECE7;
+  --amber: #A06010;
+  --amber-lt: #FEF3DC;
+  --red: #B83232;
+  --red-lt: #FCEBEB;
+  --green: #2E7D32;
+  --green-lt: #EAF3DE;
+  --r-sm: 6px;
+  --r-md: 10px;
+  --r-lg: 14px;
+  --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.07);
 }
 
-body { font-family: ‘DM Sans’, sans-serif; background: var(–bg); color: var(–text); font-size: 13px; line-height: 1.5; min-width: 1100px; }
+body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.5; min-width: 1100px; }
 
-.topnav { background: var(–surface); border-bottom: 0.5px solid var(–border2); display: flex; align-items: center; padding: 0 1.25rem; height: 52px; gap: 2rem; position: sticky; top: 0; z-index: 20; }
+.topnav { background: var(--surface); border-bottom: 0.5px solid var(--border2); display: flex; align-items: center; padding: 0 1.25rem; height: 52px; gap: 2rem; position: sticky; top: 0; z-index: 20; }
 
-.logo { display: flex; align-items: center; gap: 9px; font-family: ‘Syne’, sans-serif; font-size: 17px; font-weight: 600; color: var(–text); letter-spacing: -0.3px; flex-shrink: 0; text-decoration: none; }
-.logo-mark { width: 28px; height: 28px; background: var(–purple); border-radius: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 5px; }
+.logo { display: flex; align-items: center; gap: 9px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; flex-shrink: 0; text-decoration: none; }
+.logo-mark { width: 28px; height: 28px; background: var(--purple); border-radius: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 5px; }
 .logo-mark span { background: white; border-radius: 1.5px; }
 .logo-mark span:nth-child(2) { opacity: 0.65; }
 .logo-mark span:nth-child(3) { opacity: 0.65; }
 .logo-mark span:nth-child(4) { opacity: 0.35; }
-.subnav { font-size: 11px; color: var(–text3); margin-top: 1px; }
+.subnav { font-size: 11px; color: var(--text3); margin-top: 1px; }
 
 .nav-links { display: flex; gap: 0; flex: 1; }
-.nav-links a { font-family: ‘DM Sans’, sans-serif; font-size: 13px; color: var(–text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
-.nav-links a.active { color: var(–purple); border-bottom-color: var(–purple); font-weight: 500; }
-.nav-links a:hover:not(.active) { color: var(–text); }
+.nav-links a { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
+.nav-links a.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 500; }
+.nav-links a:hover:not(.active) { color: var(--text); }
 
 .nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-.icon-btn { width: 32px; height: 32px; border-radius: var(–r-sm); border: 0.5px solid var(–border2); background: var(–surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(–text2); }
+.icon-btn { width: 32px; height: 32px; border-radius: var(--r-sm); border: 0.5px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); }
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; cursor: pointer; }
 
 .shell { display: grid; grid-template-columns: 68px 1fr; min-height: calc(100vh - 52px); }
 
-.sidenav { background: var(–surface); border-right: 0.5px solid var(–border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
-.sidenav-item { width: 44px; height: 44px; border-radius: var(–r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(–text3); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; }
-.sidenav-item:hover { background: var(–surface2); color: var(–text2); }
-.sidenav-item.active { background: var(–purple-lt); color: var(–purple); }
+.sidenav { background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
+.sidenav-item { width: 64px; height: 52px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; text-align: center; line-height: 1.2; }
+.sidenav-item:hover { background: var(--surface2); color: var(--text2); }
+.sidenav-item.active { background: var(--purple-lt); color: var(--purple); }
 
 .content { padding: 1.25rem; display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; align-content: start; }
 
-.card { background: var(–surface); border-radius: var(–r-lg); box-shadow: var(–shadow); padding: 1.125rem 1.25rem; display: flex; flex-direction: column; gap: 0.875rem; animation: fadeUp 0.3s ease both; }
+.card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1.125rem 1.25rem; display: flex; flex-direction: column; gap: 0.875rem; animation: fadeUp 0.3s ease both; }
 .card:nth-child(1) { animation-delay: 0.04s; }
 .card:nth-child(2) { animation-delay: 0.08s; }
 .card:nth-child(3) { animation-delay: 0.12s; }
 .card:nth-child(4) { animation-delay: 0.16s; }
 
 .card-header { display: flex; align-items: center; justify-content: space-between; }
-.card-title { font-family: ‘Syne’, sans-serif; font-size: 14px; font-weight: 600; color: var(–text); letter-spacing: -0.2px; }
-.card-action { font-size: 11px; color: var(–purple); cursor: pointer; border: 0.5px solid var(–purple-md); background: var(–purple-lt); border-radius: var(–r-sm); padding: 4px 10px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
+.card-title { font-family: 'Syne', sans-serif; font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: -0.2px; }
+.card-action { font-size: 11px; color: var(--purple); cursor: pointer; border: 0.5px solid var(--purple-md); background: var(--purple-lt); border-radius: var(--r-sm); padding: 4px 10px; font-weight: 500; display: inline-flex; align-items: center; gap: 4px; text-decoration: none; }
 
 .sentiment-inner { display: grid; grid-template-columns: 1fr auto; gap: 1rem; align-items: center; }
 .client-list { display: flex; flex-direction: column; gap: 7px; }
 .client-row { display: flex; align-items: center; gap: 8px; font-size: 12.5px; }
 .client-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
-.client-name { font-weight: 500; color: var(–text); }
-.client-status { color: var(–text2); }
+.client-name { font-weight: 500; color: var(--text); }
+.client-status { color: var(--text2); }
 .change-badge { font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
-.badge-down { background: var(–red-lt); color: var(–red); }
+.badge-down { background: var(--red-lt); color: var(--red); }
 .gauge-wrap { display: flex; flex-direction: column; align-items: center; gap: 4px; flex-shrink: 0; }
 
-.composite-row { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: var(–r-md); background: var(–surface2); cursor: pointer; transition: background 0.12s; }
-.composite-row:hover { background: var(–surface3); }
-.block-icon { width: 36px; height: 36px; border-radius: var(–r-sm); background: var(–purple-lt); display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 6px; flex-shrink: 0; }
-.block-icon span { border-radius: 1px; background: var(–purple); }
+.composite-row { display: flex; align-items: center; gap: 12px; padding: 9px 10px; border-radius: var(--r-md); background: var(--surface2); cursor: pointer; transition: background 0.12s; }
+.composite-row:hover { background: var(--surface3); }
+.block-icon { width: 36px; height: 36px; border-radius: var(--r-sm); background: var(--purple-lt); display: grid; grid-template-columns: 1fr 1fr; gap: 2px; padding: 6px; flex-shrink: 0; }
+.block-icon span { border-radius: 1px; background: var(--purple); }
 .block-icon span:nth-child(2) { opacity: 0.6; }
 .block-icon span:nth-child(3) { opacity: 0.6; }
 .block-icon span:nth-child(4) { opacity: 0.3; }
-.block-icon.teal { background: var(–teal-lt); } .block-icon.teal span { background: var(–teal); }
-.block-icon.amber { background: var(–amber-lt); } .block-icon.amber span { background: var(–amber); }
+.block-icon.teal { background: var(--teal-lt); } .block-icon.teal span { background: var(--teal); }
+.block-icon.amber { background: var(--amber-lt); } .block-icon.amber span { background: var(--amber); }
 .comp-info { flex: 1; }
-.comp-name { font-size: 13px; font-weight: 500; color: var(–text); }
-.comp-sub { font-size: 11px; color: var(–text3); margin-top: 1px; }
+.comp-name { font-size: 13px; font-weight: 500; color: var(--text); }
+.comp-sub { font-size: 11px; color: var(--text3); margin-top: 1px; }
 .comp-stats { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; flex-shrink: 0; }
-.comp-pct { font-family: ‘DM Mono’, monospace; font-size: 14px; font-weight: 500; color: var(–text); }
-.comp-ytd { font-size: 11px; font-family: ‘DM Mono’, monospace; }
-.ytd-up { color: var(–teal); } .ytd-down { color: var(–coral); }
+.comp-pct { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; color: var(--text); }
+.comp-ytd { font-size: 11px; font-family: 'DM Mono', monospace; }
+.ytd-up { color: var(--teal); } .ytd-down { color: var(--coral); }
 
 .risk-inner { display: grid; grid-template-columns: auto 1fr; gap: 1.25rem; align-items: start; }
 .risk-right { display: flex; flex-direction: column; gap: 10px; }
-.trend-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(–text3); font-weight: 500; margin-bottom: 4px; }
-.heatmap { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; border-radius: var(–r-sm); overflow: hidden; }
+.trend-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; color: var(--text3); font-weight: 500; margin-bottom: 4px; }
+.heatmap { display: grid; grid-template-columns: repeat(8, 1fr); gap: 2px; border-radius: var(--r-sm); overflow: hidden; }
 .heat-cell { height: 22px; border-radius: 2px; }
 .movers { display: flex; flex-direction: column; gap: 5px; }
 .mover-row { display: flex; align-items: center; justify-content: space-between; font-size: 11.5px; }
-.mover-name { font-weight: 500; color: var(–text); font-family: ‘DM Mono’, monospace; font-size: 11px; }
-.mover-val { font-family: ‘DM Mono’, monospace; font-size: 11px; }
+.mover-name { font-weight: 500; color: var(--text); font-family: 'DM Mono', monospace; font-size: 11px; }
+.mover-val { font-family: 'DM Mono', monospace; font-size: 11px; }
 
 .block-lib-inner { display: grid; grid-template-columns: 1fr auto; gap: 1rem; }
 .block-lib-list { display: flex; flex-direction: column; gap: 5px; }
-.lib-row { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: var(–r-sm); cursor: pointer; transition: background 0.12s; }
-.lib-row:hover { background: var(–surface2); }
-.lib-icon { width: 30px; height: 30px; border-radius: 6px; background: var(–purple-lt); display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px; padding: 5px; flex-shrink: 0; }
-.lib-icon span { border-radius: 1px; background: var(–purple); }
+.lib-row { display: flex; align-items: center; gap: 10px; padding: 7px 8px; border-radius: var(--r-sm); cursor: pointer; transition: background 0.12s; }
+.lib-row:hover { background: var(--surface2); }
+.lib-icon { width: 30px; height: 30px; border-radius: 6px; background: var(--purple-lt); display: grid; grid-template-columns: 1fr 1fr; gap: 1.5px; padding: 5px; flex-shrink: 0; }
+.lib-icon span { border-radius: 1px; background: var(--purple); }
 .lib-icon span:nth-child(2) { opacity: 0.55; } .lib-icon span:nth-child(3) { opacity: 0.55; } .lib-icon span:nth-child(4) { opacity: 0.25; }
-.lib-icon.teal { background: var(–teal-lt); } .lib-icon.teal span { background: var(–teal); }
-.lib-icon.amber { background: var(–amber-lt); } .lib-icon.amber span { background: var(–amber); }
-.lib-icon.coral { background: var(–coral-lt); } .lib-icon.coral span { background: var(–coral); }
+.lib-icon.teal { background: var(--teal-lt); } .lib-icon.teal span { background: var(--teal); }
+.lib-icon.amber { background: var(--amber-lt); } .lib-icon.amber span { background: var(--amber); }
+.lib-icon.coral { background: var(--coral-lt); } .lib-icon.coral span { background: var(--coral); }
 .lib-info { flex: 1; }
-.lib-name { font-size: 12.5px; font-weight: 500; color: var(–text); }
-.lib-ret { font-size: 10.5px; color: var(–text3); }
-.lib-alloc { font-family: ‘DM Mono’, monospace; font-size: 16px; font-weight: 500; color: var(–text); flex-shrink: 0; width: 40px; text-align: right; }
+.lib-name { font-size: 12.5px; font-weight: 500; color: var(--text); }
+.lib-ret { font-size: 10.5px; color: var(--text3); }
+.lib-alloc { font-family: 'DM Mono', monospace; font-size: 16px; font-weight: 500; color: var(--text); flex-shrink: 0; width: 40px; text-align: right; }
 
-.derisk { background: var(–surface2); border-radius: var(–r-md); padding: 12px; width: 195px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
-.derisk-title { font-family: ‘Syne’, sans-serif; font-size: 12px; font-weight: 600; color: var(–text); }
-.derisk-item { display: flex; align-items: flex-start; gap: 7px; font-size: 11.5px; color: var(–text2); line-height: 1.4; }
-.check-icon { width: 15px; height: 15px; border-radius: 3px; background: var(–purple); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
-.derisk-item strong { color: var(–text); }
-.derisk-cta { background: var(–purple); color: white; border-radius: var(–r-sm); padding: 8px 10px; font-size: 11px; font-weight: 500; margin-top: 2px; font-family: ‘Syne’, sans-serif; }
+.derisk { background: var(--surface2); border-radius: var(--r-md); padding: 12px; width: 195px; display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
+.derisk-title { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; color: var(--text); }
+.derisk-item { display: flex; align-items: flex-start; gap: 7px; font-size: 11.5px; color: var(--text2); line-height: 1.4; }
+.check-icon { width: 15px; height: 15px; border-radius: 3px; background: var(--purple); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+.derisk-item strong { color: var(--text); }
+.derisk-cta { background: var(--purple); color: white; border-radius: var(--r-sm); padding: 8px 10px; font-size: 11px; font-weight: 500; margin-top: 2px; font-family: 'Syne', sans-serif; }
 .derisk-cta p { font-size: 12px; font-weight: 600; margin-bottom: 4px; line-height: 1.3; }
-.derisk-cta span { font-size: 10px; opacity: 0.8; font-family: ‘DM Sans’, sans-serif; }
-.review-btn { background: white; color: var(–purple); border: 0.5px solid var(–purple-md); border-radius: var(–r-sm); padding: 7px; font-size: 11px; font-weight: 600; font-family: ‘Syne’, sans-serif; text-align: center; cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 2px; transition: background 0.12s; }
-.review-btn:hover { background: var(–purple-lt); }
-.derisk-footer { font-size: 9.5px; color: var(–text3); line-height: 1.4; display: flex; align-items: flex-start; gap: 5px; }
+.derisk-cta span { font-size: 10px; opacity: 0.8; font-family: 'DM Sans', sans-serif; }
+.review-btn { background: white; color: var(--purple); border: 0.5px solid var(--purple-md); border-radius: var(--r-sm); padding: 7px; font-size: 11px; font-weight: 600; font-family: 'Syne', sans-serif; text-align: center; cursor: pointer; letter-spacing: 0.5px; text-transform: uppercase; margin-top: 2px; transition: background 0.12s; }
+.review-btn:hover { background: var(--purple-lt); }
+.derisk-footer { font-size: 9.5px; color: var(--text3); line-height: 1.4; display: flex; align-items: flex-start; gap: 5px; }
 
 .comp-table { width: 100%; border-collapse: collapse; }
-.comp-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(–text3); font-weight: 500; text-align: left; padding: 0 8px 8px 8px; border-bottom: 0.5px solid var(–border2); }
+.comp-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); font-weight: 500; text-align: left; padding: 0 8px 8px 8px; border-bottom: 0.5px solid var(--border2); }
 .comp-table th:last-child { text-align: right; }
-.comp-table td { padding: 9px 8px; border-bottom: 0.5px solid var(–border); vertical-align: middle; }
+.comp-table td { padding: 9px 8px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
 .comp-table tr:last-child td { border-bottom: none; }
-.tname { font-size: 13px; font-weight: 500; color: var(–text); }
-.tsub { font-size: 11px; color: var(–text3); margin-top: 1px; }
+.tname { font-size: 13px; font-weight: 500; color: var(--text); }
+.tsub { font-size: 11px; color: var(--text3); margin-top: 1px; }
 .mini-bars { display: flex; gap: 2px; align-items: flex-end; height: 18px; }
 .mini-bar { width: 4px; border-radius: 1px; }
-.taum { font-family: ‘DM Mono’, monospace; font-size: 14px; font-weight: 500; text-align: right; color: var(–text); }
-.taum-sub { font-family: ‘DM Mono’, monospace; font-size: 10.5px; color: var(–text3); text-align: right; }
-.tpct { font-family: ‘DM Mono’, monospace; font-size: 13px; font-weight: 500; color: var(–text); }
-.tytd { font-size: 11px; font-family: ‘DM Mono’, monospace; }
+.taum { font-family: 'DM Mono', monospace; font-size: 14px; font-weight: 500; text-align: right; color: var(--text); }
+.taum-sub { font-family: 'DM Mono', monospace; font-size: 10.5px; color: var(--text3); text-align: right; }
+.tpct { font-family: 'DM Mono', monospace; font-size: 13px; font-weight: 500; color: var(--text); }
+.tytd { font-size: 11px; font-family: 'DM Mono', monospace; }
 
-.ai-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: var(–purple-lt); color: var(–purple); border-radius: 20px; padding: 3px 9px; font-weight: 500; }
+.ai-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: var(--purple-lt); color: var(--purple); border-radius: 20px; padding: 3px 9px; font-weight: 500; }
 
 @keyframes fadeUp { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
 
 /* ── RESPONSIVE ── */
 @media (max-width: 900px) {
-body { min-width: 0; }
+  body { min-width: 0; }
 
-/* Top nav */
-.topnav { padding: 0 1rem; gap: 0.75rem; }
-.nav-links { display: none; }
-.subnav { display: none; }
+  /* Top nav */
+  .topnav { padding: 0 1rem; gap: 0.75rem; }
+  .nav-links { display: none; }
+  .subnav { display: none; }
 
-/* Shell: hide sidebar, full width content */
-.shell { grid-template-columns: 1fr; }
-.sidenav { display: none; }
+  /* Shell: hide sidebar, full width content */
+  .shell { grid-template-columns: 1fr; }
+  .sidenav { display: none; }
 
-/* Content: single column */
-.content { grid-template-columns: 1fr; padding: 1rem; gap: 0.875rem; }
+  /* Content: single column */
+  .content { grid-template-columns: 1fr; padding: 1rem; gap: 0.875rem; }
 
-/* Sentiment gauge shrink */
-.sentiment-inner { grid-template-columns: 1fr auto; }
+  /* Sentiment gauge shrink */
+  .sentiment-inner { grid-template-columns: 1fr auto; }
 
-/* Risk: stack gauge above details */
-.risk-inner { grid-template-columns: 1fr; }
-.gauge-wrap svg { margin: 0 auto; display: block; }
+  /* Risk: stack gauge above details */
+  .risk-inner { grid-template-columns: 1fr; }
+  .gauge-wrap svg { margin: 0 auto; display: block; }
 
-/* Block lib: stack list above derisk panel */
-.block-lib-inner { grid-template-columns: 1fr; }
-.derisk { width: 100%; }
+  /* Block lib: stack list above derisk panel */
+  .block-lib-inner { grid-template-columns: 1fr; }
+  .derisk { width: 100%; }
 
-/* Composite table: hide less important cols on small screens */
-.comp-table .tsub { display: none; }
+  /* Composite table: hide less important cols on small screens */
+  .comp-table .tsub { display: none; }
 }
 
 @media (max-width: 480px) {
-.topnav { height: 48px; }
-.logo { font-size: 15px; }
-.content { padding: 0.875rem; }
+  .topnav { height: 48px; }
+  .logo { font-size: 15px; }
+  .content { padding: 0.875rem; }
 
-/* Composite table: trim to essentials */
-.comp-table th:nth-child(3),
-.comp-table td:nth-child(3) { display: none; }
+  /* Composite table: trim to essentials */
+  .comp-table th:nth-child(3),
+  .comp-table td:nth-child(3) { display: none; }
 
-/* Smaller gauge on very small screens */
-.sentiment-inner { grid-template-columns: 1fr; }
-.gauge-wrap { align-items: flex-start; }
+  /* Smaller gauge on very small screens */
+  .sentiment-inner { grid-template-columns: 1fr; }
+  .gauge-wrap { align-items: flex-start; }
 }
 
 /* ── MOBILE HAMBURGER ── */
 .hamburger {
-display: none;
-flex-direction: column;
-gap: 4.5px;
-cursor: pointer;
-padding: 6px;
-border-radius: 6px;
-border: 0.5px solid rgba(0,0,0,0.13);
-background: transparent;
-margin-left: 8px;
-transition: background 0.12s;
+  display: none;
+  flex-direction: column;
+  gap: 4.5px;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 6px;
+  border: 0.5px solid rgba(0,0,0,0.13);
+  background: transparent;
+  margin-left: 8px;
+  transition: background 0.12s;
 }
 .hamburger:hover { background: #f0efe9; }
 .hamburger span { display: block; width: 18px; height: 1.5px; background: #181816; border-radius: 2px; transition: all 0.2s ease; }
@@ -233,27 +232,27 @@ transition: background 0.12s;
 .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .mobile-menu {
-position: fixed;
-top: 52px; left: 0; right: 0;
-background: #ffffff;
-border-bottom: 0.5px solid rgba(0,0,0,0.13);
-box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-z-index: 999;
-flex-direction: column;
-padding: 0.5rem 0;
-display: flex;
-max-height: 0;
-overflow: hidden;
-transition: max-height 0.3s ease;
+  position: fixed;
+  top: 52px; left: 0; right: 0;
+  background: #ffffff;
+  border-bottom: 0.5px solid rgba(0,0,0,0.13);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 999;
+  flex-direction: column;
+  padding: 0.5rem 0;
+  display: flex;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
 .mobile-menu.open { max-height: 500px; }
 .mobile-menu a {
-font-family: ‘DM Sans’, sans-serif;
-font-size: 15px; color: #5c5b57;
-text-decoration: none;
-padding: 13px 1.25rem;
-border-bottom: 0.5px solid rgba(0,0,0,0.08);
-display: flex; align-items: center; justify-content: space-between;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px; color: #5c5b57;
+  text-decoration: none;
+  padding: 13px 1.25rem;
+  border-bottom: 0.5px solid rgba(0,0,0,0.08);
+  display: flex; align-items: center; justify-content: space-between;
 }
 .mobile-menu a:last-child { border-bottom: none; }
 .mobile-menu a:active { background: #f0efe9; }
@@ -261,7 +260,7 @@ display: flex; align-items: center; justify-content: space-between;
 .mobile-menu-arrow { font-size: 12px; color: #9a9994; }
 
 @media (max-width: 900px) {
-.hamburger { display: flex; }
+  .hamburger { display: flex; }
 }
 
 </style>
@@ -341,199 +340,197 @@ display: flex; align-items: center; justify-content: space-between;
 
   <main class="content">
 
-```
-<!-- 1. Client & Market Signals -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-title">Client &amp; Market Signals</div>
-    <div class="ai-chip">✦ AI monitored</div>
-  </div>
-  <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px 14px;">
-    <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:10px;">Client Sentiment</div>
-    <div class="sentiment-inner">
-      <div>
-        <div class="client-list">
-          <div class="client-row"><div class="client-dot" style="background:#D88B30;"></div><span class="client-name">Smith Family</span><span class="client-status">· Fearful</span></div>
-          <div class="client-row"><div class="client-dot" style="background:#A06010;"></div><span class="client-name">Jones Family</span><span class="client-status">· Concerned</span></div>
-          <div class="client-row"><div class="client-dot" style="background:#C94E28;"></div><span class="client-name">Lee Family</span><span class="client-status">· Worried</span></div>
-        </div>
-        <div style="font-size:10px;color:var(--text3);margin-top:10px;display:flex;align-items:center;gap:4px;">
-          Low Sentiment &nbsp;<span class="change-badge badge-down">▼ 7 pts</span>
-        </div>
+    <!-- 1. Client & Market Signals -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Client &amp; Market Signals</div>
+        <div class="ai-chip">✦ AI monitored</div>
       </div>
-      <div class="gauge-wrap">
-        <svg width="100" height="68" viewBox="0 0 100 68">
-          <defs>
-            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stop-color="#B83232"/>
-              <stop offset="30%" stop-color="#D88B30"/>
-              <stop offset="60%" stop-color="#D4B800"/>
-              <stop offset="100%" stop-color="#2E7D32"/>
-            </linearGradient>
-          </defs>
-          <path d="M10 55 A40 40 0 0 1 90 55" fill="none" stroke="#e8e7e0" stroke-width="8" stroke-linecap="round"/>
-          <path d="M10 55 A40 40 0 0 1 90 55" fill="none" stroke="url(#gaugeGrad)" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
-          <text x="10" y="66" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="6" fill="#B83232" font-weight="500">FEAR</text>
-          <text x="90" y="66" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="6" fill="#2E7D32" font-weight="500">GREED</text>
-          <line x1="50" y1="55" x2="22" y2="22" stroke="#1a1a16" stroke-width="2" stroke-linecap="round"/>
-          <circle cx="50" cy="55" r="4" fill="#1a1a16"/>
-          <text x="50" y="43" text-anchor="middle" font-family="DM Mono,monospace" font-size="14" font-weight="500" fill="#1a1a16">28</text>
-        </svg>
-      </div>
-    </div>
-  </div>
-  <div>
-    <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.4px;">Market Indicators</div>
-    <div style="display:flex;flex-direction:column;gap:6px;">
-      <div class="composite-row">
-        <div class="block-icon"><span></span><span></span><span></span><span></span></div>
-        <div class="comp-info"><div class="comp-name">Growth Composite</div><div class="comp-sub">55% Equity</div></div>
-        <div class="comp-stats"><div class="comp-pct">55%</div><div class="comp-ytd ytd-down">YTD −7.8%</div></div>
-      </div>
-      <div class="composite-row">
-        <div class="block-icon teal"><span></span><span></span><span></span><span></span></div>
-        <div class="comp-info"><div class="comp-name">Balanced Composite</div><div class="comp-sub">25% Equity</div></div>
-        <div class="comp-stats"><div class="comp-pct">25%</div><div class="comp-ytd ytd-up">YTD +3.5%</div></div>
-      </div>
-      <div class="composite-row">
-        <div class="block-icon amber"><span></span><span></span><span></span><span></span></div>
-        <div class="comp-info"><div class="comp-name">Income Composite</div><div class="comp-sub">20% Equity</div></div>
-        <div class="comp-stats"><div class="comp-pct">20%</div><div class="comp-ytd ytd-up">YTD +2.5%</div></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Meeting Insights bridge -->
-  <div style="background:var(--purple-lt);border:0.5px solid var(--purple-md);border-radius:var(--r-md);padding:10px 12px;display:flex;align-items:center;gap:10px;">
-    <span style="font-size:14px;flex-shrink:0;">💬</span>
-    <div style="flex:1;">
-      <div style="font-size:11.5px;font-weight:500;color:var(--text);margin-bottom:2px;">3 recent meeting insights need portfolio action</div>
-      <div style="font-size:11px;color:var(--text2);">Smith, Jones, Lee families — AI has translated client signals into suggested portfolio adjustments.</div>
-    </div>
-    <a href="clients.html" style="font-family:'Syne',sans-serif;font-size:10px;font-weight:600;padding:5px 11px;background:var(--purple);color:white;border-radius:4px;text-decoration:none;white-space:nowrap;">Review ↗</a>
-  </div>
-</div>
-<div class="card">
-  <div class="card-header">
-    <div class="card-title">Portfolio Risk Status</div>
-    <a href="composites.html" class="card-action" style="text-decoration:none;">✏ Edit Composites</a>
-  </div>
-  <div class="risk-inner">
-    <div class="gauge-wrap">
-      <svg width="110" height="76" viewBox="0 0 110 76">
-        <defs>
-          <linearGradient id="riskGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stop-color="#B83232"/>
-            <stop offset="30%" stop-color="#D4B800"/>
-            <stop offset="55%" stop-color="#1D9E75"/>
-            <stop offset="100%" stop-color="#2E7D32"/>
-          </linearGradient>
-        </defs>
-        <path d="M12 62 A43 43 0 0 1 98 62" fill="none" stroke="#e8e7e0" stroke-width="9" stroke-linecap="round"/>
-        <path d="M12 62 A43 43 0 0 1 98 62" fill="none" stroke="url(#riskGrad)" stroke-width="9" stroke-linecap="round" opacity="0.85"/>
-        <line x1="55" y1="62" x2="55" y2="18" stroke="#1a1a16" stroke-width="2.2" stroke-linecap="round"/>
-        <circle cx="55" cy="62" r="4.5" fill="#1a1a16"/>
-        <text x="55" y="50" text-anchor="middle" font-family="DM Mono,monospace" font-size="16" font-weight="500" fill="#1a1a16">54</text>
-        <text x="55" y="61" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="7.5" fill="#0F6E56" letter-spacing="0.5" font-weight="500">BALANCED</text>
-      </svg>
-      <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
-        <span style="font-size:11px;color:var(--text3);">Trend</span>
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral);">−0.2 ▼</span>
-        <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral);">−7.8%</span>
-      </div>
-    </div>
-    <div class="risk-right">
-      <div>
-        <div class="trend-label">Sector trend — 30d</div>
-        <div class="heatmap">
-          <div class="heat-cell" style="background:#2E7D32;opacity:0.7;"></div>
-          <div class="heat-cell" style="background:#2E7D32;opacity:0.5;"></div>
-          <div class="heat-cell" style="background:#D4B800;opacity:0.6;"></div>
-          <div class="heat-cell" style="background:#D4B800;opacity:0.8;"></div>
-          <div class="heat-cell" style="background:#D88B30;opacity:0.7;"></div>
-          <div class="heat-cell" style="background:#C94E28;opacity:0.6;"></div>
-          <div class="heat-cell" style="background:#C94E28;opacity:0.8;"></div>
-          <div class="heat-cell" style="background:#B83232;opacity:0.7;"></div>
+      <div style="background:var(--surface2);border-radius:var(--r-md);padding:12px 14px;">
+        <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:10px;">Client Sentiment</div>
+        <div class="sentiment-inner">
+          <div>
+            <div class="client-list">
+              <div class="client-row"><div class="client-dot" style="background:#D88B30;"></div><span class="client-name">Smith Family</span><span class="client-status">· Fearful</span></div>
+              <div class="client-row"><div class="client-dot" style="background:#A06010;"></div><span class="client-name">Jones Family</span><span class="client-status">· Concerned</span></div>
+              <div class="client-row"><div class="client-dot" style="background:#C94E28;"></div><span class="client-name">Lee Family</span><span class="client-status">· Worried</span></div>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:10px;display:flex;align-items:center;gap:4px;">
+              Low Sentiment &nbsp;<span class="change-badge badge-down">▼ 7 pts</span>
+            </div>
+          </div>
+          <div class="gauge-wrap">
+            <svg width="100" height="68" viewBox="0 0 100 68">
+              <defs>
+                <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                  <stop offset="0%" stop-color="#B83232"/>
+                  <stop offset="30%" stop-color="#D88B30"/>
+                  <stop offset="60%" stop-color="#D4B800"/>
+                  <stop offset="100%" stop-color="#2E7D32"/>
+                </linearGradient>
+              </defs>
+              <path d="M10 55 A40 40 0 0 1 90 55" fill="none" stroke="#e8e7e0" stroke-width="8" stroke-linecap="round"/>
+              <path d="M10 55 A40 40 0 0 1 90 55" fill="none" stroke="url(#gaugeGrad)" stroke-width="8" stroke-linecap="round" opacity="0.9"/>
+              <text x="10" y="66" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="6" fill="#B83232" font-weight="500">FEAR</text>
+              <text x="90" y="66" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="6" fill="#2E7D32" font-weight="500">GREED</text>
+              <line x1="50" y1="55" x2="22" y2="22" stroke="#1a1a16" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="50" cy="55" r="4" fill="#1a1a16"/>
+              <text x="50" y="43" text-anchor="middle" font-family="DM Mono,monospace" font-size="14" font-weight="500" fill="#1a1a16">28</text>
+            </svg>
+          </div>
         </div>
       </div>
       <div>
-        <div class="trend-label">Today's top movers</div>
-        <div class="movers">
-          <div class="mover-row"><span class="mover-name">CONS</span><span class="mover-val ytd-down">−1.4% ▼</span></div>
-          <div class="mover-row"><span class="mover-name">FIN</span><span class="mover-val ytd-up">+0.8% ▲</span></div>
-          <div class="mover-row"><span class="mover-name">TECH</span><span class="mover-val ytd-down">−0.9% ▼</span></div>
-          <div class="mover-row"><span class="mover-name">HLTH</span><span class="mover-val ytd-up">+0.3% ▲</span></div>
+        <div style="font-size:11px;font-weight:500;color:var(--text2);margin-bottom:8px;text-transform:uppercase;letter-spacing:0.4px;">Market Indicators</div>
+        <div style="display:flex;flex-direction:column;gap:6px;">
+          <div class="composite-row">
+            <div class="block-icon"><span></span><span></span><span></span><span></span></div>
+            <div class="comp-info"><div class="comp-name">Growth Composite</div><div class="comp-sub">55% Equity</div></div>
+            <div class="comp-stats"><div class="comp-pct">55%</div><div class="comp-ytd ytd-down">YTD −7.8%</div></div>
+          </div>
+          <div class="composite-row">
+            <div class="block-icon teal"><span></span><span></span><span></span><span></span></div>
+            <div class="comp-info"><div class="comp-name">Balanced Composite</div><div class="comp-sub">25% Equity</div></div>
+            <div class="comp-stats"><div class="comp-pct">25%</div><div class="comp-ytd ytd-up">YTD +3.5%</div></div>
+          </div>
+          <div class="composite-row">
+            <div class="block-icon amber"><span></span><span></span><span></span><span></span></div>
+            <div class="comp-info"><div class="comp-name">Income Composite</div><div class="comp-sub">20% Equity</div></div>
+            <div class="comp-stats"><div class="comp-pct">20%</div><div class="comp-ytd ytd-up">YTD +2.5%</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Meeting Insights bridge -->
+      <div style="background:var(--purple-lt);border:0.5px solid var(--purple-md);border-radius:var(--r-md);padding:10px 12px;display:flex;align-items:center;gap:10px;">
+        <span style="font-size:14px;flex-shrink:0;">💬</span>
+        <div style="flex:1;">
+          <div style="font-size:11.5px;font-weight:500;color:var(--text);margin-bottom:2px;">3 recent meeting insights need portfolio action</div>
+          <div style="font-size:11px;color:var(--text2);">Smith, Jones, Lee families — AI has translated client signals into suggested portfolio adjustments.</div>
+        </div>
+        <a href="clients.html" style="font-family:'Syne',sans-serif;font-size:10px;font-weight:600;padding:5px 11px;background:var(--purple);color:white;border-radius:4px;text-decoration:none;white-space:nowrap;">Review ↗</a>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Portfolio Risk Status</div>
+        <a href="composites.html" class="card-action" style="text-decoration:none;">✏ Edit Composites</a>
+      </div>
+      <div class="risk-inner">
+        <div class="gauge-wrap">
+          <svg width="110" height="76" viewBox="0 0 110 76">
+            <defs>
+              <linearGradient id="riskGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#B83232"/>
+                <stop offset="30%" stop-color="#D4B800"/>
+                <stop offset="55%" stop-color="#1D9E75"/>
+                <stop offset="100%" stop-color="#2E7D32"/>
+              </linearGradient>
+            </defs>
+            <path d="M12 62 A43 43 0 0 1 98 62" fill="none" stroke="#e8e7e0" stroke-width="9" stroke-linecap="round"/>
+            <path d="M12 62 A43 43 0 0 1 98 62" fill="none" stroke="url(#riskGrad)" stroke-width="9" stroke-linecap="round" opacity="0.85"/>
+            <line x1="55" y1="62" x2="55" y2="18" stroke="#1a1a16" stroke-width="2.2" stroke-linecap="round"/>
+            <circle cx="55" cy="62" r="4.5" fill="#1a1a16"/>
+            <text x="55" y="50" text-anchor="middle" font-family="DM Mono,monospace" font-size="16" font-weight="500" fill="#1a1a16">54</text>
+            <text x="55" y="61" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="7.5" fill="#0F6E56" letter-spacing="0.5" font-weight="500">BALANCED</text>
+          </svg>
+          <div style="display:flex;align-items:center;gap:6px;margin-top:2px;">
+            <span style="font-size:11px;color:var(--text3);">Trend</span>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral);">−0.2 ▼</span>
+            <span style="font-family:'DM Mono',monospace;font-size:11px;color:var(--coral);">−7.8%</span>
+          </div>
+        </div>
+        <div class="risk-right">
+          <div>
+            <div class="trend-label">Sector trend — 30d</div>
+            <div class="heatmap">
+              <div class="heat-cell" style="background:#2E7D32;opacity:0.7;"></div>
+              <div class="heat-cell" style="background:#2E7D32;opacity:0.5;"></div>
+              <div class="heat-cell" style="background:#D4B800;opacity:0.6;"></div>
+              <div class="heat-cell" style="background:#D4B800;opacity:0.8;"></div>
+              <div class="heat-cell" style="background:#D88B30;opacity:0.7;"></div>
+              <div class="heat-cell" style="background:#C94E28;opacity:0.6;"></div>
+              <div class="heat-cell" style="background:#C94E28;opacity:0.8;"></div>
+              <div class="heat-cell" style="background:#B83232;opacity:0.7;"></div>
+            </div>
+          </div>
+          <div>
+            <div class="trend-label">Today's top movers</div>
+            <div class="movers">
+              <div class="mover-row"><span class="mover-name">CONS</span><span class="mover-val ytd-down">−1.4% ▼</span></div>
+              <div class="mover-row"><span class="mover-name">FIN</span><span class="mover-val ytd-up">+0.8% ▲</span></div>
+              <div class="mover-row"><span class="mover-name">TECH</span><span class="mover-val ytd-down">−0.9% ▼</span></div>
+              <div class="mover-row"><span class="mover-name">HLTH</span><span class="mover-val ytd-up">+0.3% ▲</span></div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- 3. Block Library -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-title">Block Library</div>
-    <div style="display:flex;gap:6px;">
-      <a href="assembly.html" class="card-action" style="text-decoration:none;">Assemble portfolio ›</a>
-      <div class="card-action" onclick="location.href='blocks-builder.html'" style="cursor:pointer;">Manage blocks ›</div>
+    <!-- 3. Block Library -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Block Library</div>
+        <div style="display:flex;gap:6px;">
+          <a href="assembly.html" class="card-action" style="text-decoration:none;">Assemble portfolio ›</a>
+          <div class="card-action" onclick="location.href='blocks-builder.html'" style="cursor:pointer;">Manage blocks ›</div>
+        </div>
+      </div>
+      <div class="block-lib-inner">
+        <div class="block-lib-list">
+          <div class="lib-row"><div class="lib-icon"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">Core Equity</div><div class="lib-ret">3Y Return 16.1%</div></div><div class="lib-alloc">40%</div></div>
+          <div class="lib-row"><div class="lib-icon teal"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">International Equity</div><div class="lib-ret">3Y Return 5.6%</div></div><div class="lib-alloc">15%</div></div>
+          <div class="lib-row"><div class="lib-icon"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">Tech &amp; Innovation</div><div class="lib-ret">3Y Return 18.1%</div></div><div class="lib-alloc">12%</div></div>
+          <div class="lib-row"><div class="lib-icon coral"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">Healthcare</div><div class="lib-ret">3Y Return 3.6%</div></div><div class="lib-alloc">10%</div></div>
+          <div class="lib-row"><div class="lib-icon amber"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">Short Duration Bonds</div><div class="lib-ret">3Y Return 3.0%</div></div><div class="lib-alloc">8%</div></div>
+        </div>
+        <div class="derisk">
+          <div class="derisk-title">Opportunity to De-Risk</div>
+          <div class="derisk-item"><div class="check-icon"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Fear &amp; Greed Index <strong>28</strong></span></div>
+          <div class="derisk-item"><div class="check-icon"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Oversold Oscillator <strong>−8.2</strong> ▼</span></div>
+          <div class="derisk-item"><div class="check-icon"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span><strong>Sentiment Drift</strong> falling, −10pts past week</span></div>
+          <div class="derisk-cta"><p>Shift 5% from Core Equity to Short Duration</p><span>AI-recommended rebalance</span></div>
+          <div class="review-btn">Review Changes</div>
+          <div class="derisk-footer"><input type="checkbox" checked style="margin-top:1px;flex-shrink:0;accent-color:var(--purple);width:11px;height:11px;"> I review and approve all changes suggested by AI before calling action.</div>
+        </div>
+      </div>
     </div>
-  </div>
-  <div class="block-lib-inner">
-    <div class="block-lib-list">
-      <div class="lib-row"><div class="lib-icon"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">Core Equity</div><div class="lib-ret">3Y Return 16.1%</div></div><div class="lib-alloc">40%</div></div>
-      <div class="lib-row"><div class="lib-icon teal"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">International Equity</div><div class="lib-ret">3Y Return 5.6%</div></div><div class="lib-alloc">15%</div></div>
-      <div class="lib-row"><div class="lib-icon"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">Tech &amp; Innovation</div><div class="lib-ret">3Y Return 18.1%</div></div><div class="lib-alloc">12%</div></div>
-      <div class="lib-row"><div class="lib-icon coral"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">Healthcare</div><div class="lib-ret">3Y Return 3.6%</div></div><div class="lib-alloc">10%</div></div>
-      <div class="lib-row"><div class="lib-icon amber"><span></span><span></span><span></span><span></span></div><div class="lib-info"><div class="lib-name">Short Duration Bonds</div><div class="lib-ret">3Y Return 3.0%</div></div><div class="lib-alloc">8%</div></div>
-    </div>
-    <div class="derisk">
-      <div class="derisk-title">Opportunity to De-Risk</div>
-      <div class="derisk-item"><div class="check-icon"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Fear &amp; Greed Index <strong>28</strong></span></div>
-      <div class="derisk-item"><div class="check-icon"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span>Oversold Oscillator <strong>−8.2</strong> ▼</span></div>
-      <div class="derisk-item"><div class="check-icon"><svg width="8" height="8" viewBox="0 0 8 8"><path d="M1.5 4l2 2 3-3" stroke="white" stroke-width="1.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span><strong>Sentiment Drift</strong> falling, −10pts past week</span></div>
-      <div class="derisk-cta"><p>Shift 5% from Core Equity to Short Duration</p><span>AI-recommended rebalance</span></div>
-      <div class="review-btn">Review Changes</div>
-      <div class="derisk-footer"><input type="checkbox" checked style="margin-top:1px;flex-shrink:0;accent-color:var(--purple);width:11px;height:11px;"> I review and approve all changes suggested by AI before calling action.</div>
-    </div>
-  </div>
-</div>
 
-<!-- 4. Composite Overview -->
-<div class="card">
-  <div class="card-header">
-    <div class="card-title">Composite Overview</div>
-    <div class="card-action" onclick="location.href='composites.html'" style="cursor:pointer;text-decoration:none;">Edit Composites ›</div>
-  </div>
-  <table class="comp-table">
-    <thead>
-      <tr><th>Composite</th><th>Equity %</th><th>Trend</th><th>YTD</th><th>AUM</th></tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td><div class="tname">Growth Composite</div><div class="tsub">39% Equity · V0.43%</div></td>
-        <td><span class="tpct">55%</span></td>
-        <td><div class="mini-bars"><div class="mini-bar" style="height:8px;background:var(--teal);"></div><div class="mini-bar" style="height:12px;background:var(--teal);"></div><div class="mini-bar" style="height:10px;background:var(--amber);"></div><div class="mini-bar" style="height:6px;background:var(--coral);"></div><div class="mini-bar" style="height:4px;background:var(--coral);"></div></div></td>
-        <td><span class="tytd ytd-up">+9.1%</span></td>
-        <td><div class="taum">$47.2M</div><div class="taum-sub">$37.8M↓</div></td>
-      </tr>
-      <tr>
-        <td><div class="tname">Balanced Composite</div><div class="tsub">36% Equity · V0.43%</div></td>
-        <td><span class="tpct">25%</span></td>
-        <td><div class="mini-bars"><div class="mini-bar" style="height:6px;background:var(--teal);"></div><div class="mini-bar" style="height:10px;background:var(--teal);"></div><div class="mini-bar" style="height:12px;background:var(--teal);"></div><div class="mini-bar" style="height:9px;background:var(--amber);"></div><div class="mini-bar" style="height:7px;background:var(--amber);"></div></div></td>
-        <td><span class="tytd ytd-up">+3.9%</span></td>
-        <td><div class="taum">$21.8M</div><div class="taum-sub">$17.1M↓</div></td>
-      </tr>
-      <tr>
-        <td><div class="tname">Income Composite</div><div class="tsub">22% Equity · V0.31%</div></td>
-        <td><span class="tpct">20%</span></td>
-        <td><div class="mini-bars"><div class="mini-bar" style="height:9px;background:var(--teal);"></div><div class="mini-bar" style="height:11px;background:var(--teal);"></div><div class="mini-bar" style="height:10px;background:var(--teal);"></div><div class="mini-bar" style="height:12px;background:var(--teal);"></div><div class="mini-bar" style="height:10px;background:var(--teal);"></div></div></td>
-        <td><span class="tytd ytd-up">+2.5%</span></td>
-        <td><div class="taum">$14.6M</div><div class="taum-sub">$12.2M↓</div></td>
-      </tr>
-    </tbody>
-  </table>
-</div>
-```
+    <!-- 4. Composite Overview -->
+    <div class="card">
+      <div class="card-header">
+        <div class="card-title">Composite Overview</div>
+        <div class="card-action" onclick="location.href='composites.html'" style="cursor:pointer;text-decoration:none;">Edit Composites ›</div>
+      </div>
+      <table class="comp-table">
+        <thead>
+          <tr><th>Composite</th><th>Equity %</th><th>Trend</th><th>YTD</th><th>AUM</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><div class="tname">Growth Composite</div><div class="tsub">39% Equity · V0.43%</div></td>
+            <td><span class="tpct">55%</span></td>
+            <td><div class="mini-bars"><div class="mini-bar" style="height:8px;background:var(--teal);"></div><div class="mini-bar" style="height:12px;background:var(--teal);"></div><div class="mini-bar" style="height:10px;background:var(--amber);"></div><div class="mini-bar" style="height:6px;background:var(--coral);"></div><div class="mini-bar" style="height:4px;background:var(--coral);"></div></div></td>
+            <td><span class="tytd ytd-up">+9.1%</span></td>
+            <td><div class="taum">$47.2M</div><div class="taum-sub">$37.8M↓</div></td>
+          </tr>
+          <tr>
+            <td><div class="tname">Balanced Composite</div><div class="tsub">36% Equity · V0.43%</div></td>
+            <td><span class="tpct">25%</span></td>
+            <td><div class="mini-bars"><div class="mini-bar" style="height:6px;background:var(--teal);"></div><div class="mini-bar" style="height:10px;background:var(--teal);"></div><div class="mini-bar" style="height:12px;background:var(--teal);"></div><div class="mini-bar" style="height:9px;background:var(--amber);"></div><div class="mini-bar" style="height:7px;background:var(--amber);"></div></div></td>
+            <td><span class="tytd ytd-up">+3.9%</span></td>
+            <td><div class="taum">$21.8M</div><div class="taum-sub">$17.1M↓</div></td>
+          </tr>
+          <tr>
+            <td><div class="tname">Income Composite</div><div class="tsub">22% Equity · V0.31%</div></td>
+            <td><span class="tpct">20%</span></td>
+            <td><div class="mini-bars"><div class="mini-bar" style="height:9px;background:var(--teal);"></div><div class="mini-bar" style="height:11px;background:var(--teal);"></div><div class="mini-bar" style="height:10px;background:var(--teal);"></div><div class="mini-bar" style="height:12px;background:var(--teal);"></div><div class="mini-bar" style="height:10px;background:var(--teal);"></div></div></td>
+            <td><span class="tytd ytd-up">+2.5%</span></td>
+            <td><div class="taum">$14.6M</div><div class="taum-sub">$12.2M↓</div></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
 
   </main>
 </div>

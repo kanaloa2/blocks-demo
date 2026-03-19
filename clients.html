@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Google tag (gtag.js) -->
+<!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N55JYVPMX"></script>
 <script>
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
-
   gtag('config', 'G-6N55JYVPMX');
 </script>
 <meta charset="UTF-8">
@@ -45,7 +44,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; cursor: pointer; }
 .shell { display: grid; grid-template-columns: 68px 1fr; min-height: calc(100vh - 52px); }
 .sidenav { background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
-.sidenav-item { width: 44px; height: 44px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 9px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; }
+.sidenav-item { width: 64px; height: 52px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; text-align: center; line-height: 1.2; }
 .sidenav-item:hover { background: var(--surface2); color: var(--text2); }
 .sidenav-item.active { background: var(--purple-lt); color: var(--purple); }
 .ai-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: var(--purple-lt); color: var(--purple); border-radius: 20px; padding: 3px 9px; font-weight: 500; }
@@ -176,32 +175,30 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .mobile-menu {
-  display: none;
   position: fixed;
   top: 52px; left: 0; right: 0;
   background: #ffffff;
   border-bottom: 0.5px solid rgba(0,0,0,0.13);
   box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-  z-index: 99;
+  z-index: 999;
   flex-direction: column;
   padding: 0.5rem 0;
-  opacity: 0;
-  transform: translateY(-8px);
-  transition: transform 0.2s ease, opacity 0.2s ease;
-  pointer-events: none;
+  display: flex;
+  max-height: 0;
+  overflow: hidden;
+  transition: max-height 0.3s ease;
 }
-.mobile-menu.open { display: flex; opacity: 1; transform: translateY(0); pointer-events: all; }
+.mobile-menu.open { max-height: 500px; }
 .mobile-menu a {
   font-family: 'DM Sans', sans-serif;
   font-size: 15px; color: #5c5b57;
   text-decoration: none;
-  padding: 12px 1.25rem;
+  padding: 13px 1.25rem;
   border-bottom: 0.5px solid rgba(0,0,0,0.08);
   display: flex; align-items: center; justify-content: space-between;
-  transition: background 0.1s;
 }
 .mobile-menu a:last-child { border-bottom: none; }
-.mobile-menu a:hover { background: #f0efe9; color: #181816; }
+.mobile-menu a:active { background: #f0efe9; }
 .mobile-menu a.m-active { color: #534AB7; font-weight: 500; }
 .mobile-menu-arrow { font-size: 12px; color: #9a9994; }
 
@@ -483,7 +480,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <div class="meeting-item-head">
               <div class="meeting-avatar" style="background:#FCEBEB;color:#B83232;">SF</div>
               <div class="meeting-client">Smith Family</div>
-              <div class="meeting-date">Mar 12 · Meeting transcript</div>
+              <div class="meeting-date">Mar 12 · Zocks transcript</div>
             </div>
             <div class="meeting-signal">
               Client expressed <strong>fear about inflation and rising rates.</strong> Referenced recent news, mentioned wanting to "be more conservative." Sentiment score dropped to <strong>28</strong>.
@@ -498,7 +495,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <div class="meeting-item-head">
               <div class="meeting-avatar" style="background:#FEF3DC;color:#A06010;">JF</div>
               <div class="meeting-client">Jones Family</div>
-              <div class="meeting-date">Mar 11 · Meeting transcript</div>
+              <div class="meeting-date">Mar 11 · Zocks transcript</div>
             </div>
             <div class="meeting-signal">
               Client asked about <strong>gold and inflation hedges</strong> after reading about central bank purchases. Expressed concern about dollar strength. Sentiment score <strong>42</strong>.
@@ -513,7 +510,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
             <div class="meeting-item-head">
               <div class="meeting-avatar" style="background:#EEEDFE;color:#534AB7;">LF</div>
               <div class="meeting-client">Lee Family</div>
-              <div class="meeting-date">Mar 10 · Meeting transcript</div>
+              <div class="meeting-date">Mar 10 · Zocks transcript</div>
             </div>
             <div class="meeting-signal">
               Client mentioned <strong>upcoming large distribution need in 18 months.</strong> Requested more liquidity. Currently 100% in Income Composite.
