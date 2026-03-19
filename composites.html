@@ -147,6 +147,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .hamburger.open span:nth-child(3) { transform: translateY(-6px) rotate(-45deg); }
 
 .mobile-menu {
+  display: none;
   position: fixed;
   top: 52px; left: 0; right: 0;
   background: #ffffff;
@@ -155,12 +156,8 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
   z-index: 999;
   flex-direction: column;
   padding: 0.5rem 0;
-  display: flex;
-  max-height: 0;
-  overflow: hidden;
-  transition: max-height 0.3s ease;
 }
-.mobile-menu.open { max-height: 500px; }
+.mobile-menu.open { display: flex; }
 .mobile-menu a {
   font-family: 'DM Sans', sans-serif;
   font-size: 15px; color: #5c5b57;
@@ -463,6 +460,27 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 function selectTab(el) {
   el.parentElement.querySelectorAll('.perf-tab').forEach(t => t.classList.remove('active'));
   el.classList.add('active');
+}
+</script>
+
+<script>
+function toggleMobileMenu() {
+  var menu = document.getElementById('mobileMenu');
+  var btn = document.getElementById('hamburger');
+  if (!menu) return;
+  if (menu.classList.contains('open')) {
+    menu.classList.remove('open');
+    if (btn) btn.classList.remove('open');
+  } else {
+    menu.classList.add('open');
+    if (btn) btn.classList.add('open');
+  }
+}
+function closeMobileMenu() {
+  var menu = document.getElementById('mobileMenu');
+  var btn = document.getElementById('hamburger');
+  if (menu) menu.classList.remove('open');
+  if (btn) btn.classList.remove('open');
 }
 </script>
 </body>
