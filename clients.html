@@ -14,18 +14,23 @@
 <title>Blocks — Clients</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* Ensure the toolbar doesn't clip the tooltip */
+/* 1. Fix the Parent Container so it doesn't clip the tooltip */
 .table-toolbar {
   overflow: visible !important;
   position: relative;
-  z-index: 10; /* Lower than the tooltip, but higher than the table below */
+  z-index: 10; 
 }
 
-/* Tooltip Text - Adjusting the 'bottom' value to ensure it clears the chip border */
+/* 2. Tooltip Container */
+.filter-chip {
+  position: relative; 
+}
+
+/* 3. Tooltip Text (The black bubble) */
 .filter-chip::after {
   content: "Triggers: Sentiment < Neutral OR Drift > 3%";
   position: absolute;
-  bottom: calc(100% + 10px); /* Moves it slightly higher */
+  bottom: calc(100% + 10px); /* Pushes it 10px above the chip */
   left: 50%;
   transform: translateX(-50%);
   background-color: #333;
@@ -37,12 +42,12 @@
   opacity: 0;
   visibility: hidden;
   transition: opacity 0.2s, visibility 0.2s;
-  z-index: 9999; /* Force it to the very top layer */
+  z-index: 9999; /* This forces it to the very front of the screen */
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Tooltip Arrow - Aligning with the new bottom position */
+/* 4. Tooltip Arrow (The little triangle) */
 .filter-chip::before {
   content: "";
   position: absolute;
@@ -56,6 +61,13 @@
   visibility: hidden;
   transition: opacity 0.2s, visibility 0.2s;
   z-index: 9999;
+}
+
+/* 5. Trigger Visibility on Hover */
+#filter-attention:hover::after,
+#filter-attention:hover::before {
+  opacity: 1;
+  visibility: visible;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
