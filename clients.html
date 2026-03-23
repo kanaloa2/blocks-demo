@@ -35,77 +35,96 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .nav-links a.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 500; }
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; }
 
-/* Sidebar & Layout */
+/* Layout Shell */
 .shell { display: grid; grid-template-columns: 68px 1fr; min-height: calc(100vh - 52px); }
 .sidenav { background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
-.sidenav-item { width: 48px; height: 48px; border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); transition: all 0.2s; }
+.sidenav-item { width: 64px; height: 52px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s; text-align: center; }
 .sidenav-item:hover { background: var(--surface2); color: var(--text2); }
 .sidenav-item.active { background: var(--purple-lt); color: var(--purple); }
 
 .page-content { padding: 1.5rem; }
 .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; }
-.page-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); }
+.page-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
 
-/* Metrics */
-.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
-.metric { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1.125rem; }
-.metric-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
-.metric-val { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; }
+/* Metrics Row */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
+.metric { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1rem 1.125rem; }
+.metric-label { font-size: 11px; color: var(--text2); margin-bottom: 5px; }
+.metric-val { font-family: 'DM Mono', monospace; font-size: 21px; font-weight: 500; color: var(--text); }
 
-/* Grid for Table and Insights */
-.two-col { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; }
+/* Main Grid */
+.two-col { display: grid; grid-template-columns: 1fr 340px; gap: 1.25rem; }
 .table-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; }
+.table-toolbar { display: flex; align-items: center; padding: 12px 16px; border-bottom: 0.5px solid var(--border2); }
+.table-toolbar-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); }
+
 .client-table { width: 100%; border-collapse: collapse; }
-.client-table th { font-size: 10px; text-transform: uppercase; color: var(--text3); text-align: left; padding: 10px 14px; background: var(--surface2); border-bottom: 0.5px solid var(--border2); }
-.client-table td { padding: 12px 14px; border-bottom: 0.5px solid var(--border); }
+.client-table th { font-size: 10px; text-transform: uppercase; color: var(--text3); text-align: left; padding: 8px 14px; background: var(--surface2); border-bottom: 0.5px solid var(--border2); }
+.client-table td { padding: 11px 14px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
 
-/* Sidebar Insights */
+/* Right Panel Elements */
 .right-panel { display: flex; flex-direction: column; gap: 1rem; }
-.focus-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1.25rem; }
-.focus-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
-.insight-item { font-size: 12px; color: var(--text2); padding: 8px 0; border-bottom: 0.5px solid var(--border); }
-.insight-item:last-child { border: none; }
+.focus-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1.125rem 1.25rem; }
+.focus-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
 
-/* Table Elements */
+/* Row Components */
 .client-cell { display: flex; align-items: center; gap: 10px; }
 .client-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
-.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
+.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; display: inline-block; white-space: nowrap; }
 .mono { font-family: 'DM Mono', monospace; }
 .up { color: var(--teal); }
+.sentiment-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 6px; }
+
 </style>
 </head>
 <body>
 
 <nav class="topnav">
-  <a href="index.html" class="logo">
-    <div class="logo-mark"><span></span><span></span><span></span><span></span></div>
-    Blocks
-  </a>
+  <div style="display:flex;flex-direction:column;">
+    <a href="index.html" class="logo">
+      <div class="logo-mark"><span></span><span></span><span></span><span></span></div>
+      Blocks
+    </a>
+    <div class="subnav">AI-assisted portfolio construction</div>
+  </div>
   <div class="nav-links">
     <a href="dashboard.html">Dashboard</a>
     <a href="clients.html" class="active">Clients</a>
     <a href="blocks-builder.html">Block Library</a>
     <a href="assembly.html">Build</a>
   </div>
-  <div class="nav-right" style="margin-left:auto;">
+  <div class="nav-right">
     <div class="avatar">CJ</div>
   </div>
 </nav>
 
 <div class="shell">
   <nav class="sidenav">
-    <div class="sidenav-item" onclick="location.href='dashboard.html'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
-    <div class="sidenav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
-    <div class="sidenav-item" onclick="location.href='blocks-builder.html'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
+    <div class="sidenav-item" onclick="location.href='dashboard.html'">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+      Dash
+    </div>
+    <div class="sidenav-item active">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
+      Clients
+    </div>
+    <div class="sidenav-item" onclick="location.href='blocks-builder.html'">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+      Blocks
+    </div>
+    <div class="sidenav-item" onclick="location.href='assembly.html'">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"></polyline><polyline points="8 6 2 12 8 18"></polyline></svg>
+        Build
+    </div>
   </nav>
 
   <div class="page-content">
     <div class="page-header">
       <div>
         <div class="page-title">Clients</div>
-        <div style="font-size:12px; color:var(--text3);" id="status-text">Connecting to database...</div>
+        <div id="status-text" style="font-size:12px; color:var(--text3);">Syncing data...</div>
       </div>
-      <button style="background:var(--purple); color:white; border:none; padding:8px 16px; border-radius:var(--r-sm); font-weight:600; cursor:pointer;">+ Add Client</button>
+      <button style="background:var(--purple); color:white; border:none; padding:7px 16px; border-radius:var(--r-sm); font-weight:600; cursor:pointer;">+ Add Client</button>
     </div>
 
     <div class="metrics">
@@ -117,9 +136,18 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
     <div class="two-col">
       <div class="table-card">
+        <div class="table-toolbar"><div class="table-toolbar-title">Active Households</div></div>
         <table class="client-table">
           <thead>
-            <tr><th>Client</th><th>Tags</th><th>AUM</th><th>Status</th></tr>
+            <tr>
+              <th>Client</th>
+              <th>Tags</th>
+              <th>AUM</th>
+              <th>Perf.</th>
+              <th>Sentiment</th>
+              <th>Drift</th>
+              <th>Status</th>
+            </tr>
           </thead>
           <tbody id="clients-list">
             </tbody>
@@ -129,13 +157,22 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div class="right-panel">
         <div class="focus-card">
           <div class="focus-title">Insights</div>
-          <div class="insight-item"><strong>3</strong> households require rebalancing.</div>
-          <div class="insight-item">High drift detected in <strong>Sloan Family</strong> account.</div>
-          <div class="insight-item">New signal for <strong>Tech Growth</strong> block.</div>
+          <div style="font-size:12px; color:var(--text2); display:flex; flex-direction:column; gap:10px;">
+            <div style="display:flex; gap:8px;">
+                <span style="color:var(--purple);">●</span>
+                <span><strong>3</strong> households require rebalancing based on current drift.</span>
+            </div>
+            <div style="display:flex; gap:8px;">
+                <span style="color:var(--coral);">●</span>
+                <span>High drift detected in <strong>Sloan Family</strong> account.</span>
+            </div>
+          </div>
         </div>
         <div class="focus-card">
           <div class="focus-title">Recent Activity</div>
-          <div style="font-size:11px; color:var(--text3);">No recent changes.</div>
+          <div style="font-size:11px; color:var(--text3); line-height:1.4;">
+            No significant changes detected in the last 24 hours across the book.
+          </div>
         </div>
       </div>
     </div>
@@ -144,45 +181,57 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // YOUR ACTUAL KEYS
-  const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co';
+  const SUPABASE_URL = 'https://ovhpgatclcljmvixatrv.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
 
   async function init() {
     try {
       const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data: households, error } = await _supabase.from('households').select('*');
+      const { data: households, error } = await _supabase
+        .from('households')
+        .select('*');
 
       if (error) throw error;
 
       const listContainer = document.getElementById('clients-list');
       document.getElementById('house-count').innerText = households.length;
-      document.getElementById('status-text').innerText = `${households.length} active households`;
+      document.getElementById('status-text').innerText = `${households.length} active households synced`;
 
       listContainer.innerHTML = '';
       households.forEach(house => {
         const row = document.createElement('tr');
-        const tags = house.tags ? house.tags.map(t => `<span class="tag" style="background:var(--purple-lt);color:var(--purple);margin-right:4px;">${t}</span>`).join('') : '';
+        
+        const tags = house.tags ? house.tags.map(t => 
+          `<span class="tag" style="background:var(--purple-lt);color:var(--purple);margin-right:4px;">${t}</span>`
+        ).join('') : '';
 
         row.innerHTML = `
           <td>
             <div class="client-cell">
-              <div class="client-avatar" style="background:var(--surface2); color:var(--text2);">${house.name.charAt(0)}</div>
+              <div class="client-avatar" style="background:var(--surface2); color:var(--text2);">${house.name ? house.name.charAt(0) : '?'}</div>
               <div>
-                <div style="font-weight:500;">${house.name}</div>
-                <div style="font-size:11px; color:var(--text3);">Household</div>
+                <div style="font-weight:500;">${house.name || 'Unnamed'}</div>
+                <div style="font-size:11px; color:var(--text3);">Active Household</div>
               </div>
             </div>
           </td>
           <td>${tags}</td>
           <td><span class="mono">$0.0M</span></td>
-          <td><span class="tag" style="background:var(--teal-lt);color:var(--teal);">Active</span></td>
+          <td><span class="mono up">+0.0%</span></td>
+          <td>
+            <div style="display:flex; align-items:center;">
+                <span class="sentiment-dot" style="background:#1D9E75;"></span>
+                <span>Neutral</span>
+            </div>
+          </td>
+          <td><span class="mono" style="color:var(--teal);">0.0%</span></td>
+          <td><span class="tag" style="background:var(--teal-lt);color:var(--teal);">Healthy</span></td>
         `;
         listContainer.appendChild(row);
       });
     } catch (err) {
       console.error(err);
-      document.getElementById('status-text').innerText = "Connection error.";
+      document.getElementById('status-text').innerText = "Database connection error.";
     }
   }
 
