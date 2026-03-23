@@ -14,6 +14,53 @@
 <title>Blocks — Clients</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* Tooltip Container */
+.filter-chip {
+  position: relative; /* Required for absolute positioning of tooltip */
+}
+
+/* Tooltip Text */
+.filter-chip::after {
+  content: "Triggers: Sentiment < Neutral OR Drift > 3%";
+  position: absolute;
+  bottom: 125%; /* Position above the chip */
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 11px;
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s;
+  z-index: 100;
+  pointer-events: none;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+/* Tooltip Arrow */
+.filter-chip::before {
+  content: "";
+  position: absolute;
+  bottom: 110%;
+  left: 50%;
+  transform: translateX(-50%);
+  border-width: 5px;
+  border-style: solid;
+  border-color: #333 transparent transparent transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s;
+}
+
+/* Only show tooltip for the Needs Attention chip */
+#filter-attention:hover::after,
+#filter-attention:hover::before {
+  opacity: 1;
+  visibility: visible;
+}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
   --bg: #f6f5f2; --surface: #ffffff; --surface2: #f0efe9; --surface3: #e8e7e0;
