@@ -3,60 +3,7 @@
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N55JYVPMX"></script>
-<script>
-  // 1. Initialize the client (ensure your URL/KEY are defined above this)
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-// 2. The function that decides: Show Dashboard or Show Login?
-async function checkUser() {
-  const { data: { user } } = await _supabase.auth.getUser();
-  const gate = document.getElementById('auth-gate');
-
-  if (!user) {
-    // No one is logged in. Show the overlay.
-    gate.style.display = 'flex';
-  } else {
-    // Advisor is logged in! Hide the overlay and load their private data.
-    gate.style.display = 'none';
-    fetchHouseholds(user.id);
-  }
-}
-
-// 3. The logic for the Login/Signup buttons
-async function handleAuth(type) {
-  const email = document.getElementById('auth-email').value;
-  const password = document.getElementById('auth-password').value;
-  const errorEl = document.getElementById('auth-error');
-  
-  errorEl.style.display = 'none';
-
-  try {
-    let result;
-    if (type === 'signup') {
-      result = await _supabase.auth.signUp({ email, password });
-      alert("Check your email for a confirmation link (if enabled) or try logging in!");
-    } else {
-      result = await _supabase.auth.signInWithPassword({ email, password });
-    }
-
-    if (result.error) throw result.error;
-    
-    // Success! Refresh the page to trigger checkUser again
-    if (result.data.user) window.location.reload();
-    
-  } catch (err) {
-    errorEl.innerText = err.message;
-    errorEl.style.display = 'block';
-  }
-}
-
-// 4. Start the check as soon as the page loads
-document.addEventListener('DOMContentLoaded', checkUser);
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'G-6N55JYVPMX');
-</script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blocks — Clients</title>
@@ -766,7 +713,60 @@ function closeMobileMenu() {
     <p id="auth-error" style="color:red; font-size:12px; margin-top:15px; display:none;"></p>
   </div>
 </div>
+<script>
+  // 1. Initialize the client (ensure your URL/KEY are defined above this)
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+// 2. The function that decides: Show Dashboard or Show Login?
+async function checkUser() {
+  const { data: { user } } = await _supabase.auth.getUser();
+  const gate = document.getElementById('auth-gate');
+
+  if (!user) {
+    // No one is logged in. Show the overlay.
+    gate.style.display = 'flex';
+  } else {
+    // Advisor is logged in! Hide the overlay and load their private data.
+    gate.style.display = 'none';
+    fetchHouseholds(user.id);
+  }
+}
+
+// 3. The logic for the Login/Signup buttons
+async function handleAuth(type) {
+  const email = document.getElementById('auth-email').value;
+  const password = document.getElementById('auth-password').value;
+  const errorEl = document.getElementById('auth-error');
+  
+  errorEl.style.display = 'none';
+
+  try {
+    let result;
+    if (type === 'signup') {
+      result = await _supabase.auth.signUp({ email, password });
+      alert("Check your email for a confirmation link (if enabled) or try logging in!");
+    } else {
+      result = await _supabase.auth.signInWithPassword({ email, password });
+    }
+
+    if (result.error) throw result.error;
+    
+    // Success! Refresh the page to trigger checkUser again
+    if (result.data.user) window.location.reload();
+    
+  } catch (err) {
+    errorEl.innerText = err.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+// 4. Start the check as soon as the page loads
+document.addEventListener('DOMContentLoaded', checkUser);
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-6N55JYVPMX');
+</script>
   </body>
 </html>
 </body>
