@@ -4,6 +4,54 @@
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N55JYVPMX"></script>
 <script>
+  // 1. Initialize the client (ensure your URL/KEY are defined above this)
+const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+// 2. The function that decides: Show Dashboard or Show Login?
+async function checkUser() {
+  const { data: { user } } = await _supabase.auth.getUser();
+  const gate = document.getElementById('auth-gate');
+
+  if (!user) {
+    // No one is logged in. Show the overlay.
+    gate.style.display = 'flex';
+  } else {
+    // Advisor is logged in! Hide the overlay and load their private data.
+    gate.style.display = 'none';
+    fetchHouseholds(user.id);
+  }
+}
+
+// 3. The logic for the Login/Signup buttons
+async function handleAuth(type) {
+  const email = document.getElementById('auth-email').value;
+  const password = document.getElementById('auth-password').value;
+  const errorEl = document.getElementById('auth-error');
+  
+  errorEl.style.display = 'none';
+
+  try {
+    let result;
+    if (type === 'signup') {
+      result = await _supabase.auth.signUp({ email, password });
+      alert("Check your email for a confirmation link (if enabled) or try logging in!");
+    } else {
+      result = await _supabase.auth.signInWithPassword({ email, password });
+    }
+
+    if (result.error) throw result.error;
+    
+    // Success! Refresh the page to trigger checkUser again
+    if (result.data.user) window.location.reload();
+    
+  } catch (err) {
+    errorEl.innerText = err.message;
+    errorEl.style.display = 'block';
+  }
+}
+
+// 4. Start the check as soon as the page loads
+document.addEventListener('DOMContentLoaded', checkUser);
   window.dataLayer = window.dataLayer || [];
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
@@ -661,20 +709,25 @@ function closeMobileMenu() {
   }
 
   // 6. Initial Data Fetch
-  async function fetchHouseholds() {
-    try {
-      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data, error } = await _supabase.from('households').select('*').order('name', { ascending: true });
-      if (error) throw error;
+  async function fetchHouseholds(userId) {
+  try {
+    // Supabase RLS will automatically filter this based on the logged-in user
+    let { data, error } = await _supabase.from('households').select('*');
+    
+    if (error) throw error;
 
+    // If this is a brand new advisor, seed the sample data
+    if (data.length === 0) {
+      await seedSampleData(userId);
+    } else {
       allHouseholds = data;
       updateMetrics(allHouseholds);
       renderTable(allHouseholds);
-
-    } catch (err) {
-      console.error("Supabase Connection Error:", err.message);
     }
+  } catch (err) {
+    console.error("Fetch error:", err.message);
   }
+}
 
   // 7. Bulletproof Event Listeners
   document.addEventListener('DOMContentLoaded', () => {
@@ -700,12 +753,19 @@ function closeMobileMenu() {
   });
 </script>
 <div id="auth-gate" style="position:fixed; inset:0; background:white; z-index:10000; display:flex; align-items:center; justify-content:center; font-family:sans-serif;">
-      <div style="width:400px; padding:40px; border:1px solid #eee; border-radius:16px; box-shadow:0 10px 25px rgba(0,0,0,0.05); text-align:center;">
-        <h1 style="font-family:'Syne', sans-serif; font-weight:800; margin-bottom:8px; font-size:28px;">Blocks</h1>
-        <p style="color:#666; margin-bottom:32px; font-size:14px;">Enterprise WealthTech Demo</p>
-        <div id="supabase-auth-ui"></div>
-      </div>
-    </div>
+  <div style="width:360px; padding:40px; border:1px solid #eee; border-radius:16px; text-align:center;">
+    <h1 style="font-family:'Syne', sans-serif; font-weight:800; margin-bottom:8px; font-size:28px;">Blocks</h1>
+    <p style="color:#666; margin-bottom:24px; font-size:14px;">Advisor Dashboard Demo</p>
+    
+    <input type="email" id="auth-email" placeholder="Email" style="width:100%; padding:12px; margin-bottom:10px; border:1px solid #ddd; border-radius:8px;">
+    <input type="password" id="auth-password" placeholder="Password" style="width:100%; padding:12px; margin-bottom:20px; border:1px solid #ddd; border-radius:8px;">
+    
+    <button onclick="handleAuth('login')" style="width:100%; padding:12px; background:#000; color:#fff; border:none; border-radius:8px; cursor:pointer; font-weight:600; margin-bottom:10px;">Login</button>
+    <button onclick="handleAuth('signup')" style="width:100%; padding:12px; background:#fff; color:#000; border:1px solid #000; border-radius:8px; cursor:pointer; font-weight:600;">Sign Up</button>
+    
+    <p id="auth-error" style="color:red; font-size:12px; margin-top:15px; display:none;"></p>
+  </div>
+</div>
 
   </body>
 </html>
