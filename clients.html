@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-6N55JYVPMX"></script>
 <script>
@@ -485,41 +484,44 @@ function closeMobileMenu() {
   if (btn) btn.classList.remove('open');
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // Your specific credentials
   const SUPABASE_URL = 'https://ovhpgatclcljmvixatrv.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
-  const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
   async function fetchHouseholds() {
     const listContainer = document.getElementById('clients-list');
-    
+    if (!listContainer) return;
+
     try {
+      // Initialize inside the function to ensure 'supabase' is defined
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
       const { data: households, error } = await _supabase
         .from('households')
         .select('*');
 
       if (error) throw error;
 
-      listContainer.innerHTML = ''; // Clear the "Loading" state
+      listContainer.innerHTML = ''; 
 
       households.forEach(house => {
         const row = document.createElement('tr');
         
-        // Map your database tags to your CSS pill format
         const tagsHtml = house.tags ? house.tags.map(tag => 
           `<span class="tag" style="background:var(--purple-lt);color:var(--purple); margin-right:4px;">${tag}</span>`
         ).join('') : '';
 
-        // This matches your original HTML structure exactly
         row.innerHTML = `
           <td>
             <div class="client-cell">
-              <div class="client-avatar" style="background:var(--purple-lt);color:var(--purple);">
+              <div class="client-avatar" style="background:var(--purple-lt);color:var(--purple); font-family: 'Syne', sans-serif;">
                 ${house.name ? house.name.charAt(0) : '?'}
               </div>
               <div>
-                <div class="client-cname">${house.name}</div>
-                <div class="client-type">Active Household</div>
+                <div class="client-cname" style="font-weight:500;">${house.name}</div>
+                <div class="client-type" style="font-size:11px; color:var(--text3);">Active Household</div>
               </div>
             </div>
           </td>
@@ -527,9 +529,9 @@ function closeMobileMenu() {
           <td><span class="mono" style="font-size:12px;">$0.0M</span></td>
           <td><span class="mono up" style="font-size:12px;">0.0%</span></td>
           <td>
-            <div class="sentiment-bar">
-              <div class="sentiment-dot" style="background:#1D9E75;"></div>
-              <span class="sentiment-label">Neutral</span>
+            <div class="sentiment-bar" style="display:flex; align-items:center;">
+              <div class="sentiment-dot" style="background:#1D9E75; width:8px; height:8px; border-radius:50%; margin-right:6px;"></div>
+              <span class="sentiment-label" style="font-size:12px;">Neutral</span>
             </div>
           </td>
           <td>
@@ -542,18 +544,18 @@ function closeMobileMenu() {
         listContainer.appendChild(row);
       });
 
-      // Update the "Households" count in your metrics bar if that ID exists
+      // Update the Households count in your metric card
       const houseCountDisplay = document.querySelector('.metric:nth-child(2) .metric-val');
       if (houseCountDisplay) houseCountDisplay.innerText = households.length;
 
     } catch (err) {
       console.error("Supabase Error:", err.message);
-      listContainer.innerHTML = '<tr><td colspan="7" style="padding:20px; text-align:center; color:var(--red);">Error loading clients. Check console.</td></tr>';
+      listContainer.innerHTML = '<tr><td colspan="7" style="padding:20px; text-align:center;">Connection error.</td></tr>';
     }
   }
 
-  // Initialize on load
-  document.addEventListener('DOMContentLoaded', fetchHouseholds);
-</script>  
+  // Use window.onload to ensure the CDN is ready
+  window.onload = fetchHouseholds;
+</script>
 </body>
 </html>
