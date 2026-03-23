@@ -489,16 +489,16 @@ function closeMobileMenu() {
   const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
 
-  // Helper to format AUM (e.g., 18400000 -> $18.4M)
+  // Helper: Format large numbers (18400000 -> $18.4M)
   const formatAUM = (val) => {
     if (!val) return '$0.0M';
     return '$' + (val / 1000000).toFixed(1) + 'M';
   };
 
-  // Helper for sentiment colors
+  // Helper: Get color based on sentiment label
   const getSentimentColor = (s) => {
     const colors = {
-      'Confident': '#1D9E75',
+      'Confident': '#2E7D32',
       'Neutral': '#1D9E75',
       'Concerned': '#A06010',
       'Worried': '#C94E28',
@@ -507,16 +507,29 @@ function closeMobileMenu() {
     return colors[s] || '#9a9994';
   };
 
-  // Helper for status styles
-  const getStatusStyle = (status) => {
-    if (status === 'Rebalance') return 'background:var(--red-lt); color:var(--red);';
-    if (status === 'Watch') return 'background:var(--amber-lt); color:var(--amber);';
-    return 'background:var(--green-lt); color:var(--green);';
-  };
+  // Logic to update the top 4 metric cards
+  function updateMetrics(households) {
+    const totalAUM = households.reduce((sum, h) => sum + (Number(h.aum) || 0), 0);
+    const avgYTD = households.reduce((sum, h) => sum + (Number(h.ytd_return) || 0), 0) / households.length;
+    const rebalanceCount = households.filter(h => h.status === 'Rebalance').length;
+    
+    // Update Header and Metric Cards
+    // Note: Ensure your HTML has these IDs or update them to match
+    const headerSub = document.querySelector('.page-sub');
+    if (headerSub) headerSub.innerText = `${households.length} households · ${formatAUM(totalAUM)} AUM`;
+
+    const aumVal = document.querySelector('.metric:nth-child(1) .metric-val');
+    if (aumVal) aumVal.innerText = formatAUM(totalAUM);
+
+    const rebalanceVal = document.querySelector('.metric:nth-child(3) .metric-val');
+    if (rebalanceVal) rebalanceVal.innerText = `${rebalanceCount} clients`;
+
+    const ytdVal = document.querySelector('.metric:nth-child(4) .metric-val');
+    if (ytdVal) ytdVal.innerText = `+${avgYTD.toFixed(1)}%`;
+  }
 
   async function fetchHouseholds() {
     const listContainer = document.getElementById('clients-list');
-    const countEl = document.getElementById('house-count');
     
     try {
       const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -527,14 +540,15 @@ function closeMobileMenu() {
 
       if (error) throw error;
 
-      if (countEl) countEl.innerText = households.length;
-      if (!listContainer) return;
+      // Update the top metrics first
+      updateMetrics(households);
 
+      if (!listContainer) return;
       listContainer.innerHTML = ''; 
 
       households.forEach(house => {
         const row = document.createElement('tr');
-        
+        const initials = house.name ? house.name.split(' ').map(n => n[0]).join('').substring(0,2) : '??';
         const tagsHtml = house.tags ? house.tags.map(tag => 
           `<span class="tag" style="background:var(--purple-lt);color:var(--purple); margin-right:4px;">${tag}</span>`
         ).join('') : '';
@@ -542,32 +556,37 @@ function closeMobileMenu() {
         row.innerHTML = `
           <td>
             <div class="client-cell">
-              <div class="client-avatar" style="background:var(--purple-lt);color:var(--purple); font-family:Syne;">
-                ${house.name ? house.name.split(' ').map(n => n[0]).join('').substring(0,2) : '?'}
-              </div>
+              <div class="client-avatar" style="background:var(--purple-lt);color:var(--purple); font-family:Syne;">${initials}</div>
               <div>
-                <div class="client-cname" style="font-weight:500; color:var(--text);">${house.name}</div>
+                <div class="client-cname" style="font-weight:500;">${house.name}</div>
                 <div class="client-type" style="font-size:11px; color:var(--text3);">Active Household</div>
               </div>
             </div>
           </td>
-          <td><div style="display:flex; flex-wrap:wrap; gap:4px;">${tagsHtml}</div></td>
+          <td><span style="font-size:12px;color:var(--text2);">Growth</span></td>
           <td><span class="mono" style="font-size:12px;">${formatAUM(house.aum)}</span></td>
           <td><span class="mono up" style="font-size:12px;">+${house.ytd_return}%</span></td>
           <td>
-            <div class="sentiment-bar" style="display:flex; align-items:center;">
-              <div class="sentiment-dot" style="background:${getSentimentColor(house.sentiment)}; width:8px; height:8px; border-radius:50%; margin-right:6px;"></div>
-              <span class="sentiment-label" style="font-size:12px;">${house.sentiment}</span>
+            <div class="sentiment-bar">
+              <div class="sentiment-dot" style="background:${getSentimentColor(house.sentiment)};"></div>
+              <span class="sentiment-label">${house.sentiment}</span>
             </div>
           </td>
-          <td><span class="mono" style="font-size:11px; color:${house.drift > 3 ? 'var(--red)' : 'var(--teal)'};">${house.drift}%</span></td>
-          <td><span class="tag" style="${getStatusStyle(house.status)}">${house.status}</span></td>
+          <td>
+            <div class="drift-indicator">
+              <div class="drift-bar-track">
+                <div class="drift-bar-fill" style="width:${Math.min(house.drift * 20, 100)}%; background:${house.drift > 3 ? 'var(--coral)' : 'var(--teal)'};"></div>
+              </div>
+              <span style="font-size:11px; color:${house.drift > 3 ? 'var(--red)' : 'var(--teal)'};">${house.drift}%</span>
+            </div>
+          </td>
+          <td><span class="tag" style="background:${house.status === 'Rebalance' ? 'var(--red-lt)' : 'var(--teal-lt)'}; color:${house.status === 'Rebalance' ? 'var(--red)' : 'var(--teal)'};">${house.status}</span></td>
         `;
         listContainer.appendChild(row);
       });
 
     } catch (err) {
-      console.error("Supabase Error:", err.message);
+      console.error("Connection Error:", err.message);
     }
   }
 
