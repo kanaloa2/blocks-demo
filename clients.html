@@ -549,5 +549,22 @@ function closeMobileMenu() {
   if (btn) btn.classList.remove('open');
 }
 </script>
+<script>
+  async function checkDatabase() {
+    // This tries to grab the Miller Household you created earlier
+    const { data, error } = await _supabase
+      .from('households')
+      .select('name, tags');
+
+    if (error) {
+      console.error("Connection Error:", error.message);
+    } else {
+      console.log("Success! Database connected. Found:", data);
+    }
+  }
+
+  // Run the check as soon as the page loads
+  checkDatabase();
+</script>
 </body>
 </html>
