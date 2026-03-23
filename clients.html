@@ -486,23 +486,49 @@ function closeMobileMenu() {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-  // Your specific credentials
   const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
 
+  // Helper to format AUM (e.g., 18400000 -> $18.4M)
+  const formatAUM = (val) => {
+    if (!val) return '$0.0M';
+    return '$' + (val / 1000000).toFixed(1) + 'M';
+  };
+
+  // Helper for sentiment colors
+  const getSentimentColor = (s) => {
+    const colors = {
+      'Confident': '#1D9E75',
+      'Neutral': '#1D9E75',
+      'Concerned': '#A06010',
+      'Worried': '#C94E28',
+      'Fearful': '#B83232'
+    };
+    return colors[s] || '#9a9994';
+  };
+
+  // Helper for status styles
+  const getStatusStyle = (status) => {
+    if (status === 'Rebalance') return 'background:var(--red-lt); color:var(--red);';
+    if (status === 'Watch') return 'background:var(--amber-lt); color:var(--amber);';
+    return 'background:var(--green-lt); color:var(--green);';
+  };
+
   async function fetchHouseholds() {
     const listContainer = document.getElementById('clients-list');
-    if (!listContainer) return;
-
+    const countEl = document.getElementById('house-count');
+    
     try {
-      // Initialize inside the function to ensure 'supabase' is defined
       const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      
       const { data: households, error } = await _supabase
         .from('households')
-        .select('*');
+        .select('*')
+        .order('name', { ascending: true });
 
       if (error) throw error;
+
+      if (countEl) countEl.innerText = households.length;
+      if (!listContainer) return;
 
       listContainer.innerHTML = ''; 
 
@@ -516,45 +542,35 @@ function closeMobileMenu() {
         row.innerHTML = `
           <td>
             <div class="client-cell">
-              <div class="client-avatar" style="background:var(--purple-lt);color:var(--purple); font-family: 'Syne', sans-serif;">
-                ${house.name ? house.name.charAt(0) : '?'}
+              <div class="client-avatar" style="background:var(--purple-lt);color:var(--purple); font-family:Syne;">
+                ${house.name ? house.name.split(' ').map(n => n[0]).join('').substring(0,2) : '?'}
               </div>
               <div>
-                <div class="client-cname" style="font-weight:500;">${house.name}</div>
+                <div class="client-cname" style="font-weight:500; color:var(--text);">${house.name}</div>
                 <div class="client-type" style="font-size:11px; color:var(--text3);">Active Household</div>
               </div>
             </div>
           </td>
           <td><div style="display:flex; flex-wrap:wrap; gap:4px;">${tagsHtml}</div></td>
-          <td><span class="mono" style="font-size:12px;">$0.0M</span></td>
-          <td><span class="mono up" style="font-size:12px;">0.0%</span></td>
+          <td><span class="mono" style="font-size:12px;">${formatAUM(house.aum)}</span></td>
+          <td><span class="mono up" style="font-size:12px;">+${house.ytd_return}%</span></td>
           <td>
             <div class="sentiment-bar" style="display:flex; align-items:center;">
-              <div class="sentiment-dot" style="background:#1D9E75; width:8px; height:8px; border-radius:50%; margin-right:6px;"></div>
-              <span class="sentiment-label" style="font-size:12px;">Neutral</span>
+              <div class="sentiment-dot" style="background:${getSentimentColor(house.sentiment)}; width:8px; height:8px; border-radius:50%; margin-right:6px;"></div>
+              <span class="sentiment-label" style="font-size:12px;">${house.sentiment}</span>
             </div>
           </td>
-          <td>
-            <div class="drift-indicator">
-              <span style="font-size:11px;color:var(--teal);">0.0%</span>
-            </div>
-          </td>
-          <td><span class="tag" style="background:var(--teal-lt);color:var(--teal);">Healthy</span></td>
+          <td><span class="mono" style="font-size:11px; color:${house.drift > 3 ? 'var(--red)' : 'var(--teal)'};">${house.drift}%</span></td>
+          <td><span class="tag" style="${getStatusStyle(house.status)}">${house.status}</span></td>
         `;
         listContainer.appendChild(row);
       });
 
-      // Update the Households count in your metric card
-      const houseCountDisplay = document.querySelector('.metric:nth-child(2) .metric-val');
-      if (houseCountDisplay) houseCountDisplay.innerText = households.length;
-
     } catch (err) {
       console.error("Supabase Error:", err.message);
-      listContainer.innerHTML = '<tr><td colspan="7" style="padding:20px; text-align:center;">Connection error.</td></tr>';
     }
   }
 
-  // Use window.onload to ensure the CDN is ready
   window.onload = fetchHouseholds;
 </script>
 </body>
