@@ -26,11 +26,11 @@
   position: relative; 
 }
 
-/* 3. Tooltip Text - Flipped to the BOTTOM */
+/* 3. Tooltip Text - Flipped to BOTTOM with Delay */
 #filter-attention::after {
   content: "Triggers: Sentiment < Neutral OR Drift > 3%";
   position: absolute;
-  top: calc(100% + 10px); /* Position 10px BELOW the chip */
+  top: calc(100% + 10px); 
   left: 50%;
   transform: translateX(-50%);
   background-color: #333;
@@ -41,33 +41,43 @@
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s;
+  /* 0.2s for the fade + 0.3s delay before it starts */
+  transition: opacity 0.2s ease-in-out, visibility 0.2s;
+  transition-delay: 0.3s; 
   z-index: 9999;
   pointer-events: none;
   box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* 4. Tooltip Arrow - Pointing UP */
+/* 4. Tooltip Arrow - Pointing UP with Delay */
 #filter-attention::before {
   content: "";
   position: absolute;
-  top: calc(100% + 2px); /* Position at the top of the bubble */
+  top: calc(100% + 2px); 
   left: 50%;
   transform: translateX(-50%);
   border-width: 4px;
   border-style: solid;
-  border-color: transparent transparent #333 transparent; /* Arrow points up */
+  border-color: transparent transparent #333 transparent;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s;
+  transition: opacity 0.2s ease-in-out, visibility 0.2s;
+  transition-delay: 0.3s;
   z-index: 9999;
 }
 
-/* 5. Trigger Visibility */
+/* 5. Trigger Visibility (Resets delay on mouseout so it disappears instantly) */
 #filter-attention:hover::after,
 #filter-attention:hover::before {
   opacity: 1;
   visibility: visible;
+  transition-delay: 0.3s;
+}
+
+/* Instant hide when moving mouse away */
+#filter-attention:not(:hover)::after,
+#filter-attention:not(:hover)::before {
+  transition-delay: 0s;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
