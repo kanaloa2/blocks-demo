@@ -569,23 +569,31 @@ function closeMobileMenu() {
 
   // 4. Filter & Search Logic
   function applyFilters() {
-    const searchTerm = document.getElementById('client-search').value.toLowerCase();
-    const activeBtn = document.querySelector('.filter-chip.active').id;
+    const searchInput = document.getElementById('client-search');
+    const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+    
+    // Find which chip has the 'active' class
+    const activeBtn = document.querySelector('.filter-chip.active')?.id;
 
     const filtered = allHouseholds.filter(h => {
-      const matchesSearch = h.name.toLowerCase().includes(searchTerm);
-      
-      if (activeBtn === 'filter-attention') {
-        return matchesSearch && (['Fearful', 'Worried', 'Concerned'].includes(h.sentiment) || h.drift > 3);
-      }
-      if (activeBtn === 'filter-rebalance') {
-        return matchesSearch && h.status === 'Rebalance';
-      }
-      return matchesSearch; 
+        const matchesSearch = h.name.toLowerCase().includes(searchTerm);
+        
+        // If "Needs Attention" is clicked
+        if (activeBtn === 'filter-attention') {
+            return matchesSearch && (['Fearful', 'Worried', 'Concerned'].includes(h.sentiment) || h.drift > 3);
+        }
+        
+        // If "Rebalance Due" is clicked
+        if (activeBtn === 'filter-rebalance') {
+            return matchesSearch && h.status === 'Rebalance';
+        }
+
+        // Default: Show everything that matches search
+        return matchesSearch; 
     });
 
     renderTable(filtered);
-  }
+}
 
   // 5. Initial Fetch
   async function fetchHouseholds() {
