@@ -22,8 +22,6 @@
   --teal: #0F6E56; --teal-lt: #E1F5EE;
   --coral: #C94E28; --coral-lt: #FAECE7;
   --amber: #A06010; --amber-lt: #FEF3DC;
-  --red: #B83232; --red-lt: #FCEBEB;
-  --green: #2E7D32; --green-lt: #EAF3DE;
   --r-sm: 6px; --r-md: 10px; --r-lg: 14px;
   --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.07);
 }
@@ -32,167 +30,163 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 .logo { display: flex; align-items: center; gap: 9px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; text-decoration: none; }
 .logo-mark { width: 28px; height: 28px; background: var(--purple); border-radius: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 5px; }
 .logo-mark span { background: white; border-radius: 1.5px; }
-.logo-mark span:nth-child(2), .logo-mark span:nth-child(3) { opacity: 0.65; } .logo-mark span:nth-child(4) { opacity: 0.35; }
-.subnav { font-size: 11px; color: var(--text3); margin-top: 1px; }
 .nav-links { display: flex; gap: 0; flex: 1; }
 .nav-links a { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; }
 .nav-links a.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 500; }
-.nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
 .avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; }
+
+/* Sidebar & Layout */
 .shell { display: grid; grid-template-columns: 68px 1fr; min-height: calc(100vh - 52px); }
 .sidenav { background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
-.sidenav-item { width: 64px; height: 52px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; text-align: center; }
+.sidenav-item { width: 48px; height: 48px; border-radius: var(--r-md); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text3); transition: all 0.2s; }
+.sidenav-item:hover { background: var(--surface2); color: var(--text2); }
 .sidenav-item.active { background: var(--purple-lt); color: var(--purple); }
+
 .page-content { padding: 1.5rem; }
 .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; }
-.page-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
+.page-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); }
+
+/* Metrics */
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 1.5rem; }
+.metric { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1.125rem; }
+.metric-label { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+.metric-val { font-family: 'DM Mono', monospace; font-size: 20px; font-weight: 500; }
+
+/* Grid for Table and Insights */
+.two-col { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; }
 .table-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; }
 .client-table { width: 100%; border-collapse: collapse; }
-.client-table th { font-size: 10px; text-transform: uppercase; color: var(--text3); text-align: left; padding: 8px 14px; background: var(--surface2); border-bottom: 0.5px solid var(--border2); }
-.client-table td { padding: 11px 14px; border-bottom: 0.5px solid var(--border); }
+.client-table th { font-size: 10px; text-transform: uppercase; color: var(--text3); text-align: left; padding: 10px 14px; background: var(--surface2); border-bottom: 0.5px solid var(--border2); }
+.client-table td { padding: 12px 14px; border-bottom: 0.5px solid var(--border); }
+
+/* Sidebar Insights */
+.right-panel { display: flex; flex-direction: column; gap: 1rem; }
+.focus-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1.25rem; }
+.focus-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; margin-bottom: 10px; }
+.insight-item { font-size: 12px; color: var(--text2); padding: 8px 0; border-bottom: 0.5px solid var(--border); }
+.insight-item:last-child { border: none; }
+
+/* Table Elements */
 .client-cell { display: flex; align-items: center; gap: 10px; }
 .client-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
-.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; display: inline-block; }
+.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; }
 .mono { font-family: 'DM Mono', monospace; }
-
-/* Hamburger Menu CSS */
-.hamburger { display: none; flex-direction: column; gap: 4.5px; cursor: pointer; padding: 6px; border-radius: 6px; border: 0.5px solid var(--border2); background: transparent; }
-.hamburger span { display: block; width: 18px; height: 1.5px; background: #181816; transition: 0.2s; }
-.mobile-menu { display: none; position: fixed; top: 52px; left: 0; right: 0; background: white; border-bottom: 0.5px solid var(--border2); flex-direction: column; z-index: 100; }
-.mobile-menu.open { display: flex; }
-
-@media (max-width: 900px) {
-  .hamburger { display: flex; }
-  .nav-links, .sidenav { display: none; }
-  .shell { grid-template-columns: 1fr; }
-}
+.up { color: var(--teal); }
 </style>
 </head>
 <body>
 
 <nav class="topnav">
-  <div style="display:flex;flex-direction:column;">
-    <a href="index.html" class="logo">
-      <div class="logo-mark"><span></span><span></span><span></span><span></span></div>
-      Blocks
-    </a>
-    <div class="subnav">AI-assisted portfolio construction</div>
-  </div>
+  <a href="index.html" class="logo">
+    <div class="logo-mark"><span></span><span></span><span></span><span></span></div>
+    Blocks
+  </a>
   <div class="nav-links">
     <a href="dashboard.html">Dashboard</a>
     <a href="clients.html" class="active">Clients</a>
     <a href="blocks-builder.html">Block Library</a>
     <a href="assembly.html">Build</a>
   </div>
-  <div class="nav-right">
+  <div class="nav-right" style="margin-left:auto;">
     <div class="avatar">CJ</div>
   </div>
-  <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
-
-<div class="mobile-menu" id="mobileMenu">
-  <a href="dashboard.html" style="padding:15px; border-bottom:1px solid #eee; text-decoration:none; color:inherit;">Dashboard</a>
-  <a href="clients.html" style="padding:15px; text-decoration:none; color:inherit;">Clients</a>
-</div>
 
 <div class="shell">
   <nav class="sidenav">
-    <div class="sidenav-item" onclick="location.href='dashboard.html'">Dash</div>
-    <div class="sidenav-item active">Clients</div>
-    <div class="sidenav-item" onclick="location.href='blocks-builder.html'">Blocks</div>
+    <div class="sidenav-item" onclick="location.href='dashboard.html'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg></div>
+    <div class="sidenav-item active"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg></div>
+    <div class="sidenav-item" onclick="location.href='blocks-builder.html'"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg></div>
   </nav>
 
   <div class="page-content">
     <div class="page-header">
       <div>
         <div class="page-title">Clients</div>
-        <div id="client-count" style="font-size:12px; color:var(--text3);">Loading households...</div>
+        <div style="font-size:12px; color:var(--text3);" id="status-text">Connecting to database...</div>
       </div>
+      <button style="background:var(--purple); color:white; border:none; padding:8px 16px; border-radius:var(--r-sm); font-weight:600; cursor:pointer;">+ Add Client</button>
     </div>
 
-    <div class="table-card">
-      <table class="client-table">
-        <thead>
-          <tr>
-            <th>Client</th>
-            <th>Tags</th>
-            <th>AUM</th>
-            <th>Status</th>
-          </tr>
-        </thead>
-        <tbody id="clients-list">
-          </tbody>
-      </table>
+    <div class="metrics">
+      <div class="metric"><div class="metric-label">Total AUM</div><div class="metric-val">$142.5M</div></div>
+      <div class="metric"><div class="metric-label">Households</div><div class="metric-val" id="house-count">--</div></div>
+      <div class="metric"><div class="metric-label">Avg. Drift</div><div class="metric-val" style="color:var(--amber);">2.4%</div></div>
+      <div class="metric"><div class="metric-label">YTD Return</div><div class="metric-val up">+8.7%</div></div>
+    </div>
+
+    <div class="two-col">
+      <div class="table-card">
+        <table class="client-table">
+          <thead>
+            <tr><th>Client</th><th>Tags</th><th>AUM</th><th>Status</th></tr>
+          </thead>
+          <tbody id="clients-list">
+            </tbody>
+        </table>
+      </div>
+
+      <div class="right-panel">
+        <div class="focus-card">
+          <div class="focus-title">Insights</div>
+          <div class="insight-item"><strong>3</strong> households require rebalancing.</div>
+          <div class="insight-item">High drift detected in <strong>Sloan Family</strong> account.</div>
+          <div class="insight-item">New signal for <strong>Tech Growth</strong> block.</div>
+        </div>
+        <div class="focus-card">
+          <div class="focus-title">Recent Activity</div>
+          <div style="font-size:11px; color:var(--text3);">No recent changes.</div>
+        </div>
+      </div>
     </div>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-  // Replace these with your actual keys from Supabase Dashboard
-  const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co'; 
-  const SUPABASE_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
-
-  let _supabase;
+  // YOUR ACTUAL KEYS
+  const SUPABASE_URL = 'https://your-project-url.supabase.co';
+  const SUPABASE_KEY = 'your-anon-key-here';
 
   async function init() {
     try {
-      // Create client
-      _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      
-      // Fetch data
-      const { data: households, error } = await _supabase
-        .from('households')
-        .select('*');
+      const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      const { data: households, error } = await _supabase.from('households').select('*');
 
       if (error) throw error;
 
       const listContainer = document.getElementById('clients-list');
-      const countLabel = document.getElementById('client-count');
-      
-      countLabel.innerText = `${households.length} active households`;
-      listContainer.innerHTML = '';
+      document.getElementById('house-count').innerText = households.length;
+      document.getElementById('status-text').innerText = `${households.length} active households`;
 
+      listContainer.innerHTML = '';
       households.forEach(house => {
         const row = document.createElement('tr');
-        
-        const tagsHtml = house.tags ? house.tags.map(tag => 
-          `<span class="tag" style="background:var(--purple-lt);color:var(--purple);margin-right:4px;">${tag}</span>`
-        ).join('') : '';
+        const tags = house.tags ? house.tags.map(t => `<span class="tag" style="background:var(--purple-lt);color:var(--purple);margin-right:4px;">${t}</span>`).join('') : '';
 
         row.innerHTML = `
           <td>
             <div class="client-cell">
-              <div class="client-avatar" style="background:var(--surface2);color:var(--text2);">
-                ${house.name ? house.name.charAt(0) : '?'}
-              </div>
+              <div class="client-avatar" style="background:var(--surface2); color:var(--text2);">${house.name.charAt(0)}</div>
               <div>
-                <div class="client-cname">${house.name || 'Unnamed'}</div>
-                <div class="client-type">Household</div>
+                <div style="font-weight:500;">${house.name}</div>
+                <div style="font-size:11px; color:var(--text3);">Household</div>
               </div>
             </div>
           </td>
-          <td>${tagsHtml}</td>
+          <td>${tags}</td>
           <td><span class="mono">$0.0M</span></td>
           <td><span class="tag" style="background:var(--teal-lt);color:var(--teal);">Active</span></td>
         `;
         listContainer.appendChild(row);
       });
-
     } catch (err) {
-      console.error("Initialization Error:", err.message);
-      document.getElementById('client-count').innerText = "Connection error. Check console.";
+      console.error(err);
+      document.getElementById('status-text').innerText = "Connection error.";
     }
   }
 
-  function toggleMobileMenu() {
-    document.getElementById('mobileMenu').classList.toggle('open');
-  }
-
-  // Ensure library is loaded before calling init
   window.onload = init;
 </script>
-
 </body>
 </html>
