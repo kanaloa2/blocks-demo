@@ -14,11 +14,11 @@
 <title>Blocks — Clients</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-/* 1. Fix the Parent Container so it doesn't clip the tooltip */
+/* 1. Ensure the toolbar can show overlapping content */
 .table-toolbar {
   overflow: visible !important;
   position: relative;
-  z-index: 10; 
+  z-index: 100; 
 }
 
 /* 2. Tooltip Container */
@@ -26,11 +26,11 @@
   position: relative; 
 }
 
-/* 3. Tooltip Text (The black bubble) */
-.filter-chip::after {
+/* 3. Tooltip Text - Flipped to the BOTTOM */
+#filter-attention::after {
   content: "Triggers: Sentiment < Neutral OR Drift > 3%";
   position: absolute;
-  bottom: calc(100% + 10px); /* Pushes it 10px above the chip */
+  top: calc(100% + 10px); /* Position 10px BELOW the chip */
   left: 50%;
   transform: translateX(-50%);
   background-color: #333;
@@ -41,29 +41,29 @@
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s, visibility 0.2s;
-  z-index: 9999; /* This forces it to the very front of the screen */
+  transition: opacity 0.2s;
+  z-index: 9999;
   pointer-events: none;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
 }
 
-/* 4. Tooltip Arrow (The little triangle) */
-.filter-chip::before {
+/* 4. Tooltip Arrow - Pointing UP */
+#filter-attention::before {
   content: "";
   position: absolute;
-  bottom: calc(100% + 2px);
+  top: calc(100% + 2px); /* Position at the top of the bubble */
   left: 50%;
   transform: translateX(-50%);
   border-width: 4px;
   border-style: solid;
-  border-color: #333 transparent transparent transparent;
+  border-color: transparent transparent #333 transparent; /* Arrow points up */
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s, visibility 0.2s;
+  transition: opacity 0.2s;
   z-index: 9999;
 }
 
-/* 5. Trigger Visibility on Hover */
+/* 5. Trigger Visibility */
 #filter-attention:hover::after,
 #filter-attention:hover::before {
   opacity: 1;
