@@ -566,5 +566,52 @@ function closeMobileMenu() {
   // Run the check as soon as the page loads
   checkDatabase();
 </script>
+<script>
+  async function fetchHouseholds() {
+    // 1. Pull the real data from Supabase
+    const { data: households, error } = await supabase
+      .from('households')
+      .select('*');
+
+    if (error) {
+      console.error('Error fetching households:', error.message);
+      return;
+    }
+
+    // 2. Find the table in your HTML (Make sure your <tbody> has id="clients-list")
+    const listContainer = document.getElementById('clients-list');
+    if (!listContainer) return;
+
+    // 3. Clear the static/mock data
+    listContainer.innerHTML = '';
+
+    // 4. Loop through and build the rows
+    households.forEach(house => {
+      const row = document.createElement('tr');
+      row.className = "border-b hover:bg-slate-50 transition-colors";
+      
+      // Create the tags HTML
+      const tagsHtml = house.tags ? house.tags.map(tag => 
+        `<span class="inline-block bg-blue-100 text-blue-700 text-xs px-2 py-1 rounded mr-1">${tag}</span>`
+      ).join('') : '';
+
+      row.innerHTML = `
+        <td class="p-4 font-semibold text-slate-800">${house.name}</td>
+        <td class="p-4">${tagsHtml}</td>
+        <td class="p-4 text-slate-500 text-sm">Active</td>
+        <td class="p-4 text-right">
+          <button onclick="viewDetails('${house.id}')" class="text-blue-600 font-medium hover:underline">Manage</button>
+        </td>
+      `;
+      listContainer.appendChild(row);
+    });
+    
+    console.log(`Success! Displayed ${households.length} households.`);
+  }
+
+  // Run this as soon as the page is ready
+  document.addEventListener('DOMContentLoaded', fetchHouseholds);
+</script>
+
 </body>
 </html>
