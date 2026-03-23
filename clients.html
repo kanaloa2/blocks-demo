@@ -486,13 +486,16 @@ function closeMobileMenu() {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+  // 1. Configuration & Global State
   const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
+  let allHouseholds = []; 
 
-  let allHouseholds = []; // Global store so we don't have to keep fetching from Supabase
-
-  // 1. Helpers for Formatting & Visuals
-  const formatAUM = (val) => val ? '$' + (val / 1000000).toFixed(1) + 'M' : '$0.0M';
+  // 2. Formatting Helpers
+  const formatAUM = (val) => {
+    if (!val) return '$0.0M';
+    return '$' + (Number(val) / 1000000).toFixed(1) + 'M';
+  };
 
   const getSentimentTheme = (s) => {
     const themes = {
@@ -505,17 +508,17 @@ function closeMobileMenu() {
     return themes[s] || { bg: '#f0efe9', dot: '#9a9994', text: '#5c5b57' };
   };
 
-  // 2. Update Top Metric Cards
+  // 3. Update Top Metric Cards
   function updateMetrics(data) {
     const totalAUM = data.reduce((sum, h) => sum + (Number(h.aum) || 0), 0);
-    const avgYTD = data.reduce((sum, h) => sum + (Number(h.ytd_return) || 0), 0) / (data.length || 1);
+    const avgYTD = data.length > 0 ? (data.reduce((sum, h) => sum + (Number(h.ytd_return) || 0), 0) / data.length) : 0;
     const rebalanceCount = data.filter(h => h.status === 'Rebalance').length;
     
-    // Update Header
+    // Header Sub-text
     const headerSub = document.querySelector('.page-sub');
     if (headerSub) headerSub.innerText = `${data.length} households · ${formatAUM(totalAUM)} AUM`;
 
-    // Update Cards (Mapping by index to match your layout)
+    // Metric Cards (Selecting by class to ensure we hit the right elements)
     const metrics = document.querySelectorAll('.metric-val');
     if (metrics[0]) metrics[0].innerText = formatAUM(totalAUM);
     if (metrics[1]) metrics[1].innerText = data.length;
@@ -523,7 +526,7 @@ function closeMobileMenu() {
     if (metrics[3]) metrics[3].innerText = `+${avgYTD.toFixed(1)}%`;
   }
 
-  // 3. Render the Table Rows
+  // 4. Render Table Rows
   function renderTable(data) {
     const listContainer = document.getElementById('clients-list');
     if (!listContainer) return;
@@ -537,7 +540,7 @@ function closeMobileMenu() {
       row.innerHTML = `
         <td>
           <div class="client-cell">
-            <div class="client-avatar" style="background:${theme.bg}; color:${theme.text}; font-weight:700;">${initials}</div>
+            <div class="client-avatar" style="background:${theme.bg}; color:${theme.text}; font-weight:700; font-family:'Syne', sans-serif;">${initials}</div>
             <div>
               <div class="client-cname" style="font-weight:500;">${house.name}</div>
               <div class="client-type" style="font-size:11px; color:var(--text3);">Active Household</div>
@@ -548,54 +551,49 @@ function closeMobileMenu() {
         <td><span class="mono" style="font-size:12px;">${formatAUM(house.aum)}</span></td>
         <td><span class="mono up" style="font-size:12px;">+${house.ytd_return}%</span></td>
         <td>
-          <div class="sentiment-bar">
-            <div class="sentiment-dot" style="background:${theme.dot};"></div>
-            <span class="sentiment-label">${house.sentiment}</span>
+          <div class="sentiment-bar" style="display:flex; align-items:center;">
+            <div class="sentiment-dot" style="background:${theme.dot}; width:8px; height:8px; border-radius:50%; margin-right:8px;"></div>
+            <span class="sentiment-label" style="font-size:12px;">${house.sentiment}</span>
           </div>
         </td>
         <td>
-          <div class="drift-indicator">
-            <div class="drift-bar-track">
-              <div class="drift-bar-fill" style="width:${Math.min(house.drift * 20, 100)}%; background:${house.drift > 3 ? '#E57373' : '#1D9E75'};"></div>
+          <div class="drift-indicator" style="display:flex; align-items:center; gap:8px;">
+            <div class="drift-bar-track" style="width:60px; height:4px; background:#eee; border-radius:2px; overflow:hidden;">
+              <div class="drift-bar-fill" style="width:${Math.min(house.drift * 15, 100)}%; height:100%; background:${house.drift > 3 ? '#D32F2F' : '#1D9E75'};"></div>
             </div>
             <span style="font-size:11px; color:${house.drift > 3 ? '#D32F2F' : '#1D9E75'};">${house.drift}%</span>
           </div>
         </td>
-        <td><span class="tag" style="background:${house.status === 'Rebalance' ? 'var(--red-lt)' : 'var(--teal-lt)'}; color:${house.status === 'Rebalance' ? 'var(--red)' : 'var(--teal)'}; font-weight:600;">${house.status}</span></td>
+        <td><span class="tag" style="background:${house.status === 'Rebalance' ? 'var(--red-lt)' : 'var(--teal-lt)'}; color:${house.status === 'Rebalance' ? 'var(--red)' : 'var(--teal)'}; font-weight:600; padding:4px 8px; border-radius:12px; font-size:11px;">${house.status}</span></td>
       `;
       listContainer.appendChild(row);
     });
   }
 
-  // 4. Filter & Search Logic
+  // 5. Filter & Search Orchestration
   function applyFilters() {
     const searchInput = document.getElementById('client-search');
     const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
-    
-    // Find which chip has the 'active' class
-    const activeBtn = document.querySelector('.filter-chip.active')?.id;
+    const activeChip = document.querySelector('.filter-chip.active');
+    const activeId = activeChip ? activeChip.id : 'filter-all';
 
     const filtered = allHouseholds.filter(h => {
-        const matchesSearch = h.name.toLowerCase().includes(searchTerm);
-        
-        // If "Needs Attention" is clicked
-        if (activeBtn === 'filter-attention') {
-            return matchesSearch && (['Fearful', 'Worried', 'Concerned'].includes(h.sentiment) || h.drift > 3);
-        }
-        
-        // If "Rebalance Due" is clicked
-        if (activeBtn === 'filter-rebalance') {
-            return matchesSearch && h.status === 'Rebalance';
-        }
-
-        // Default: Show everything that matches search
-        return matchesSearch; 
+      const name = h.name || "";
+      const matchesSearch = name.toLowerCase().includes(searchTerm);
+      
+      if (activeId === 'filter-attention') {
+        return matchesSearch && (['Fearful', 'Worried', 'Concerned'].includes(h.sentiment) || h.drift > 3);
+      }
+      if (activeId === 'filter-rebalance') {
+        return matchesSearch && h.status === 'Rebalance';
+      }
+      return matchesSearch; 
     });
 
     renderTable(filtered);
-}
+  }
 
-  // 5. Initial Fetch
+  // 6. Initial Data Fetch
   async function fetchHouseholds() {
     try {
       const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
@@ -607,22 +605,32 @@ function closeMobileMenu() {
       renderTable(allHouseholds);
 
     } catch (err) {
-      console.error("Fetch Error:", err.message);
+      console.error("Supabase Connection Error:", err.message);
     }
   }
 
-  // 6. Global Event Listeners
+  // 7. Bulletproof Event Listeners
   document.addEventListener('DOMContentLoaded', () => {
     fetchHouseholds();
 
-    // Search Input Listener
-    const searchInput = document.getElementById('client-search');
-    if (searchInput) searchInput.addEventListener('input', applyFilters);
+    // Listen for search typing
+    const searchBox = document.getElementById('client-search');
+    if (searchBox) {
+      searchBox.addEventListener('input', applyFilters);
+    }
 
-    // Filter Chip Listeners
-    document.querySelectorAll('.filter-chip').forEach(chip => {
-      chip.addEventListener('click', function() {
+    // Listen for filter clicks using delegation
+    document.addEventListener('click', (e) => {
+      const chip = e.target.closest('.filter-chip');
+      if (chip) {
+        // Toggle Active Class
         document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        this.classList.add
+        chip.classList.add('active');
+        // Execute Filter
+        applyFilters();
+      }
+    });
+  });
+</script>
 </body>
 </html>
