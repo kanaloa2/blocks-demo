@@ -327,10 +327,10 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div class="table-card">
         <div class="table-toolbar">
           <div class="table-toolbar-title">All Clients</div>
-          <input class="search-box" placeholder="Search clients…" type="text">
-          <div class="filter-chip active" onclick="this.classList.toggle('active')">All</div>
-          <div class="filter-chip" onclick="this.classList.toggle('active')">Needs attention</div>
-          <div class="filter-chip" onclick="this.classList.toggle('active')">Rebalance due</div>
+          <input class="search-box" id="client-search" placeholder="Search clients…" type="text">
+          <div class="filter-chip active" id="filter-all">All</div>
+          <div class="filter-chip" id="filter-attention">Needs attention</div>
+          <div class="filter-chip" id="filter-rebalance">Rebalance due</div>
         </div>
         <table class="client-table">
           <thead>
@@ -489,115 +489,132 @@ function closeMobileMenu() {
   const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co';
   const SUPABASE_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
 
-  // Helper: Format large numbers (18400000 -> $18.4M)
-  const formatAUM = (val) => {
-    if (!val) return '$0.0M';
-    return '$' + (val / 1000000).toFixed(1) + 'M';
-  };
+  let allHouseholds = []; // Global store so we don't have to keep fetching from Supabase
 
-  // Helper: Returns specific Light/Dark pairings for the avatar and sentiment dot
+  // 1. Helpers for Formatting & Visuals
+  const formatAUM = (val) => val ? '$' + (val / 1000000).toFixed(1) + 'M' : '$0.0M';
+
   const getSentimentTheme = (s) => {
     const themes = {
-      'Confident': { bg: '#EAF3DE', dot: '#2E7D32', text: '#1B4D1E' }, // Green
-      'Neutral':   { bg: '#E1F5EE', dot: '#1D9E75', text: '#0B5D46' }, // Teal
-      'Concerned': { bg: '#FEF3DC', dot: '#A06010', text: '#6D410B' }, // Amber/Brown
-      'Worried':   { bg: '#FAECE7', dot: '#C94E28', text: '#8A351B' }, // Orange/Coral
-      'Fearful':   { bg: '#FCEBEB', dot: '#B83232', text: '#7A2121' }  // Red
+      'Confident': { bg: '#EAF3DE', dot: '#2E7D32', text: '#1B4D1E' },
+      'Neutral':   { bg: '#E1F5EE', dot: '#1D9E75', text: '#0B5D46' },
+      'Concerned': { bg: '#FEF3DC', dot: '#A06010', text: '#6D410B' },
+      'Worried':   { bg: '#FAECE7', dot: '#C94E28', text: '#8A351B' },
+      'Fearful':   { bg: '#FCEBEB', dot: '#B83232', text: '#7A2121' }
     };
     return themes[s] || { bg: '#f0efe9', dot: '#9a9994', text: '#5c5b57' };
   };
 
-  function updateMetrics(households) {
-    const totalAUM = households.reduce((sum, h) => sum + (Number(h.aum) || 0), 0);
-    const avgYTD = households.reduce((sum, h) => sum + (Number(h.ytd_return) || 0), 0) / households.length;
-    const rebalanceCount = households.filter(h => h.status === 'Rebalance').length;
+  // 2. Update Top Metric Cards
+  function updateMetrics(data) {
+    const totalAUM = data.reduce((sum, h) => sum + (Number(h.aum) || 0), 0);
+    const avgYTD = data.reduce((sum, h) => sum + (Number(h.ytd_return) || 0), 0) / (data.length || 1);
+    const rebalanceCount = data.filter(h => h.status === 'Rebalance').length;
     
-    // 1. Update the sub-header (e.g., "7 households · $177.2M AUM")
+    // Update Header
     const headerSub = document.querySelector('.page-sub');
-    if (headerSub) headerSub.innerText = `${households.length} households · ${formatAUM(totalAUM)} AUM`;
+    if (headerSub) headerSub.innerText = `${data.length} households · ${formatAUM(totalAUM)} AUM`;
 
-    // 2. Update Metric Cards
-    const aumVal = document.querySelector('.metric:nth-child(1) .metric-val');
-    if (aumVal) aumVal.innerText = formatAUM(totalAUM);
-
-    const houseCountVal = document.querySelector('.metric:nth-child(2) .metric-val');
-    if (houseCountVal) houseCountVal.innerText = households.length;
-
-    const rebalanceVal = document.querySelector('.metric:nth-child(3) .metric-val');
-    if (rebalanceVal) rebalanceVal.innerText = `${rebalanceCount} clients`;
-
-    const ytdVal = document.querySelector('.metric:nth-child(4) .metric-val');
-    if (ytdVal) ytdVal.innerText = `+${avgYTD.toFixed(1)}%`;
+    // Update Cards (Mapping by index to match your layout)
+    const metrics = document.querySelectorAll('.metric-val');
+    if (metrics[0]) metrics[0].innerText = formatAUM(totalAUM);
+    if (metrics[1]) metrics[1].innerText = data.length;
+    if (metrics[2]) metrics[2].innerText = `${rebalanceCount} clients`;
+    if (metrics[3]) metrics[3].innerText = `+${avgYTD.toFixed(1)}%`;
   }
 
-  async function fetchHouseholds() {
+  // 3. Render the Table Rows
+  function renderTable(data) {
     const listContainer = document.getElementById('clients-list');
-    
+    if (!listContainer) return;
+    listContainer.innerHTML = '';
+
+    data.forEach(house => {
+      const theme = getSentimentTheme(house.sentiment);
+      const initials = house.name ? house.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : '??';
+      const row = document.createElement('tr');
+
+      row.innerHTML = `
+        <td>
+          <div class="client-cell">
+            <div class="client-avatar" style="background:${theme.bg}; color:${theme.text}; font-weight:700;">${initials}</div>
+            <div>
+              <div class="client-cname" style="font-weight:500;">${house.name}</div>
+              <div class="client-type" style="font-size:11px; color:var(--text3);">Active Household</div>
+            </div>
+          </div>
+        </td>
+        <td><span style="font-size:12px;color:var(--text2);">Growth</span></td>
+        <td><span class="mono" style="font-size:12px;">${formatAUM(house.aum)}</span></td>
+        <td><span class="mono up" style="font-size:12px;">+${house.ytd_return}%</span></td>
+        <td>
+          <div class="sentiment-bar">
+            <div class="sentiment-dot" style="background:${theme.dot};"></div>
+            <span class="sentiment-label">${house.sentiment}</span>
+          </div>
+        </td>
+        <td>
+          <div class="drift-indicator">
+            <div class="drift-bar-track">
+              <div class="drift-bar-fill" style="width:${Math.min(house.drift * 20, 100)}%; background:${house.drift > 3 ? '#E57373' : '#1D9E75'};"></div>
+            </div>
+            <span style="font-size:11px; color:${house.drift > 3 ? '#D32F2F' : '#1D9E75'};">${house.drift}%</span>
+          </div>
+        </td>
+        <td><span class="tag" style="background:${house.status === 'Rebalance' ? 'var(--red-lt)' : 'var(--teal-lt)'}; color:${house.status === 'Rebalance' ? 'var(--red)' : 'var(--teal)'}; font-weight:600;">${house.status}</span></td>
+      `;
+      listContainer.appendChild(row);
+    });
+  }
+
+  // 4. Filter & Search Logic
+  function applyFilters() {
+    const searchTerm = document.getElementById('client-search').value.toLowerCase();
+    const activeBtn = document.querySelector('.filter-chip.active').id;
+
+    const filtered = allHouseholds.filter(h => {
+      const matchesSearch = h.name.toLowerCase().includes(searchTerm);
+      
+      if (activeBtn === 'filter-attention') {
+        return matchesSearch && (['Fearful', 'Worried', 'Concerned'].includes(h.sentiment) || h.drift > 3);
+      }
+      if (activeBtn === 'filter-rebalance') {
+        return matchesSearch && h.status === 'Rebalance';
+      }
+      return matchesSearch; 
+    });
+
+    renderTable(filtered);
+  }
+
+  // 5. Initial Fetch
+  async function fetchHouseholds() {
     try {
       const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-      const { data: households, error } = await _supabase
-        .from('households')
-        .select('*')
-        .order('name', { ascending: true });
-
+      const { data, error } = await _supabase.from('households').select('*').order('name', { ascending: true });
       if (error) throw error;
 
-      updateMetrics(households);
-
-      if (!listContainer) return;
-      listContainer.innerHTML = ''; 
-
-      households.forEach(house => {
-        const theme = getSentimentTheme(house.sentiment);
-        const row = document.createElement('tr');
-        
-        // Generate initials (e.g., Smith Family -> SF)
-        const initials = house.name ? house.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : '??';
-        
-        const tagsHtml = house.tags ? house.tags.map(tag => 
-          `<span class="tag" style="background:var(--purple-lt);color:var(--purple); margin-right:4px;">${tag}</span>`
-        ).join('') : '';
-
-        row.innerHTML = `
-          <td>
-            <div class="client-cell">
-              <div class="client-avatar" style="background:${theme.bg}; color:${theme.text}; font-family:'Syne', sans-serif; font-weight:700;">
-                ${initials}
-              </div>
-              <div>
-                <div class="client-cname" style="font-weight:500;">${house.name}</div>
-                <div class="client-type" style="font-size:11px; color:var(--text3);">Active Household</div>
-              </div>
-            </div>
-          </td>
-          <td><span style="font-size:12px;color:var(--text2);">Growth</span></td>
-          <td><span class="mono" style="font-size:12px;">${formatAUM(house.aum)}</span></td>
-          <td><span class="mono up" style="font-size:12px;">+${house.ytd_return}%</span></td>
-          <td>
-            <div class="sentiment-bar">
-              <div class="sentiment-dot" style="background:${theme.dot};"></div>
-              <span class="sentiment-label">${house.sentiment}</span>
-            </div>
-          </td>
-          <td>
-            <div class="drift-indicator">
-              <div class="drift-bar-track">
-                <div class="drift-bar-fill" style="width:${Math.min(house.drift * 20, 100)}%; background:${house.drift > 3 ? 'var(--coral)' : 'var(--teal)'};"></div>
-              </div>
-              <span style="font-size:11px; color:${house.drift > 3 ? 'var(--red)' : 'var(--teal)'};">${house.drift}%</span>
-            </div>
-          </td>
-          <td><span class="tag" style="background:${house.status === 'Rebalance' ? 'var(--red-lt)' : 'var(--teal-lt)'}; color:${house.status === 'Rebalance' ? 'var(--red)' : 'var(--teal)'}; font-weight:600;">${house.status}</span></td>
-        `;
-        listContainer.appendChild(row);
-      });
+      allHouseholds = data;
+      updateMetrics(allHouseholds);
+      renderTable(allHouseholds);
 
     } catch (err) {
-      console.error("Connection Error:", err.message);
+      console.error("Fetch Error:", err.message);
     }
   }
 
-  window.onload = fetchHouseholds;
-</script>
+  // 6. Global Event Listeners
+  document.addEventListener('DOMContentLoaded', () => {
+    fetchHouseholds();
+
+    // Search Input Listener
+    const searchInput = document.getElementById('client-search');
+    if (searchInput) searchInput.addEventListener('input', applyFilters);
+
+    // Filter Chip Listeners
+    document.querySelectorAll('.filter-chip').forEach(chip => {
+      chip.addEventListener('click', function() {
+        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+        this.classList.add
 </body>
 </html>
