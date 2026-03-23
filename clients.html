@@ -10,7 +10,6 @@
   gtag('config', 'G-6N55JYVPMX');
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="supabase-config.js"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blocks — Clients</title>
@@ -346,7 +345,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
               <th>Status</th>
             </tr>
           </thead>
-          <tbody>
+          <tbody id="clients-list">
             <tr>
               <td><div class="client-cell"><div class="client-avatar" style="background:#EEEDFE;color:#534AB7;">SF</div><div><div class="client-cname">Smith Family</div><div class="client-type">Growth · Taxable</div></div></div></td>
               <td><span style="font-size:12px;color:var(--text2);">Growth</span></td>
@@ -613,6 +612,17 @@ function closeMobileMenu() {
   document.addEventListener('DOMContentLoaded', fetchHouseholds);
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/app.js"></script>
+    
+    <script src="js/app.js"></script>
+
+    <script>
+      // Mobile menu logic (Keep this if you want the hamburger to work)
+      function toggleMobileMenu() {
+        document.getElementById('mobileMenu').classList.toggle('open');
+        document.getElementById('hamburger').classList.toggle('open');
+      }
+    </script>
+</body>
+</html>
 </body>
 </html>
