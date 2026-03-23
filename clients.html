@@ -14,52 +14,48 @@
 <title>Blocks — Clients</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  /* Tooltip Container */
-.filter-chip {
-  position: relative; /* Required for absolute positioning of tooltip */
+/* Ensure the toolbar doesn't clip the tooltip */
+.table-toolbar {
+  overflow: visible !important;
+  position: relative;
+  z-index: 10; /* Lower than the tooltip, but higher than the table below */
 }
 
-/* Tooltip Text */
+/* Tooltip Text - Adjusting the 'bottom' value to ensure it clears the chip border */
 .filter-chip::after {
   content: "Triggers: Sentiment < Neutral OR Drift > 3%";
   position: absolute;
-  bottom: 125%; /* Position above the chip */
+  bottom: calc(100% + 10px); /* Moves it slightly higher */
   left: 50%;
   transform: translateX(-50%);
   background-color: #333;
   color: #fff;
-  padding: 6px 10px;
+  padding: 8px 12px;
   border-radius: 6px;
   font-size: 11px;
   white-space: nowrap;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s;
-  z-index: 100;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 9999; /* Force it to the very top layer */
   pointer-events: none;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
-/* Tooltip Arrow */
+/* Tooltip Arrow - Aligning with the new bottom position */
 .filter-chip::before {
   content: "";
   position: absolute;
-  bottom: 110%;
+  bottom: calc(100% + 2px);
   left: 50%;
   transform: translateX(-50%);
-  border-width: 5px;
+  border-width: 4px;
   border-style: solid;
   border-color: #333 transparent transparent transparent;
   opacity: 0;
   visibility: hidden;
-  transition: opacity 0.2s;
-}
-
-/* Only show tooltip for the Needs Attention chip */
-#filter-attention:hover::after,
-#filter-attention:hover::before {
-  opacity: 1;
-  visibility: visible;
+  transition: opacity 0.2s, visibility 0.2s;
+  z-index: 9999;
 }
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 :root {
