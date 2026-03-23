@@ -8,7 +8,6 @@
   gtag('js', new Date());
   gtag('config', 'G-6N55JYVPMX');
 </script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Blocks — Clients</title>
@@ -29,75 +28,43 @@
   --shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.07);
 }
 body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--text); font-size: 13px; line-height: 1.5; min-width: 1100px; }
-.topnav { background: var(--surface); border-bottom: 0.5px solid var(--border2); display: flex; align-items: center; padding: 0 1.25rem; height: 52px; gap: 2rem; position: sticky; top: 0; z-index: 20; overflow: visible; }
-.logo { display: flex; align-items: center; gap: 9px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; flex-shrink: 0; text-decoration: none; }
+.topnav { background: var(--surface); border-bottom: 0.5px solid var(--border2); display: flex; align-items: center; padding: 0 1.25rem; height: 52px; gap: 2rem; position: sticky; top: 0; z-index: 20; }
+.logo { display: flex; align-items: center; gap: 9px; font-family: 'Syne', sans-serif; font-size: 17px; font-weight: 600; color: var(--text); letter-spacing: -0.3px; text-decoration: none; }
 .logo-mark { width: 28px; height: 28px; background: var(--purple); border-radius: 7px; display: grid; grid-template-columns: 1fr 1fr; gap: 2.5px; padding: 5px; }
 .logo-mark span { background: white; border-radius: 1.5px; }
-.logo-mark span:nth-child(2) { opacity: 0.65; } .logo-mark span:nth-child(3) { opacity: 0.65; } .logo-mark span:nth-child(4) { opacity: 0.35; }
+.logo-mark span:nth-child(2), .logo-mark span:nth-child(3) { opacity: 0.65; } .logo-mark span:nth-child(4) { opacity: 0.35; }
 .subnav { font-size: 11px; color: var(--text3); margin-top: 1px; }
 .nav-links { display: flex; gap: 0; flex: 1; }
-.nav-links a { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; transition: color 0.15s; }
+.nav-links a { font-family: 'DM Sans', sans-serif; font-size: 13px; color: var(--text2); text-decoration: none; padding: 0 14px; height: 52px; display: flex; align-items: center; border-bottom: 2px solid transparent; }
 .nav-links a.active { color: var(--purple); border-bottom-color: var(--purple); font-weight: 500; }
-.nav-links a:hover:not(.active) { color: var(--text); }
 .nav-right { display: flex; align-items: center; gap: 10px; margin-left: auto; }
-.icon-btn { width: 32px; height: 32px; border-radius: var(--r-sm); border: 0.5px solid var(--border2); background: var(--surface); display: flex; align-items: center; justify-content: center; cursor: pointer; color: var(--text2); }
-.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; cursor: pointer; }
+.avatar { width: 32px; height: 32px; border-radius: 50%; background: linear-gradient(135deg, #534AB7, #1D9E75); display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; color: white; }
 .shell { display: grid; grid-template-columns: 68px 1fr; min-height: calc(100vh - 52px); }
 .sidenav { background: var(--surface); border-right: 0.5px solid var(--border); display: flex; flex-direction: column; align-items: center; padding: 1rem 0; gap: 4px; }
-.sidenav-item { width: 64px; height: 52px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; transition: background 0.12s, color 0.12s; text-align: center; line-height: 1.2; }
-.sidenav-item:hover { background: var(--surface2); color: var(--text2); }
+.sidenav-item { width: 64px; height: 52px; border-radius: var(--r-md); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; cursor: pointer; color: var(--text3); font-size: 8px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.3px; text-align: center; }
 .sidenav-item.active { background: var(--purple-lt); color: var(--purple); }
-.ai-chip { display: inline-flex; align-items: center; gap: 5px; font-size: 10px; background: var(--purple-lt); color: var(--purple); border-radius: 20px; padding: 3px 9px; font-weight: 500; }
-.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; display: inline-block; white-space: nowrap; }
-.mono { font-family: 'DM Mono', monospace; }
-.up { color: var(--teal); } .down { color: var(--coral); }
-
-/* Page layout */
 .page-content { padding: 1.5rem; }
 .page-header { display: flex; align-items: flex-end; justify-content: space-between; margin-bottom: 1.5rem; }
 .page-title { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; color: var(--text); letter-spacing: -0.5px; }
-.page-sub { font-size: 12px; color: var(--text3); margin-top: 3px; }
-.btn-purple { font-family: 'Syne', sans-serif; font-size: 12px; font-weight: 600; padding: 7px 16px; background: var(--purple); color: white; border: none; border-radius: var(--r-sm); cursor: pointer; transition: opacity 0.15s; }
-.btn-purple:hover { opacity: 0.88; }
-
-/* Metrics row */
-.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-bottom: 1.25rem; }
-.metric { background: var(--surface); border-radius: var(--r-lg); box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.07); padding: 1rem 1.125rem; }
-.metric-label { font-size: 11px; color: var(--text2); margin-bottom: 5px; }
-.metric-val { font-family: 'DM Mono', monospace; font-size: 21px; font-weight: 500; color: var(--text); letter-spacing: -0.5px; }
-.metric-val.up { color: var(--teal); }
-.metric-val.warn { color: var(--amber); }
-.metric-sub { font-size: 11px; color: var(--text3); margin-top: 3px; }
-
-/* Table styles */
-.table-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: 0 1px 4px rgba(0,0,0,0.07), 0 0 0 0.5px rgba(0,0,0,0.07); overflow: hidden; }
-.table-toolbar { display: flex; align-items: center; gap: 10px; padding: 12px 16px; border-bottom: 0.5px solid var(--border2); }
-.table-toolbar-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; color: var(--text); flex: 1; }
+.table-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); overflow: hidden; }
 .client-table { width: 100%; border-collapse: collapse; }
-.client-table th { font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text3); font-weight: 500; text-align: left; padding: 8px 14px; background: var(--surface2); border-bottom: 0.5px solid var(--border2); }
-.client-table td { padding: 11px 14px; border-bottom: 0.5px solid var(--border); vertical-align: middle; }
-.client-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; flex-shrink: 0; }
+.client-table th { font-size: 10px; text-transform: uppercase; color: var(--text3); text-align: left; padding: 8px 14px; background: var(--surface2); border-bottom: 0.5px solid var(--border2); }
+.client-table td { padding: 11px 14px; border-bottom: 0.5px solid var(--border); }
 .client-cell { display: flex; align-items: center; gap: 10px; }
-.client-cname { font-size: 13px; font-weight: 500; color: var(--text); }
-.client-type { font-size: 11px; color: var(--text3); margin-top: 1px; }
+.client-avatar { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 500; }
+.tag { font-size: 10px; padding: 2px 8px; border-radius: 20px; font-weight: 500; display: inline-block; }
+.mono { font-family: 'DM Mono', monospace; }
 
-.two-col { display: grid; grid-template-columns: 1fr 340px; gap: 1.25rem; }
-.right-panel { display: flex; flex-direction: column; gap: 1rem; }
-.focus-card { background: var(--surface); border-radius: var(--r-lg); box-shadow: var(--shadow); padding: 1.125rem 1.25rem; }
-.focus-title { font-family: 'Syne', sans-serif; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
-
-/* Mobile logic */
+/* Hamburger Menu CSS */
 .hamburger { display: none; flex-direction: column; gap: 4.5px; cursor: pointer; padding: 6px; border-radius: 6px; border: 0.5px solid var(--border2); background: transparent; }
-.hamburger span { display: block; width: 18px; height: 1.5px; background: #181816; border-radius: 2px; }
-.mobile-menu { visibility: hidden; opacity: 0; position: fixed; top: 52px; left: 0; right: 0; background: #fff; z-index: 999; display: flex; flex-direction: column; pointer-events: none; border-bottom: 0.5px solid var(--border2); }
-.mobile-menu.open { visibility: visible; opacity: 1; pointer-events: all; }
+.hamburger span { display: block; width: 18px; height: 1.5px; background: #181816; transition: 0.2s; }
+.mobile-menu { display: none; position: fixed; top: 52px; left: 0; right: 0; background: white; border-bottom: 0.5px solid var(--border2); flex-direction: column; z-index: 100; }
+.mobile-menu.open { display: flex; }
 
 @media (max-width: 900px) {
   .hamburger { display: flex; }
   .nav-links, .sidenav { display: none; }
   .shell { grid-template-columns: 1fr; }
-  .two-col { grid-template-columns: 1fr; }
-  .metrics { grid-template-columns: 1fr 1fr; }
 }
 </style>
 </head>
@@ -115,24 +82,17 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <a href="dashboard.html">Dashboard</a>
     <a href="clients.html" class="active">Clients</a>
     <a href="blocks-builder.html">Block Library</a>
-    <a href="composites.html">Composites</a>
-    <a href="signals.html">Signals</a>
     <a href="assembly.html">Build</a>
-    <a href="proposal.html">Proposal</a>
   </div>
   <div class="nav-right">
-    <div class="icon-btn">
-      <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5C5.01 1.5 3 3.51 3 6v3l-1 1.5h11L12 9V6c0-2.49-2.01-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6 12a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
-    </div>
     <div class="avatar">CJ</div>
   </div>
   <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()"><span></span><span></span><span></span></button>
 </nav>
 
 <div class="mobile-menu" id="mobileMenu">
-  <a href="dashboard.html" style="padding:15px; border-bottom:0.5px solid var(--border);">Dashboard</a>
-  <a href="clients.html" style="padding:15px; border-bottom:0.5px solid var(--border);">Clients</a>
-  <a href="blocks-builder.html" style="padding:15px;">Block Library</a>
+  <a href="dashboard.html" style="padding:15px; border-bottom:1px solid #eee; text-decoration:none; color:inherit;">Dashboard</a>
+  <a href="clients.html" style="padding:15px; text-decoration:none; color:inherit;">Clients</a>
 </div>
 
 <div class="shell">
@@ -140,43 +100,29 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="sidenav-item" onclick="location.href='dashboard.html'">Dash</div>
     <div class="sidenav-item active">Clients</div>
     <div class="sidenav-item" onclick="location.href='blocks-builder.html'">Blocks</div>
-    <div class="sidenav-item" onclick="location.href='assembly.html'">Build</div>
   </nav>
 
   <div class="page-content">
     <div class="page-header">
       <div>
         <div class="page-title">Clients</div>
-        <div class="page-sub" id="aum-summary">Syncing database...</div>
+        <div id="client-count" style="font-size:12px; color:var(--text3);">Loading households...</div>
       </div>
-      <button class="btn-purple">+ Add Client</button>
     </div>
 
-    <div class="metrics">
-      <div class="metric"><div class="metric-label">Total AUM</div><div class="metric-val" id="total-aum">$0.0M</div></div>
-      <div class="metric"><div class="metric-label">Households</div><div class="metric-val" id="house-count">0</div></div>
-      <div class="metric"><div class="metric-label">Avg. Drift</div><div class="metric-val warn">2.4%</div></div>
-      <div class="metric"><div class="metric-label">YTD Return</div><div class="metric-val up">+8.7%</div></div>
-    </div>
-
-    <div class="two-col">
-      <div class="table-card">
-        <div class="table-toolbar"><div class="table-toolbar-title">Active Households</div></div>
-        <table class="client-table">
-          <thead>
-            <tr><th>Client</th><th>Tags</th><th>Status</th><th style="text-align:right;">Action</th></tr>
-          </thead>
-          <tbody id="clients-list">
-            </tbody>
-        </table>
-      </div>
-
-      <div class="right-panel">
-        <div class="focus-card">
-          <div class="focus-title">System Status</div>
-          <div id="status-msg" style="font-size:12px; color:var(--text2);">Initializing connection...</div>
-        </div>
-      </div>
+    <div class="table-card">
+      <table class="client-table">
+        <thead>
+          <tr>
+            <th>Client</th>
+            <th>Tags</th>
+            <th>AUM</th>
+            <th>Status</th>
+          </tr>
+        </thead>
+        <tbody id="clients-list">
+          </tbody>
+      </table>
     </div>
   </div>
 </div>
@@ -184,35 +130,33 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  // 2. DEFINE CREDENTIALS (MUST BE UPDATED WITH YOUR REAL KEYS)
-  const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co';
+  // Replace these with your actual keys from Supabase Dashboard
+  const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co'; 
   const SUPABASE_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
 
-  // 3. INITIALIZE CLIENT (Global variable that app.js can see)
-  window.supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-  
-  // Create an alias so your existing code doesn't break
-  const _supabase = window.supabaseClient;
-</script>
+  let _supabase;
 
-<script src="js/app.js"></script>
-
-<script>
-  async function fetchHouseholds() {
-    const listContainer = document.getElementById('clients-list');
-    if (!listContainer) return;
-
+  async function init() {
     try {
-      const { data: households, error } = await window.supabaseClient
+      // Create client
+      _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+      
+      // Fetch data
+      const { data: households, error } = await _supabase
         .from('households')
         .select('*');
 
       if (error) throw error;
 
-      listContainer.innerHTML = ''; // Clear mock data
+      const listContainer = document.getElementById('clients-list');
+      const countLabel = document.getElementById('client-count');
+      
+      countLabel.innerText = `${households.length} active households`;
+      listContainer.innerHTML = '';
 
       households.forEach(house => {
         const row = document.createElement('tr');
+        
         const tagsHtml = house.tags ? house.tags.map(tag => 
           `<span class="tag" style="background:var(--purple-lt);color:var(--purple);margin-right:4px;">${tag}</span>`
         ).join('') : '';
@@ -220,33 +164,35 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
         row.innerHTML = `
           <td>
             <div class="client-cell">
-              <div class="client-avatar" style="background:var(--surface2);color:var(--text2);">${house.name.charAt(0)}</div>
+              <div class="client-avatar" style="background:var(--surface2);color:var(--text2);">
+                ${house.name ? house.name.charAt(0) : '?'}
+              </div>
               <div>
-                <div class="client-cname">${house.name}</div>
-                <div class="client-type">Active Household</div>
+                <div class="client-cname">${house.name || 'Unnamed'}</div>
+                <div class="client-type">Household</div>
               </div>
             </div>
           </td>
-          <td><span style="font-size:12px;color:var(--text2);">Growth</span></td>
-          <td><span class="mono" style="font-size:12px;">$0.0M</span></td>
-          <td><span class="mono up" style="font-size:12px;">0.0%</span></td>
-          <td><div class="sentiment-bar"><div class="sentiment-dot" style="background:#1D9E75;"></div><span class="sentiment-label">Neutral</span></div></td>
-          <td><div class="drift-indicator"><span style="font-size:11px;color:var(--teal);">0.0%</span></div></td>
-          <td><span class="tag" style="background:var(--teal-lt);color:var(--teal);">Healthy</span></td>
+          <td>${tagsHtml}</td>
+          <td><span class="mono">$0.0M</span></td>
+          <td><span class="tag" style="background:var(--teal-lt);color:var(--teal);">Active</span></td>
         `;
         listContainer.appendChild(row);
       });
+
     } catch (err) {
-      console.error("Fetch Error:", err.message);
+      console.error("Initialization Error:", err.message);
+      document.getElementById('client-count').innerText = "Connection error. Check console.";
     }
   }
 
   function toggleMobileMenu() {
     document.getElementById('mobileMenu').classList.toggle('open');
-    document.getElementById('hamburger').classList.toggle('open');
   }
 
-  document.addEventListener('DOMContentLoaded', fetchHouseholds);
+  // Ensure library is loaded before calling init
+  window.onload = init;
 </script>
+
 </body>
 </html>
