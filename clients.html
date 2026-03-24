@@ -545,6 +545,25 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
 </div>
 
 <script>
+  // --- GLOBAL UI FUNCTIONS ---
+function toggleDropdown() {
+    const menu = document.getElementById('account-dropdown');
+    if (menu) {
+        const isHidden = menu.style.display === 'none' || menu.style.display === '';
+        menu.style.display = isHidden ? 'block' : 'none';
+    }
+}
+
+// This will be called by your "Log In" menu item later
+function toggleAdminModal() {
+    // For now, we'll just use a simple prompt for the demo login
+    handleAdminLogin();
+}
+
+async function handleAdminLogout() {
+    await _supabase.auth.signOut();
+    window.location.reload();
+}
 function toggleMobileMenu() {
   var menu = document.getElementById('mobileMenu');
   var btn = document.getElementById('hamburger');
@@ -697,27 +716,28 @@ function closeMobileMenu() {
 }
 
   // 7. Bulletproof Event Listeners
-  document.addEventListener('DOMContentLoaded', () => {
-    fetchHouseholds();
+  
+  // 3. THE INITIALIZER (Runs after the page is ready)
+document.addEventListener('DOMContentLoaded', () => {
+    // 1. This handles the JD vs CJ identity and data fetching
+    checkAdminStatus(); 
 
-    // Listen for search typing
+    // 2. KEEP: Listen for search typing
     const searchBox = document.getElementById('client-search');
     if (searchBox) {
-      searchBox.addEventListener('input', applyFilters);
+        searchBox.addEventListener('input', applyFilters);
     }
 
-    // Listen for filter clicks using delegation
+    // 3. KEEP: Listen for filter chips (All, Needs Attention, etc.)
     document.addEventListener('click', (e) => {
-      const chip = e.target.closest('.filter-chip');
-      if (chip) {
-        // Toggle Active Class
-        document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
-        chip.classList.add('active');
-        // Execute Filter
-        applyFilters();
-      }
+        const chip = e.target.closest('.filter-chip');
+        if (chip) {
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            chip.classList.add('active');
+            applyFilters();
+        }
     });
-  });
+});
 </script>
 
 <script>
@@ -725,18 +745,35 @@ function closeMobileMenu() {
 const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // 2. The function that decides: Show Dashboard or Show Login?
-async function checkUser() {
-  const { data: { user } } = await _supabase.auth.getUser();
-  const gate = document.getElementById('auth-gate');
+async function checkAdminStatus() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const avatar = document.getElementById('user-avatar');
+    const statusLabel = document.getElementById('dropdown-status');
+    const nameLabel = document.getElementById('dropdown-name');
+    const logoutBtn = document.getElementById('logout-btn');
 
-  if (!user) {
-    // No one is logged in. Show the overlay.
-    gate.style.display = 'flex';
-  } else {
-    // Advisor is logged in! Hide the overlay and load their private data.
-    gate.style.display = 'none';
-    fetchHouseholds(user.id);
-  }
+    if (user) {
+        // ADMIN MODE (CJ BROWNING)
+        document.body.classList.add('is-admin');
+        if(avatar) avatar.innerText = "CJ";
+        if(statusLabel) statusLabel.innerText = "Admin Access";
+        if(nameLabel) nameLabel.innerText = "CJ Browning";
+        
+        if(logoutBtn) {
+            logoutBtn.style.color = "#ff4d4d";
+            logoutBtn.style.cursor = "pointer";
+            logoutBtn.style.pointerEvents = "auto";
+        }
+    } else {
+        // DEMO MODE (JAMES DAVIDSON)
+        document.body.classList.remove('is-admin');
+        if(avatar) avatar.innerText = "JD";
+        if(statusLabel) statusLabel.innerText = "Demo Mode";
+        if(nameLabel) nameLabel.innerText = "James Davidson, CFP";
+    }
+    
+    // Always fetch households so the demo is populated for everyone
+    fetchHouseholds();
 }
 
 // 3. The logic for the Login/Signup buttons
@@ -773,34 +810,6 @@ document.addEventListener('DOMContentLoaded', checkUser);
   function gtag(){dataLayer.push(arguments);}
   gtag('js', new Date());
   gtag('config', 'G-6N55JYVPMX');
-
-  async function updateAuthUI() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    const avatar = document.getElementById('user-avatar');
-    const statusLabel = document.getElementById('dropdown-status');
-    const nameLabel = document.getElementById('dropdown-name');
-    const logoutBtn = document.getElementById('logout-btn');
-
-    if (user) {
-        // --- LOGGED IN (CJ BROWNING) ---
-        avatar.innerText = "CJ";
-        statusLabel.innerText = "Admin Access";
-        nameLabel.innerText = "CJ Browning";
-        
-        // Enable Logout styling
-        logoutBtn.style.color = "#ff4d4d";
-        logoutBtn.style.cursor = "pointer";
-        
-        document.body.classList.add('is-admin');
-    } else {
-        // --- DEMO MODE (JAMES DAVIDSON) ---
-        avatar.innerText = "JD";
-        statusLabel.innerText = "Demo Mode";
-        nameLabel.innerText = "James Davidson, CFP";
-        
-        document.body.classList.remove('is-admin');
-    }
-}
 
 // Make sure to call this inside your existing DOMContentLoaded listener
 document.addEventListener('DOMContentLoaded', () => {
