@@ -596,7 +596,7 @@ function closeMobileMenu() {
 <script>
   let allHouseholds = [];
 
-  // --- TABLE LOGIC FUNCTIONS ---
+  // --- TABLE LOGIC FUNCTIONS (Must stay in this file) ---
   const formatAUM = (val) => {
       if (!val) return '$0.0M';
       return '$' + (Number(val) / 1000000).toFixed(1) + 'M';
@@ -687,7 +687,7 @@ function closeMobileMenu() {
   }
 
   async function fetchHouseholds() {
-      // Note: _supabase is defined in app.js, so it's available here globally
+      // _supabase is defined in app.js and is available here
       const { data, error } = await _supabase.from('households').select('*');
       if (!error) {
           allHouseholds = data || [];
@@ -704,8 +704,10 @@ function closeMobileMenu() {
 
   // --- INITIALIZATION ---
   document.addEventListener('DOMContentLoaded', () => {
+      // Fetch the table data
       fetchHouseholds();
       
+      // Set up listeners
       const searchBox = document.getElementById('client-search');
       if (searchBox) searchBox.addEventListener('input', applyFilters);
 
