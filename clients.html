@@ -9,6 +9,15 @@
 <title>Blocks — Clients</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* Hide admin elements by default */
+.admin-only {
+    display: none !important;
+}
+
+/* Show them only when the body has the 'is-admin' class */
+body.is-admin .admin-only {
+    display: inline-block !important;
+}
   .menu-item:hover {
     background-color: #f9f9f9;
 }
@@ -367,7 +376,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div style="display:flex;gap:8px;">
         <a href="proposal.html" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:7px 16px;background:var(--surface);color:var(--purple);border:0.5px solid var(--purple-md);border-radius:var(--r-sm);cursor:pointer;text-decoration:none;">View Proposal</a>
         <a href="assembly.html" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:7px 16px;background:var(--surface);color:var(--text2);border:0.5px solid var(--border2);border-radius:var(--r-sm);cursor:pointer;text-decoration:none;">Assemble Portfolio</a>
-        <button class="btn-purple">+ Add Client</button>
+        <button class="btn-primary admin-only">Add Client</button>
       </div>
     </div>
 
@@ -767,6 +776,8 @@ function closeMobileMenu() {
 
   // 5. INITIALIZATION
   document.addEventListener('DOMContentLoaded', () => {
+      // This is the new function name! 
+      // Ensure 'checkUser' is deleted and replaced with this:
       checkAdminStatus();
 
       const searchBox = document.getElementById('client-search');
