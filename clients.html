@@ -594,10 +594,100 @@ function closeMobileMenu() {
 <script src="js/app.js"></script>
 
 <script>
-  // This code only runs on the Clients page
   let allHouseholds = [];
 
+  // --- TABLE LOGIC FUNCTIONS ---
+  const formatAUM = (val) => {
+      if (!val) return '$0.0M';
+      return '$' + (Number(val) / 1000000).toFixed(1) + 'M';
+  };
+
+  const getSentimentTheme = (s) => {
+      const themes = {
+          'Confident': { bg: '#EAF3DE', dot: '#2E7D32', text: '#1B4D1E' },
+          'Neutral':   { bg: '#E1F5EE', dot: '#1D9E75', text: '#0B5D46' },
+          'Concerned': { bg: '#FEF3DC', dot: '#A06010', text: '#6D410B' },
+          'Worried':   { bg: '#FAECE7', dot: '#C94E28', text: '#8A351B' },
+          'Fearful':   { bg: '#FCEBEB', dot: '#B83232', text: '#7A2121' }
+      };
+      return themes[s] || { bg: '#f0efe9', dot: '#9a9994', text: '#5c5b57' };
+  };
+
+  function updateMetrics(data) {
+      const totalAUM = data.reduce((sum, h) => sum + (Number(h.aum) || 0), 0);
+      const avgYTD = data.length > 0 ? (data.reduce((sum, h) => sum + (Number(h.ytd_return) || 0), 0) / data.length) : 0;
+      const rebalanceCount = data.filter(h => h.status === 'Rebalance').length;
+      
+      const metrics = document.querySelectorAll('.metric-val');
+      if (metrics[0]) metrics[0].innerText = formatAUM(totalAUM);
+      if (metrics[1]) metrics[1].innerText = data.length;
+      if (metrics[2]) metrics[2].innerText = `${rebalanceCount} clients`;
+      if (metrics[3]) metrics[3].innerText = `+${avgYTD.toFixed(1)}%`;
+  }
+
+  function renderTable(data) {
+      const listContainer = document.getElementById('clients-list');
+      if (!listContainer) return;
+      listContainer.innerHTML = '';
+
+      data.forEach(house => {
+          const theme = getSentimentTheme(house.sentiment);
+          const initials = house.name ? house.name.split(' ').map(n => n[0]).join('').substring(0,2).toUpperCase() : '??';
+          const row = document.createElement('tr');
+          row.innerHTML = `
+            <td>
+              <div class="client-cell">
+                <div class="client-avatar" style="background:${theme.bg}; color:${theme.text}; font-weight:700;">${initials}</div>
+                <div>
+                  <div class="client-cname">${house.name}</div>
+                  <div class="client-type">Active Household</div>
+                </div>
+              </div>
+            </td>
+            <td><span style="font-size:12px;color:var(--text2);">Growth</span></td>
+            <td><span class="mono">${formatAUM(house.aum)}</span></td>
+            <td><span class="mono up">+${house.ytd_return}%</span></td>
+            <td>
+              <div class="sentiment-bar">
+                <div class="sentiment-dot" style="background:${theme.dot};"></div>
+                <span class="sentiment-label">${house.sentiment}</span>
+              </div>
+            </td>
+            <td>
+              <div class="drift-indicator">
+                <div class="drift-bar-track">
+                  <div class="drift-bar-fill" style="width:${Math.min(house.drift * 15, 100)}%; background:${house.drift > 3 ? '#D32F2F' : '#1D9E75'};"></div>
+                </div>
+                <span>${house.drift}%</span>
+              </div>
+            </td>
+            <td><span class="tag" style="background:${house.status === 'Rebalance' ? 'var(--red-lt)' : 'var(--teal-lt)'}; color:${house.status === 'Rebalance' ? 'var(--red)' : 'var(--teal)'};">${house.status}</span></td>
+            <td class="admin-only" style="text-align: right;">
+                <button onclick="deleteHousehold('${house.id}')" style="background:none; border:none; color:#ff4d4d; cursor:pointer;">✕</button>
+            </td>
+          `;
+          listContainer.appendChild(row);
+      });
+  }
+
+  function applyFilters() {
+      const searchInput = document.getElementById('client-search');
+      const searchTerm = searchInput ? searchInput.value.toLowerCase() : '';
+      const activeChip = document.querySelector('.filter-chip.active');
+      const activeId = activeChip ? activeChip.id : 'filter-all';
+
+      const filtered = allHouseholds.filter(h => {
+          const name = h.name || "";
+          const matchesSearch = name.toLowerCase().includes(searchTerm);
+          if (activeId === 'filter-attention') return matchesSearch && (['Fearful', 'Worried', 'Concerned'].includes(h.sentiment) || h.drift > 3);
+          if (activeId === 'filter-rebalance') return matchesSearch && h.status === 'Rebalance';
+          return matchesSearch; 
+      });
+      renderTable(filtered);
+  }
+
   async function fetchHouseholds() {
+      // Note: _supabase is defined in app.js, so it's available here globally
       const { data, error } = await _supabase.from('households').select('*');
       if (!error) {
           allHouseholds = data || [];
@@ -606,18 +696,27 @@ function closeMobileMenu() {
       }
   }
 
-  // ... (Keep your renderTable, applyFilters, updateMetrics, and formatAUM functions here) ...
-
   async function deleteHousehold(id) {
       if (!confirm("Are you sure?")) return;
       await _supabase.from('households').delete().eq('id', id);
       fetchHouseholds();
   }
 
+  // --- INITIALIZATION ---
   document.addEventListener('DOMContentLoaded', () => {
       fetchHouseholds();
+      
       const searchBox = document.getElementById('client-search');
       if (searchBox) searchBox.addEventListener('input', applyFilters);
+
+      document.addEventListener('click', (e) => {
+          const chip = e.target.closest('.filter-chip');
+          if (chip) {
+              document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+              chip.classList.add('active');
+              applyFilters();
+          }
+      });
   });
 </script>
   </body>
