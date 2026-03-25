@@ -128,37 +128,39 @@ async function checkAdminStatus() {
     const statusLabel = document.getElementById('dropdown-status');
     const nameLabel = document.getElementById('dropdown-name');
 
+    // Helper function to force the "Clean" look
+    const applyCleanStyle = (el, text, isCJ) => {
+        if (!el) return;
+        el.innerText = text;
+        el.style.fontWeight = "500"; // Dropping to 500 for that premium look
+        el.style.letterSpacing = "normal";
+        el.style.webkitFontSmoothing = "antialiased";
+        el.style.background = isCJ ? "#000" : "linear-gradient(135deg, #534AB7, #1D9E75)";
+    };
+
     if (user) {
-        // --- LOGGED IN (CJ) ---
         document.body.classList.add('is-admin');
-        if(avatar) { avatar.innerText = "CJ"; avatar.style.background = "#000"; }
+        applyCleanStyle(avatar, "CJ", true);
+        
         if(statusLabel) statusLabel.innerText = "Admin Access";
         if(nameLabel) nameLabel.innerText = "CJ Browning";
 
-        // ADD THESE: Swap the buttons in the menu
         if(document.getElementById('login-menu-item')) document.getElementById('login-menu-item').style.display = 'none';
         if(document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'block';
-
-        // Show all admin buttons/features
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
 
     } else {
-        // --- LOGGED OUT (Demo) ---
         document.body.classList.remove('is-admin');
-        if(avatar) { avatar.innerText = "JD"; avatar.style.background = "linear-gradient(135deg, #534AB7, #1D9E75)"; }
+        applyCleanStyle(avatar, "JD", false);
+        
         if(statusLabel) statusLabel.innerText = "Demo Mode";
         if(nameLabel) nameLabel.innerText = "James Davidson, CFP";
 
-        // ADD THESE: Swap the buttons back
         if(document.getElementById('login-menu-item')) document.getElementById('login-menu-item').style.display = 'block';
         if(document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'none';
-
-        // Hide all admin buttons/features
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
     }
 }
-
-
 
 // --- 4. INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', async () => {
