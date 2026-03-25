@@ -390,7 +390,7 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
     <div class="icon-btn">
       <svg width="15" height="15" viewBox="0 0 15 15" fill="none"><path d="M7.5 1.5C5.01 1.5 3 3.51 3 6v3l-1 1.5h11L12 9V6c0-2.49-2.01-4.5-4.5-4.5z" stroke="currentColor" stroke-width="1.2" fill="none"/><path d="M6 12a1.5 1.5 0 003 0" stroke="currentColor" stroke-width="1.2" fill="none"/></svg>
     </div>
-    <div class="avatar">JD</div>
+    <div id="global-nav-auth"></div>
   </div>
   <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
@@ -800,5 +800,7 @@ function closeMobileMenu() {
   if (btn) btn.classList.remove('open');
 }
 </script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="js/app.js"></script>
 </body>
 </html>
