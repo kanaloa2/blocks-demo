@@ -61,8 +61,21 @@ async function checkAdminStatus() {
     }
 }
 
-// Initialize Global UI on every page
+// --- 4. INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
-    injectNavBar();
-    checkAdminStatus();
+    injectNavBar();      
+    checkAdminStatus();  
+
+    // ADD THIS: Close dropdown when clicking outside
+    window.addEventListener('click', (e) => {
+        const menu = document.getElementById('account-dropdown');
+        const avatar = document.getElementById('user-avatar');
+        
+        // If the menu is open AND the click was NOT on the avatar AND NOT inside the menu
+        if (menu && menu.style.display === 'block' && 
+            !avatar.contains(e.target) && 
+            !menu.contains(e.target)) {
+            menu.style.display = 'none';
+        }
+    });
 });
