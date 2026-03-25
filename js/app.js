@@ -183,4 +183,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             menu.style.display = 'none';
         }
     });
+    // Add this at the very bottom of app.js
+function formatAUM(amt) {
+    const num = Number(amt);
+    if (isNaN(num)) return "$0";
+    
+    if (num >= 1000000000) return `$${(num / 1000000000).toFixed(1)}B`;
+    if (num >= 1000000) return `$${(num / 1000000).toFixed(1)}M`;
+    return `$${num.toLocaleString()}`;
+}
 });
