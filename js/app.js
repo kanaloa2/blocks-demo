@@ -117,22 +117,7 @@ async function checkAdminStatus() {
     }
 }
 
-async function checkAdminStatus() {
-    const { data: { user } } = await _supabase.auth.getUser();
-    const avatar = document.getElementById('user-avatar');
-    const statusLabel = document.getElementById('dropdown-status');
-    const nameLabel = document.getElementById('dropdown-name');
 
-    if (user) {
-        document.body.classList.add('is-admin');
-        if(avatar) { avatar.innerText = "CJ"; avatar.style.background = "#000"; }
-        if(statusLabel) statusLabel.innerText = "Admin Access";
-        if(nameLabel) nameLabel.innerText = "CJ Browning";
-    } else {
-        document.body.classList.remove('is-admin');
-        if(avatar) { avatar.innerText = "JD"; avatar.style.background = "linear-gradient(135deg, #534AB7, #1D9E75)"; }
-    }
-}
 
 // --- 4. INITIALIZATION ---
 document.addEventListener('DOMContentLoaded', () => {
