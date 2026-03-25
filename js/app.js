@@ -6,9 +6,13 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 // --- 2. GLOBAL UI INJECTION (Draws the menu on every page) ---
 function injectNavBar() {
     // 1. GLOBAL STYLE INJECTION
-    // This fixes the extra bold fonts (weight 600) and ensures hover effects work globally
     const style = document.createElement('style');
     style.innerHTML = `
+        /* This targets the avatar specifically to stop the extra bold flash */
+        #user-avatar { 
+            font-weight: 600 !important; 
+        }
+        /* This fixes all other bold elements globally */
         b, strong, h1, h2, h3, .bold-text { 
             font-weight: 600 !important; 
             letter-spacing: -0.01em; 
