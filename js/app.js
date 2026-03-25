@@ -5,18 +5,29 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // --- 2. GLOBAL UI INJECTION (Draws the menu on every page) ---
 function injectNavBar() {
+    // 1. GLOBAL STYLE INJECTION
+    // This fixes the extra bold fonts (weight 600) and ensures hover effects work globally
+    const style = document.createElement('style');
+    style.innerHTML = `
+        b, strong, h1, h2, h3, .bold-text { 
+            font-weight: 600 !important; 
+            letter-spacing: -0.01em; 
+        }
+        .menu-item:hover {
+            background-color: #f8f8f8 !important;
+        }
+    `;
+    document.head.appendChild(style);
+
     const navContainer = document.getElementById('global-nav-auth');
     if (!navContainer) return;
 
-    // 1. Check local memory immediately to prevent the "JD Flash"
+    // 2. CHECK LOCAL MEMORY (Prevents the "JD Flash")
     const savedInitials = localStorage.getItem('user_initials') || 'JD';
-    
-    // 2. Set the background color based on who is "remembered"
-    // CJ gets the black background, JD gets the purple/green gradient
-    const avatarBg = (savedInitials === 'CJ') 
-        ? '#000' 
-        : 'linear-gradient(135deg, rgb(83, 74, 183), rgb(29, 158, 117))';
+    const isAdmin = savedInitials === 'CJ';
+    const avatarBg = isAdmin ? '#000' : 'linear-gradient(135deg, rgb(83, 74, 183), rgb(29, 158, 117))';
 
+    // 3. INJECT THE HTML
     navContainer.innerHTML = `
         <div style="position: relative; display: inline-block;">
             <div id="user-avatar" class="avatar" onclick="toggleDropdown(event)" 
@@ -27,20 +38,20 @@ function injectNavBar() {
             <div id="account-dropdown" style="display: none; position: absolute; top: 50px; right: 0; width: 220px; background: white; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10001; padding: 8px 0; text-align: left;">
                 <div style="padding: 12px 16px; border-bottom: 1px solid #f8f8f8; margin-bottom: 4px;">
                     <p id="dropdown-status" style="margin:0; font-size: 11px; color: #999; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
-                        ${savedInitials === 'CJ' ? 'Admin Access' : 'Demo Mode'}
+                        ${isAdmin ? 'Admin Access' : 'Demo Mode'}
                     </p>
                     <p id="dropdown-name" style="margin:2px 0 0 0; font-size: 14px; font-weight: 600; color: #333;">
-                        ${savedInitials === 'CJ' ? 'CJ Browning' : 'James Davidson, CFP'}
+                        ${isAdmin ? 'CJ Browning' : 'James Davidson, CFP'}
                     </p>
                 </div>
                 
                 <div id="login-menu-item" class="menu-item" onclick="showLoginModal()" 
-                     style="padding: 10px 16px; cursor: pointer; font-size: 14px; color: #333; display: ${savedInitials === 'CJ' ? 'none' : 'block'};">
+                     style="padding: 10px 16px; cursor: pointer; font-size: 14px; color: #333; display: ${isAdmin ? 'none' : 'block'};">
                      Log In
                 </div>
                 
                 <div id="logout-btn" onclick="handleAdminLogout()" 
-                     style="padding: 10px 16px; font-size: 14px; color: #cc0000; cursor: pointer; border-top: 1px solid #f8f8f8; display: ${savedInitials === 'CJ' ? 'block' : 'none'};">
+                     style="padding: 10px 16px; font-size: 14px; color: #cc0000; cursor: pointer; border-top: 1px solid #f8f8f8; display: ${isAdmin ? 'block' : 'none'};">
                      Log Out
                 </div>
             </div>
