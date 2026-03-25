@@ -8,28 +8,52 @@ function injectNavBar() {
     const navContainer = document.getElementById('global-nav-auth');
     if (!navContainer) return;
 
+    // 1. Check local memory immediately to prevent the "JD Flash"
+    const savedInitials = localStorage.getItem('user_initials') || 'JD';
+    
+    // 2. Set the background color based on who is "remembered"
+    // CJ gets the black background, JD gets the purple/green gradient
+    const avatarBg = (savedInitials === 'CJ') 
+        ? '#000' 
+        : 'linear-gradient(135deg, rgb(83, 74, 183), rgb(29, 158, 117))';
+
     navContainer.innerHTML = `
         <div style="position: relative; display: inline-block;">
-            <div id="user-avatar" class="avatar" onclick="toggleDropdown(event)" style="cursor: pointer; display: flex; align-items: center; justify-content: center;">JD</div>
+            <div id="user-avatar" class="avatar" onclick="toggleDropdown(event)" 
+                 style="cursor: pointer; display: flex; align-items: center; justify-content: center; background: ${avatarBg}; color: white; width: 40px; height: 40px; border-radius: 50%; font-weight: 600; font-size: 14px;">
+                 ${savedInitials}
+            </div>
             
             <div id="account-dropdown" style="display: none; position: absolute; top: 50px; right: 0; width: 220px; background: white; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10001; padding: 8px 0; text-align: left;">
                 <div style="padding: 12px 16px; border-bottom: 1px solid #f8f8f8; margin-bottom: 4px;">
-                    <p id="dropdown-status" style="margin:0; font-size: 11px; color: #999; font-weight: 700; text-transform: uppercase;">Demo Mode</p>
-                    <p id="dropdown-name" style="margin:2px 0 0 0; font-size: 14px; font-weight: 600; color: #333;">James Davidson, CFP</p>
+                    <p id="dropdown-status" style="margin:0; font-size: 11px; color: #999; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;">
+                        ${savedInitials === 'CJ' ? 'Admin Access' : 'Demo Mode'}
+                    </p>
+                    <p id="dropdown-name" style="margin:2px 0 0 0; font-size: 14px; font-weight: 600; color: #333;">
+                        ${savedInitials === 'CJ' ? 'CJ Browning' : 'James Davidson, CFP'}
+                    </p>
                 </div>
-                <div id="login-menu-item" class="menu-item" onclick="showLoginModal()" style="padding: 10px 16px; cursor: pointer; font-size: 14px; color: #333;">Log In</div>
-                <div id="logout-btn" style="padding: 10px 16px; font-size: 14px; color: #cc0000; cursor: pointer; border-top: 1px solid #f8f8f8; display: none;" onclick="handleAdminLogout()">Log Out</div>
+                
+                <div id="login-menu-item" class="menu-item" onclick="showLoginModal()" 
+                     style="padding: 10px 16px; cursor: pointer; font-size: 14px; color: #333; display: ${savedInitials === 'CJ' ? 'none' : 'block'};">
+                     Log In
+                </div>
+                
+                <div id="logout-btn" onclick="handleAdminLogout()" 
+                     style="padding: 10px 16px; font-size: 14px; color: #cc0000; cursor: pointer; border-top: 1px solid #f8f8f8; display: ${savedInitials === 'CJ' ? 'block' : 'none'};">
+                     Log Out
+                </div>
             </div>
         </div>
 
         <div id="login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 20000; align-items: center; justify-content: center;">
             <div style="background: white; padding: 30px; border-radius: 16px; width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
-                <h3 style="margin-top: 0; margin-bottom: 20px; font-family: sans-serif;">Admin Login</h3>
-                <input type="email" id="login-email" placeholder="Email" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
-                <input type="password" id="login-pass" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+                <h3 style="margin-top: 0; margin-bottom: 20px; font-family: sans-serif; font-weight: 600;">Admin Login</h3>
+                <input type="email" id="login-email" placeholder="Email" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
+                <input type="password" id="login-pass" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box; font-size: 14px;">
                 <div style="display: flex; gap: 10px;">
-                    <button onclick="closeLoginModal()" style="flex: 1; padding: 12px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer;">Cancel</button>
-                    <button onclick="executeLogin()" style="flex: 1; padding: 12px; background: #000; color: white; border: none; border-radius: 8px; cursor: pointer;">Log In</button>
+                    <button onclick="closeLoginModal()" style="flex: 1; padding: 12px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer; font-size: 14px;">Cancel</button>
+                    <button onclick="executeLogin()" style="flex: 1; padding: 12px; background: #000; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; font-weight: 600;">Log In</button>
                 </div>
             </div>
         </div>
@@ -62,22 +86,20 @@ async function executeLogin() {
     const email = document.getElementById('login-email').value;
     const password = document.getElementById('login-pass').value;
 
-    if (!email || !password) {
-        alert("Please fill in both fields.");
-        return;
-    }
-
-    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await _supabase.auth.signInWithPassword({ email, password });
     
     if (error) {
         alert("Login failed: " + error.message);
     } else {
+        // SAVE INITIALS TO LOCAL STORAGE
+        localStorage.setItem('user_initials', 'CJ'); 
         window.location.reload();
     }
 }
 
 async function handleAdminLogout() {
     await _supabase.auth.signOut();
+    localStorage.removeItem('user_initials'); // CLEAR INITIALS
     window.location.reload();
 }
 
