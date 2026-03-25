@@ -8,21 +8,25 @@ function injectNavBar() {
     // 1. GLOBAL STYLE INJECTION
     const style = document.createElement('style');
     style.innerHTML = `
-        /* This targets the avatar specifically to stop the extra bold flash */
-        #user-avatar { 
-            font-weight: 600 !important; 
+        /* Target the avatar by ID and Class to ensure we win the specificity war */
+        #user-avatar, .avatar { 
+            font-weight: 500 !important; 
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            text-rendering: optimizeLegibility;
         }
-        /* This fixes all other bold elements globally */
+
+        /* Global cleanup for all other bold elements */
         b, strong, h1, h2, h3, .bold-text { 
             font-weight: 600 !important; 
             letter-spacing: -0.01em; 
         }
+
         .menu-item:hover {
             background-color: #f8f8f8 !important;
         }
     `;
     document.head.appendChild(style);
-
     const navContainer = document.getElementById('global-nav-auth');
     if (!navContainer) return;
 
