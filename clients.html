@@ -605,24 +605,28 @@ function closeMobileMenu() {
   };
 
   function updateMetrics(data) {
-    // Keep your existing calculations
+    // 1. Existing calculations
     const totalAUM = data.reduce((sum, h) => sum + (Number(h.aum) || 0), 0);
     const avgYTD = data.length > 0 ? (data.reduce((sum, h) => sum + (Number(h.ytd_return) || 0), 0) / data.length) : 0;
     const rebalanceCount = data.filter(h => h.status === 'Rebalance').length;
     
-    // Update the big metric cards
+    // 2. Update the 4 Metric Cards
     const metrics = document.querySelectorAll('.metric-val');
     if (metrics[0]) metrics[0].innerText = formatAUM(totalAUM);
     if (metrics[1]) metrics[1].innerText = data.length;
     if (metrics[2]) metrics[2].innerText = `${rebalanceCount} clients`;
     if (metrics[3]) metrics[3].innerText = `+${avgYTD.toFixed(1)}%`;
 
-    // --- NEW: Update the Header Subtitle ---
-    const subtitle = document.querySelector('.page-subtitle');
+    // 3. FIX: Update the Header Subtitle (Screenshot fix)
+    const subtitle = document.getElementById('client-subtitle');
     if (subtitle) {
-        // This will now show "7 households · $214.8M AUM" (or whatever the real data is)
+        // This dynamically changes "18 households" to "7 households" (or whatever is in 'data')
         subtitle.innerText = `${data.length} households · ${formatAUM(totalAUM)} AUM`;
     }
+
+    // 4. Update the text under the first metric card for consistency
+    const metricSubs = document.querySelectorAll('.metric-sub');
+    if (metricSubs[0]) metricSubs[0].innerText = `across ${data.length} households`;
 }
 
   function renderTable(data) {
