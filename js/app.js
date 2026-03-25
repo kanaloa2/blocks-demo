@@ -17,8 +17,20 @@ function injectNavBar() {
                     <p id="dropdown-status" style="margin:0; font-size: 11px; color: #999; font-weight: 700; text-transform: uppercase;">Demo Mode</p>
                     <p id="dropdown-name" style="margin:2px 0 0 0; font-size: 14px; font-weight: 600; color: #333;">James Davidson, CFP</p>
                 </div>
-                <div class="menu-item" onclick="toggleAdminModal()" style="padding: 10px 16px; cursor: pointer; font-size: 14px; color: #333;">Log In</div>
-                <div id="logout-btn" style="padding: 10px 16px; font-size: 14px; color: #ccc; cursor: not-allowed; border-top: 1px solid #f8f8f8;" onclick="handleAdminLogout()">Log Out</div>
+                <div id="login-menu-item" class="menu-item" onclick="showLoginModal()" style="padding: 10px 16px; cursor: pointer; font-size: 14px; color: #333;">Log In</div>
+                <div id="logout-btn" style="padding: 10px 16px; font-size: 14px; color: #cc0000; cursor: pointer; border-top: 1px solid #f8f8f8; display: none;" onclick="handleAdminLogout()">Log Out</div>
+            </div>
+        </div>
+
+        <div id="login-modal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 20000; align-items: center; justify-content: center;">
+            <div style="background: white; padding: 30px; border-radius: 16px; width: 320px; box-shadow: 0 20px 40px rgba(0,0,0,0.2);">
+                <h3 style="margin-top: 0; margin-bottom: 20px; font-family: sans-serif;">Admin Login</h3>
+                <input type="email" id="login-email" placeholder="Email" style="width: 100%; padding: 12px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+                <input type="password" id="login-pass" placeholder="Password" style="width: 100%; padding: 12px; margin-bottom: 20px; border: 1px solid #ddd; border-radius: 8px; box-sizing: border-box;">
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="closeLoginModal()" style="flex: 1; padding: 12px; border: 1px solid #ddd; background: white; border-radius: 8px; cursor: pointer;">Cancel</button>
+                    <button onclick="executeLogin()" style="flex: 1; padding: 12px; background: #000; color: white; border: none; border-radius: 8px; cursor: pointer;">Log In</button>
+                </div>
             </div>
         </div>
     `;
@@ -34,13 +46,33 @@ function toggleDropdown(e) {
     }
 }
 
-async function toggleAdminModal() {
-    const email = prompt("Enter Admin Email:");
-    const password = prompt("Enter Admin Password:");
-    if (email && password) {
-        const { error } = await _supabase.auth.signInWithPassword({ email, password });
-        if (error) alert("Login failed: " + error.message);
-        else window.location.reload();
+// Show the Modal
+function showLoginModal() {
+    document.getElementById('account-dropdown').style.display = 'none';
+    document.getElementById('login-modal').style.display = 'flex';
+}
+
+// Close the Modal
+function closeLoginModal() {
+    document.getElementById('login-modal').style.display = 'none';
+}
+
+// Perform the actual Login
+async function executeLogin() {
+    const email = document.getElementById('login-email').value;
+    const password = document.getElementById('login-pass').value;
+
+    if (!email || !password) {
+        alert("Please fill in both fields.");
+        return;
+    }
+
+    const { error } = await _supabase.auth.signInWithPassword({ email, password });
+    
+    if (error) {
+        alert("Login failed: " + error.message);
+    } else {
+        window.location.reload();
     }
 }
 
@@ -62,6 +94,10 @@ async function checkAdminStatus() {
         if(statusLabel) statusLabel.innerText = "Admin Access";
         if(nameLabel) nameLabel.innerText = "CJ Browning";
 
+        // ADD THESE: Swap the buttons in the menu
+        if(document.getElementById('login-menu-item')) document.getElementById('login-menu-item').style.display = 'none';
+        if(document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'block';
+
         // Show all admin buttons/features
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
 
@@ -71,6 +107,10 @@ async function checkAdminStatus() {
         if(avatar) { avatar.innerText = "JD"; avatar.style.background = "linear-gradient(135deg, #534AB7, #1D9E75)"; }
         if(statusLabel) statusLabel.innerText = "Demo Mode";
         if(nameLabel) nameLabel.innerText = "James Davidson, CFP";
+
+        // ADD THESE: Swap the buttons back
+        if(document.getElementById('login-menu-item')) document.getElementById('login-menu-item').style.display = 'block';
+        if(document.getElementById('logout-btn')) document.getElementById('logout-btn').style.display = 'none';
 
         // Hide all admin buttons/features
         document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
