@@ -363,7 +363,9 @@ body { font-family: 'DM Sans', sans-serif; background: var(--bg); color: var(--t
       <div style="display:flex;gap:8px;">
         <a href="proposal.html" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:7px 16px;background:var(--surface);color:var(--purple);border:0.5px solid var(--purple-md);border-radius:var(--r-sm);cursor:pointer;text-decoration:none;">View Proposal</a>
         <a href="assembly.html" style="font-family:'Syne',sans-serif;font-size:12px;font-weight:600;padding:7px 16px;background:var(--surface);color:var(--text2);border:0.5px solid var(--border2);border-radius:var(--r-sm);cursor:pointer;text-decoration:none;">Assemble Portfolio</a>
-        <button class="btn-primary admin-only">Add Client</button>
+        <button id="add-client-btn" class="btn-primary admin-only" onclick="handleQuickAdd()">
+          Add Client
+        </button>
       </div>
     </div>
 
@@ -676,14 +678,24 @@ function closeMobileMenu() {
   }
 
   async function fetchHouseholds() {
-      // _supabase is defined in app.js and is available here
-      const { data, error } = await _supabase.from('households').select('*');
-      if (!error) {
-          allHouseholds = data || [];
-          updateMetrics(allHouseholds);
-          renderTable(allHouseholds);
-      }
-  }
+    try {
+        const { data: { user } } = await _supabase.auth.getUser();
+        
+        // If logged in as CJ, pull from the live table
+        // If logged out, pull from a demo/sample set
+        const tableName = user ? 'households' : 'demo_households';
+        
+        const { data, error } = await _supabase.from(tableName).select('*');
+        
+        if (error) throw error;
+        
+        allHouseholds = data || [];
+        updateMetrics(allHouseholds);
+        renderTable(allHouseholds);
+    } catch (err) {
+        console.error("Fetch error:", err.message);
+    }
+}
 
   async function deleteHousehold(id) {
       if (!confirm("Are you sure?")) return;
@@ -709,6 +721,36 @@ function closeMobileMenu() {
           }
       });
   });
+  async function handleQuickAdd() {
+    const name = prompt("Enter Client/Household Name:");
+    if (!name) return;
+
+    const aumStr = prompt("Enter AUM (e.g., 1500000):", "1000000");
+    const aum = parseFloat(aumStr) || 0;
+
+    // 1. Save to Supabase
+    const { data, error } = await _supabase
+        .from('households')
+        .insert([
+            { 
+                name: name, 
+                aum: aum, 
+                sentiment: 'Neutral', 
+                status: 'Active',
+                drift: 0,
+                ytd_return: 0
+            }
+        ])
+        .select();
+
+    if (error) {
+        alert("Error saving to database: " + error.message);
+    } else {
+        console.log("Success! Client persisted:", data);
+        // 2. Refresh the table to show the new data
+        fetchHouseholds();
+    }
+}
 </script>
   </body>
 </html>
