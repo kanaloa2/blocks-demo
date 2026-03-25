@@ -25,10 +25,8 @@ function injectNavBar() {
 }
 
 // --- 3. GLOBAL UI FUNCTIONS ---
-// Updated to accept 'e' (the event)
 function toggleDropdown(e) {
-    if (e) e.stopPropagation(); // This is the secret sauce! 
-    
+    if (e) e.stopPropagation(); 
     const menu = document.getElementById('account-dropdown');
     if (menu) {
         const isHidden = menu.style.display === 'none' || menu.style.display === '';
@@ -49,6 +47,34 @@ async function toggleAdminModal() {
 async function handleAdminLogout() {
     await _supabase.auth.signOut();
     window.location.reload();
+}
+
+async function checkAdminStatus() {
+    const { data: { user } } = await _supabase.auth.getUser();
+    const avatar = document.getElementById('user-avatar');
+    const statusLabel = document.getElementById('dropdown-status');
+    const nameLabel = document.getElementById('dropdown-name');
+
+    if (user) {
+        // --- LOGGED IN (CJ) ---
+        document.body.classList.add('is-admin');
+        if(avatar) { avatar.innerText = "CJ"; avatar.style.background = "#000"; }
+        if(statusLabel) statusLabel.innerText = "Admin Access";
+        if(nameLabel) nameLabel.innerText = "CJ Browning";
+
+        // Show all admin buttons/features
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'block');
+
+    } else {
+        // --- LOGGED OUT (Demo) ---
+        document.body.classList.remove('is-admin');
+        if(avatar) { avatar.innerText = "JD"; avatar.style.background = "linear-gradient(135deg, #534AB7, #1D9E75)"; }
+        if(statusLabel) statusLabel.innerText = "Demo Mode";
+        if(nameLabel) nameLabel.innerText = "James Davidson, CFP";
+
+        // Hide all admin buttons/features
+        document.querySelectorAll('.admin-only').forEach(el => el.style.display = 'none');
+    }
 }
 
 async function checkAdminStatus() {
