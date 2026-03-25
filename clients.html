@@ -692,27 +692,22 @@ function closeMobileMenu() {
 
   async function fetchHouseholds() {
     try {
-        const { data: { user } } = await _supabase.auth.getUser();
+        const { data, error } = await _supabase
+            .from('households')
+            .select('*')
+            .order('name', { ascending: true });
+
+        if (error) throw error;
+
+        allHouseholds = data || [];
         
-        if (user) {
-            // LOGGED IN: Pull real data from Supabase
-            const { data, error } = await _supabase.from('households').select('*');
-            if (error) throw error;
-            allHouseholds = data || [];
-        } else {
-            // LOGGED OUT: Use the local hardcoded demo data
-            allHouseholds = getLocalDemoData();
-        }
-        
-        // Always update the UI with whatever data we got
+        // This will now dynamically show 7 for guests, 
+        // or 7 + [Private Records] for a logged-in user.
         updateMetrics(allHouseholds);
         renderTable(allHouseholds);
 
     } catch (err) {
-        console.error("Fetch error, falling back to demo data:", err.message);
-        allHouseholds = getLocalDemoData();
-        updateMetrics(allHouseholds);
-        renderTable(allHouseholds);
+        console.error("Fetch error:", err.message);
     }
 }
 
