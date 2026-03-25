@@ -694,20 +694,39 @@ function closeMobileMenu() {
     try {
         const { data: { user } } = await _supabase.auth.getUser();
         
-        // If logged in as CJ, pull from the live table
-        // If logged out, pull from a demo/sample set
-        const tableName = user ? 'households' : 'demo_households';
+        if (user) {
+            // LOGGED IN: Pull real data from Supabase
+            const { data, error } = await _supabase.from('households').select('*');
+            if (error) throw error;
+            allHouseholds = data || [];
+        } else {
+            // LOGGED OUT: Use the local hardcoded demo data
+            allHouseholds = getLocalDemoData();
+        }
         
-        const { data, error } = await _supabase.from(tableName).select('*');
-        
-        if (error) throw error;
-        
-        allHouseholds = data || [];
+        // Always update the UI with whatever data we got
         updateMetrics(allHouseholds);
         renderTable(allHouseholds);
+
     } catch (err) {
-        console.error("Fetch error:", err.message);
+        console.error("Fetch error, falling back to demo data:", err.message);
+        allHouseholds = getLocalDemoData();
+        updateMetrics(allHouseholds);
+        renderTable(allHouseholds);
     }
+}
+
+// 2. Add this helper function below to hold your 7 households
+function getLocalDemoData() {
+    return [
+        { id: 1, name: 'Smith Family', composite: 'Growth', aum: 18400000, ytd_return: 12.4, sentiment: 28, drift: 4.2, status: 'Rebalance' },
+        { id: 2, name: 'Patel Family', composite: 'Growth', aum: 42300000, ytd_return: 14.1, sentiment: 45, drift: 4.8, status: 'Rebalance' },
+        { id: 3, name: 'Kim Family', composite: 'Growth', aum: 28900000, ytd_return: 9.2, sentiment: 42, drift: 3.1, status: 'Monitoring' },
+        { id: 4, name: 'Lee Family', composite: 'Income', aum: 12100000, ytd_return: 4.5, sentiment: 65, drift: 1.2, status: 'On Target' },
+        { id: 5, name: 'Jones Family', composite: 'Balanced', aum: 31500000, ytd_return: 7.8, sentiment: 55, drift: 2.1, status: 'On Target' },
+        { id: 6, name: 'Browning Household', composite: 'Growth', aum: 55200000, ytd_return: 11.5, sentiment: 78, drift: 0.8, status: 'On Target' },
+        { id: 7, name: 'Davidson Trust', composite: 'Income', aum: 26400000, ytd_return: 3.9, sentiment: 72, drift: 1.5, status: 'On Target' }
+    ];
 }
 
   async function deleteHousehold(id) {
