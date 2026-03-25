@@ -11,6 +11,7 @@ function injectNavBar() {
     navContainer.innerHTML = `
         <div style="position: relative; display: inline-block;">
             <div id="user-avatar" class="avatar" onclick="toggleDropdown(event)" style="cursor: pointer; display: flex; align-items: center; justify-content: center;">JD</div>
+            
             <div id="account-dropdown" style="display: none; position: absolute; top: 50px; right: 0; width: 220px; background: white; border: 1px solid #eee; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); z-index: 10001; padding: 8px 0; text-align: left;">
                 <div style="padding: 12px 16px; border-bottom: 1px solid #f8f8f8; margin-bottom: 4px;">
                     <p id="dropdown-status" style="margin:0; font-size: 11px; color: #999; font-weight: 700; text-transform: uppercase;">Demo Mode</p>
@@ -24,9 +25,15 @@ function injectNavBar() {
 }
 
 // --- 3. GLOBAL UI FUNCTIONS ---
-function toggleDropdown() {
+// Updated to accept 'e' (the event)
+function toggleDropdown(e) {
+    if (e) e.stopPropagation(); // This is the secret sauce! 
+    
     const menu = document.getElementById('account-dropdown');
-    if (menu) menu.style.display = (menu.style.display === 'none' || menu.style.display === '') ? 'block' : 'none';
+    if (menu) {
+        const isHidden = menu.style.display === 'none' || menu.style.display === '';
+        menu.style.display = isHidden ? 'block' : 'none';
+    }
 }
 
 async function toggleAdminModal() {
@@ -66,12 +73,11 @@ document.addEventListener('DOMContentLoaded', () => {
     injectNavBar();      
     checkAdminStatus();  
 
-    // ADD THIS: Close dropdown when clicking outside
+    // Close dropdown when clicking outside
     window.addEventListener('click', (e) => {
         const menu = document.getElementById('account-dropdown');
         const avatar = document.getElementById('user-avatar');
         
-        // If the menu is open AND the click was NOT on the avatar AND NOT inside the menu
         if (menu && menu.style.display === 'block' && 
             !avatar.contains(e.target) && 
             !menu.contains(e.target)) {
