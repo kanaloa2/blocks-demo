@@ -120,11 +120,16 @@ async function checkAdminStatus() {
 
 
 // --- 4. INITIALIZATION ---
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
+    // 1. Inject the HTML first
     injectNavBar();      
-    checkAdminStatus();  
+    
+    // 2. Wait a tiny bit (50ms) to ensure the DOM is ready
+    setTimeout(async () => {
+        await checkAdminStatus();
+    }, 50);
 
-    // Close dropdown when clicking outside
+    // 3. Click-outside listener
     window.addEventListener('click', (e) => {
         const menu = document.getElementById('account-dropdown');
         const avatar = document.getElementById('user-avatar');
