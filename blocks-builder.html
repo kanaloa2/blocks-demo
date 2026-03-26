@@ -892,370 +892,109 @@ body {
   </div>
 </div>
 
-<script>
-  const genAI = new GoogleGenerativeAI("YOUR_GEMINI_API_KEY");
-const model = genAI.getGenerativeModel({ 
-  model: "gemini-1.5-flash",
-  systemInstruction: "You are a WealthTech data engine. Always return strictly valid JSON. No conversational text. Use the schema provided in prompts."
-});
-const SECURITIES = [
+  <script type="importmap">
   {
-    ticker: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', color: '#FAECE7', tcolor: '#C94E28',
-    score: 94, div: '3.1%', beta: '0.62', pe: '15.2x', ytd: '+4.2',
-    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
-    rationale: 'Consecutive dividend growth for 61 years. Defensive moat across pharma and MedTech.'
-  },
-  {
-    ticker: 'PG', name: 'Procter & Gamble', sector: 'Consumer Staples', color: '#EEEDFE', tcolor: '#534AB7',
-    score: 91, div: '2.5%', beta: '0.55', pe: '24.1x', ytd: '+2.8',
-    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
-    rationale: 'Pricing power and global distribution. Low-beta, bond-like equity characteristics.'
-  },
-  {
-    ticker: 'KO', name: 'The Coca-Cola Company', sector: 'Consumer Staples', color: '#FCEBEB', tcolor: '#B83232',
-    score: 89, div: '3.4%', beta: '0.58', pe: '22.8x', ytd: '+5.1',
-    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
-    rationale: 'Iconic brand with 62yr dividend growth streak. Resilient in downturns.'
-  },
-  {
-    ticker: 'VZ', name: 'Verizon Communications', sector: 'Telecom', color: '#EEEDFE', tcolor: '#534AB7',
-    score: 81, div: '6.8%', beta: '0.41', pe: '8.3x', ytd: '-1.2',
-    tag: 'High Yield', tagBg: '#FEF3DC', tagColor: '#A06010',
-    rationale: 'Highest dividend yield in screen. Debt load elevated but free cash flow covers payout.'
-  },
-  {
-    ticker: 'MMM', name: '3M Company', sector: 'Industrials', color: '#FEF3DC', tcolor: '#A06010',
-    score: 74, div: '5.2%', beta: '0.79', pe: '11.4x', ytd: '+8.3',
-    tag: 'Watch: Litigation', tagBg: '#FCEBEB', tagColor: '#B83232',
-    rationale: 'Strong yield and diversification but litigation overhang warrants position sizing caution.'
-  },
-  {
-    ticker: 'ABT', name: 'Abbott Laboratories', sector: 'Healthcare', color: '#FAECE7', tcolor: '#C94E28',
-    score: 88, div: '2.0%', beta: '0.71', pe: '19.6x', ytd: '+3.5',
-    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
-    rationale: 'Diversified medtech with diagnostics and devices. Consistent earnings in defensive category.'
-  },
-  {
-    ticker: 'CL', name: 'Colgate-Palmolive', sector: 'Consumer Staples', color: '#E1F5EE', tcolor: '#0F6E56',
-    score: 83, div: '2.4%', beta: '0.52', pe: '26.3x', ytd: '+1.9',
-    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
-    rationale: 'Global oral care dominance. Among the lowest betas in consumer staples.'
-  },
-  {
-    ticker: 'WMT', name: 'Walmart Inc.', sector: 'Consumer Staples', color: '#EAF3DE', tcolor: '#2E7D32',
-    score: 86, div: '1.3%', beta: '0.49', pe: '27.1x', ytd: '+9.4',
-    tag: 'Defensive Growth', tagBg: '#EEEDFE', tagColor: '#534AB7',
-    rationale: 'Recession-resistant with growing e-commerce. Lower yield offset by strong capital appreciation.'
-  },
-  {
-    ticker: 'MCD', name: "McDonald's Corp", sector: 'Consumer Discretionary', color: '#FEF3DC', tcolor: '#A06010',
-    score: 80, div: '2.3%', beta: '0.69', pe: '23.7x', ytd: '+0.6',
-    tag: 'Franchise Model', tagBg: '#EEEDFE', tagColor: '#534AB7',
-    rationale: 'Asset-light franchise model with inflation pass-through. Steady dividend grower.'
-  },
-  {
-    ticker: 'T', name: 'AT&T Inc.', sector: 'Telecom', color: '#E1F5EE', tcolor: '#0F6E56',
-    score: 69, div: '5.9%', beta: '0.44', pe: '7.1x', ytd: '+11.2',
-    tag: 'High Yield', tagBg: '#FEF3DC', tagColor: '#A06010',
-    rationale: 'Dividend cut now stabilized. Deleveraging in progress. High yield with capital upside if execution holds.'
+    "imports": {
+      "@google/generative-ai": "https://esm.run/@google/generative-ai"
+    }
   }
-];
+</script>
 
-let added = new Set();
-let resultsShown = false;
+<script type="module">
+  import { GoogleGenerativeAI } from "@google/generative-ai";
 
-function fillPrompt(el) {
-  document.getElementById('promptBox').value = el.textContent;
-}
+  // 2. Initialize with your key
+  const API_KEY = "YOUR_GEMINI_API_KEY"; 
+  const genAI = new GoogleGenerativeAI(API_KEY);
+  
+  // Use a unique name to avoid "Duplicate Variable" errors
+  const aiModel = genAI.getGenerativeModel({ 
+    model: "gemini-1.5-flash",
+    systemInstruction: "You are a WealthTech API. Return ONLY strictly valid JSON. No conversational text."
+  });
 
-function toggleChip(el) {
-  el.classList.toggle('selected');
-}
+  // 3. Define UI Helpers
+  window.showShimmer = function() {
+    const body = document.getElementById('resultsBody');
+    if(!body) return;
+    body.innerHTML = Array(5).fill(0).map(() => `
+      <tr>
+        <td colspan="8"><div class="shimmer-line" style="margin: 15px 0;"></div></td>
+      </tr>
+    `).join('');
+  };
 
-function selectOne(el, group) {
-  el.parentElement.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-}
+  // 4. The Main Search Logic
+  window.executeAISearch = async function() {
+    const userQuery = document.getElementById('promptBox').value;
+    const activeChip = document.querySelector('.chip.active');
+    const resultLimit = activeChip ? parseInt(activeChip.innerText) : 10;
 
-async function runScreen() {
-  const btn = document.getElementById('screenBtn');
-  const userQuery = document.getElementById('promptBox').value;
+    try {
+      // Step A: Translate Intent to Filters
+      const sqlPrompt = `
+        Context: Table 'security_universe' [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta].
+        User Goal: "${userQuery}"
+        Return JSON: {"yield_gt": 0.04, "limit": ${resultLimit}}
+      `;
+      
+      const sqlResult = await aiModel.generateContent(sqlPrompt);
+      const queryParams = JSON.parse(sqlResult.response.text().replace(/```json|```/g, ''));
 
-  if (!userQuery) return alert("Please tell the AI what you're looking for.");
+      // Step B: Fetch from Supabase
+      let query = _supabase.from('security_universe').select('*');
+      if (queryParams.yield_gt) query = query.gt('fund_yield', queryParams.yield_gt);
+      if (queryParams.price_lt) query = query.lt('last_price', queryParams.price_lt);
+      
+      const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
+      if (error || !securities.length) throw new Error("No securities found");
 
-  btn.classList.add('loading');
-  btn.disabled = true;
+      // Step C: Enrichment (Rationale & Score)
+      const enrichmentPrompt = `
+        User Goal: "${userQuery}"
+        Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}
+        Return JSON: [{"t": "TICKER", "score": 95, "rationale": "..."}]
+      `;
 
-  // 1. Start the Shimmer effect immediately
-  showShimmer();
+      const enrichResult = await aiModel.generateContent(enrichmentPrompt);
+      const enrichedData = JSON.parse(enrichResult.response.text().replace(/```json|```/g, ''));
 
-  try {
-    // 2. Call the AI Search Bridge
-    await executeAISearch(); 
-    
-    // 3. Update the UI state
-    document.getElementById('rightPanel').classList.add('active');
-  } catch (err) {
-    console.error("Screening failed:", err);
-  } finally {
+      const finalData = securities.map(s => {
+        const ai = enrichedData.find(e => e.t === s.fund_symbol);
+        return {
+          ...s,
+          score: ai ? ai.score : 80,
+          rationale: ai ? ai.rationale : "Matches selected investment criteria."
+        };
+      });
+
+      renderRows(finalData);
+      
+      document.getElementById('ai-rationale-text').innerText = 
+        `AI generated ${finalData.length} recommendations for "${userQuery}".`;
+
+    } catch (err) {
+      console.error("AI Search Error:", err);
+      document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" class="p-10 text-center">AI Search failed. Please try a different query.</td></tr>`;
+    }
+  };
+
+  // 5. The Trigger
+  window.runScreen = async function() {
+    const btn = document.getElementById('screenBtn');
+    if (!document.getElementById('promptBox').value) return;
+
+    btn.classList.add('loading');
+    btn.disabled = true;
+    showShimmer();
+
+    await executeAISearch();
+
     btn.classList.remove('loading');
     btn.disabled = false;
-  }
-}
-
-function showResults() {
-  const panel = document.getElementById('rightPanel');
-  added = new Set();
-  resultsShown = true;
-
-  const sorted = [...SECURITIES].sort((a, b) => b.score - a.score);
-
-  panel.innerHTML = `
-    <div class="block-name-row">
-      <input class="block-name-input" id="blockNameInput" placeholder="Name this block…" value="Defensive Dividend Block">
-      <span class="selected-count" id="selectedCount">0 of ${sorted.length} selected</span>
-    </div>
-
-    <div class="ai-rationale">
-      <div class="ai-spark">✦</div>
-      <div class="ai-text">
-        Found <strong>${sorted.length} candidates</strong> matching your criteria: defensive equities with dividend yield ≥ 2%, beta ≤ 0.9, large/mid-cap US. Ranked by composite AI score weighing dividend reliability, balance sheet strength, and drawdown history. <strong>5 Dividend Aristocrats</strong> identified. Review and add to your block below.
-      </div>
-    </div>
-
-    <div class="results-header">
-      <div>
-        <div class="results-title">Screening Results</div>
-        <div class="results-meta">${sorted.length} securities · sorted by AI score</div>
-      </div>
-      <div class="results-actions">
-        <select class="sort-sel" onchange="resortResults(this.value)">
-          <option value="score">Sort: AI Score</option>
-          <option value="div">Sort: Dividend Yield</option>
-          <option value="beta">Sort: Beta (low→high)</option>
-          <option value="ytd">Sort: YTD Return</option>
-        </select>
-        <button class="save-btn" id="saveBtn" onclick="saveBlock()" disabled>
-          Save Block
-        </button>
-      </div>
-    </div>
-
-    <div class="results-table-wrap">
-      <table class="results-table">
-        <thead>
-          <tr>
-            <th style="width:180px;">Security</th>
-            <th>AI Score</th>
-            <th>Div Yield</th>
-            <th>Beta</th>
-            <th>P/E</th>
-            <th>YTD</th>
-            <th>Rationale</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody">
-        </tbody>
-      </table>
-    </div>
-  `;
-
-  renderRows(sorted);
-}
-
-function renderRows(data) {
-  const body = document.getElementById('resultsBody');
-  if (!body) return;
-
-  body.innerHTML = data.map((s, i) => {
-    // 1. Map Supabase/AI data to template variables
-    // Use || as a fallback for missing AI scores or rationales
-    const score = s.score || 0; 
-    const rationale = s.rationale || "Analyzing security fit...";
-    const yieldVal = s.fund_yield ? (s.fund_yield * 100).toFixed(2) + '%' : '0.00%';
-    const betaVal = s.beta ? parseFloat(s.beta).toFixed(2) : 'N/A';
-    const peVal = s.fund_price_earning_ratio ? parseFloat(s.fund_price_earning_ratio).toFixed(1) + 'x' : '—';
-    
-    // 2. Dynamic styling for AI Score
-    const scoreColor = score > 80 ? 'var(--green)' : score > 60 ? 'var(--amber)' : 'var(--text3)';
-
-    return `
-      <tr class="result-row" style="animation-delay:${i * 0.045}s">
-        <td>
-          <div class="ticker-cell">
-            <div class="sec-icon" style="background:var(--purple-lt); color:var(--purple);">
-              ${s.fund_symbol ? s.fund_symbol.slice(0, 3) : '??'}
-            </div>
-            <div>
-              <div class="ticker">${s.fund_symbol || s.ticker}</div>
-              <div class="sec-name">${s.fund_short_name || s.name || 'Unknown Security'}</div>
-            </div>
-          </div>
-        </td>
-        <td>
-          <div class="score-bar-wrap">
-            <div class="score-bar-track">
-              <div class="score-bar-fill" style="width:${score}%; background:${scoreColor};"></div>
-            </div>
-            <div class="score-num">${score}</div>
-          </div>
-        </td>
-        <td><span class="stat up">${yieldVal}</span></td>
-        <td><span class="stat">${betaVal}</span></td>
-        <td><span class="stat muted">${peVal}</span></td>
-        <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${s.ytd || '0.0'}%</span></td>
-        <td>
-          <div>
-            <span class="tag-small" style="background:var(--purple-lt); color:var(--purple);">
-              ${s.fund_category || 'General'}
-            </span>
-            <div class="rationale-snippet" style="margin-top:4px;">${rationale}</div>
-          </div>
-        </td>
-        <td>
-          <div class="add-btn-row ${added.has(s.fund_symbol) ? 'added' : ''}" 
-               id="add-${s.fund_symbol}" 
-               onclick="toggleAdd('${s.fund_symbol}')">
-            ${added.has(s.fund_symbol) ? '✓' : '+'}
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
-}
-
-function toggleAdd(ticker) {
-  const btn = document.getElementById('add-' + ticker);
-  if (added.has(ticker)) {
-    added.delete(ticker);
-    btn.classList.remove('added');
-    btn.textContent = '+';
-  } else {
-    added.add(ticker);
-    btn.classList.add('added');
-    btn.textContent = '✓';
-  }
-  const count = added.size;
-  document.getElementById('selectedCount').textContent = `${count} of ${SECURITIES.length} selected`;
-  document.getElementById('saveBtn').disabled = count === 0;
-}
-
-function resortResults(key) {
-  const data = [...SECURITIES];
-  if (key === 'score') data.sort((a, b) => b.score - a.score);
-  else if (key === 'div') data.sort((a, b) => parseFloat(b.div) - parseFloat(a.div));
-  else if (key === 'beta') data.sort((a, b) => parseFloat(a.beta) - parseFloat(b.beta));
-  else if (key === 'ytd') data.sort((a, b) => parseFloat(b.ytd) - parseFloat(a.ytd));
-  renderRows(data);
-}
-
-function saveBlock() {
-  const name = document.getElementById('blockNameInput').value || 'Unnamed Block';
-  const btn = document.getElementById('saveBtn');
-  btn.textContent = '✓ Saved!';
-  btn.style.background = '#0F6E56';
-  btn.disabled = true;
-  setTimeout(() => {
-    window.location.href = 'assembly.html';
-  }, 900);
-}
+    document.getElementById('rightPanel').classList.add('active');
+  };
 </script>
 
-<script>
-function toggleMobileMenu() {
-  var menu = document.getElementById('mobileMenu');
-  var btn = document.getElementById('hamburger');
-  if (!menu) return;
-  if (menu.classList.contains('open')) {
-    menu.classList.remove('open');
-    if (btn) btn.classList.remove('open');
-  } else {
-    menu.classList.add('open');
-    if (btn) btn.classList.add('open');
-  }
-}
-function closeMobileMenu() {
-  var menu = document.getElementById('mobileMenu');
-  var btn = document.getElementById('hamburger');
-  if (menu) menu.classList.remove('open');
-  if (btn) btn.classList.remove('open');
-}
-</script>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="js/app.js"></script>
-<script>
-  // 1. Setup Gemini 1.5 Flash
-const genAI = new GoogleGenerativeAI("AIzaSyBx8HQWQuqwd3MMeEsmM3IrVFwygKr8OWc");
-const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-
-async function executeAISearch() {
-  const userQuery = document.getElementById('promptBox').value;
-  const resultLimit = parseInt(document.querySelector('.chip.active')?.innerText) || 10;
-  
-  if (!userQuery) return;
-
-  try {
-    // STEP 1: Get SQL Filter Parameters
-    const sqlPrompt = `
-      Table: 'security_universe'
-      Columns: [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta]
-      User Request: "${userQuery}"
-      Task: Return JSON for Supabase filters. Example: {"yield_gt": 0.04, "limit": ${resultLimit}}
-    `;
-    
-    const sqlResult = await model.generateContent(sqlPrompt);
-    const queryParams = JSON.parse(sqlResult.response.text().replace(/```json|```/g, ''));
-
-    // STEP 2: Fetch from Supabase
-    let query = _supabase.from('security_universe').select('*');
-    if (queryParams.yield_gt) query = query.gt('fund_yield', queryParams.yield_gt);
-    if (queryParams.price_lt) query = query.lt('last_price', queryParams.price_lt);
-    
-    const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
-    if (error || !securities.length) throw new Error("No securities found");
-
-    // STEP 3: The Magic (Score & Rationale)
-    // We send only the essential data to save tokens and speed up the response
-    const enrichmentPrompt = `
-      User Goal: "${userQuery}"
-      Securities: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}
-      Task: Rate each 1-100 and give a 1-sentence rationale.
-      Return JSON: [{"t": "TICKER", "score": 95, "rationale": "..."}]
-    `;
-
-    const enrichResult = await model.generateContent(enrichmentPrompt);
-    const enrichedData = JSON.parse(enrichResult.response.text().replace(/```json|```/g, ''));
-
-    // Final Merge
-    const finalData = securities.map(s => {
-      const ai = enrichedData.find(e => e.t === s.fund_symbol);
-      return {
-        ...s,
-        score: ai ? ai.score : 75, // Default fallback
-        rationale: ai ? ai.rationale : "Matches portfolio criteria."
-      };
-    });
-
-    renderRows(finalData);
-    
-    // Update the AI Summary Bar
-    document.getElementById('ai-rationale-text').innerText = 
-      `Identified ${finalData.length} securities for "${userQuery}" with high alignment to your strategy.`;
-
-  } catch (err) {
-    console.error("AI Bridge Error:", err);
-    document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" class="p-10 text-center">AI could not find exact matches. Try simplifying your request.</td></tr>`;
-  }
-}
-function showShimmer() {
-  const body = document.getElementById('resultsBody');
-  body.innerHTML = Array(5).fill(0).map(() => `
-    <tr>
-      <td colspan="8"><div class="shimmer-line" style="margin: 10px 0;"></div></td>
-    </tr>
-  `).join('');
-}
-</script>
 </body>
 </html>
