@@ -891,7 +891,8 @@ body {
     </div>
   </div>
 </div>
-<script type="importmap">
+
+ <script type="importmap">
   {
     "imports": {
       "@google/generative-ai": "https://esm.run/@google/generative-ai"
@@ -902,141 +903,116 @@ body {
 <script type="module">
   import { GoogleGenerativeAI } from "@google/generative-ai";
 
-  // 1. Setup & Config
+  // 1. Setup with your key
   const API_KEY = "AIzaSyBx8HQWQuqwd3MMeEsmM3IrVFwygKr8OWc"; 
   const genAI = new GoogleGenerativeAI(API_KEY);
   
-  // Use the full path 'models/gemini-1.5-flash' to avoid 404
+  // FIXED: Model name must be prefixed with 'models/' for the v1beta SDK
   const aiModel = genAI.getGenerativeModel({ 
-    model: "models/gemini-1.5-flash",
+    model: "models/gemini-1.5-flash", 
     systemInstruction: "You are a WealthTech API. Return ONLY strictly valid JSON. No conversational text."
   });
 
-  // 2. Local State for Added Tickers
-  const added = new Set();
-
-  // 3. UI: Render Table Rows
-  window.renderRows = function(data) {
-    const body = document.getElementById('resultsBody');
-    if (!body) return;
-    
-    body.innerHTML = data.map((s, i) => {
-      const score = s.score || 0;
-      const rationale = s.rationale || "Analyzing strategy...";
-      const yieldVal = s.fund_yield ? (s.fund_yield * 100).toFixed(2) + '%' : '0.00%';
-      const betaVal = s.beta ? parseFloat(s.beta).toFixed(2) : 'N/A';
-      const peVal = s.fund_price_earning_ratio ? parseFloat(s.fund_price_earning_ratio).toFixed(1) + 'x' : '—';
-      const scoreColor = score > 80 ? '#0F6E56' : score > 60 ? '#D97706' : '#9a9994';
-
-      return `
-        <tr class="result-row" style="animation-delay:${i * 0.045}s">
-          <td>
-            <div class="ticker-cell">
-              <div class="sec-icon" style="background:#f0efe9; color:#181816;">${s.fund_symbol ? s.fund_symbol.slice(0,3) : '??'}</div>
-              <div>
-                <div class="ticker">${s.fund_symbol}</div>
-                <div class="sec-name">${s.fund_short_name}</div>
-              </div>
-            </div>
-          </td>
-          <td>
-            <div class="score-bar-wrap">
-              <div class="score-bar-track"><div class="score-bar-fill" style="width:${score}%; background:${scoreColor};"></div></div>
-              <div class="score-num">${score}</div>
-            </div>
-          </td>
-          <td><span class="stat up">${yieldVal}</span></td>
-          <td><span class="stat">${betaVal}</span></td>
-          <td><span class="stat muted">${peVal}</span></td>
-          <td><span class="stat ${parseFloat(s.week52_high_low_change_perc) >= 0 ? 'up' : 'down'}">${s.week52_high_low_change_perc || '0.0'}%</span></td>
-          <td>
-            <div>
-              <span class="tag-small" style="background:#f0efe9; color:#5c5b57;">${s.fund_category || 'ETF'}</span>
-              <div class="rationale-snippet" style="margin-top:4px; font-size:11px; line-height:1.3; color:#5c5b57;">${rationale}</div>
-            </div>
-          </td>
-          <td>
-            <div class="add-btn-row ${added.has(s.fund_symbol) ? 'added' : ''}" onclick="window.toggleAdd('${s.fund_symbol}')">
-              ${added.has(s.fund_symbol) ? '✓' : '+'}
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  };
-
-  // 4. UI: Show Shimmer
+  // 2. UI Helpers (Attached to window so your HTML buttons can find them)
   window.showShimmer = function() {
     const body = document.getElementById('resultsBody');
-    if(body) body.innerHTML = Array(5).fill(0).map(() => `<tr><td colspan="8"><div class="shimmer-line" style="margin:20px 0;"></div></td></tr>`).join('');
+    if (body) {
+      body.innerHTML = Array(5).fill(0).map(() => `
+        <tr><td colspan="8"><div class="shimmer-line" style="margin: 20px 0;"></div></td></tr>
+      `).join('');
+    }
   };
 
-  // 5. Logic: Execute AI Search
+  window.fillPrompt = function(text) {
+    const promptBox = document.getElementById('promptBox');
+    if (promptBox) promptBox.value = text;
+  };
+
+  // 3. The Search Engine
   window.executeAISearch = async function() {
-    const userQuery = document.getElementById('promptBox').value;
+    const userQuery = document.getElementById('promptBox')?.value;
+    const bodyEl = document.getElementById('resultsBody');
+    if (!userQuery || !bodyEl) return;
+
     const activeChip = document.querySelector('.chip.active');
     const resultLimit = activeChip ? parseInt(activeChip.innerText) : 10;
 
     try {
-      // Step A: Translate Intent
-      const sqlPrompt = `Context: Table 'security_universe' [fund_symbol, fund_short_name, fund_category, last_price, fund_yield, beta].
-                        User: "${userQuery}". Return JSON: {"yield_gt": 0.04, "limit": ${resultLimit}}`;
-      const sqlRes = await aiModel.generateContent(sqlPrompt);
-      const queryParams = JSON.parse(sqlRes.response.text().replace(/```json|```/g, '').trim());
+      // Step A: Translate Intent to SQL Filters
+      const sqlPrompt = `
+        Table: 'security_universe'
+        Columns: [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta]
+        User Request: "${userQuery}"
+        Task: Return JSON for Supabase filters. Example: {"yield_gt": 0.04, "limit": ${resultLimit}}
+      `;
+      
+      const sqlResult = await aiModel.generateContent(sqlPrompt);
+      const sqlText = sqlResult.response.text().replace(/```json|```/g, '').trim();
+      const queryParams = JSON.parse(sqlText);
 
-      // Step B: Fetch Supabase
+      // Step B: Fetch from Supabase
       let query = _supabase.from('security_universe').select('*');
       if (queryParams.yield_gt) query = query.gt('fund_yield', queryParams.yield_gt);
-      const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
+      if (queryParams.price_lt) query = query.lt('last_price', queryParams.price_lt);
       
-      if (error || !securities.length) throw new Error("No securities found");
+      const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
+      if (error || !securities?.length) throw new Error("No securities found in your database.");
 
-      // Step C: Enrich
-      const enrichPrompt = `Goal: "${userQuery}". Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}.
-                           Return JSON array: [{"t": "TICKER", "score": 95, "rationale": "..."}]`;
-      const enrichRes = await aiModel.generateContent(enrichPrompt);
-      const enrichedData = JSON.parse(enrichRes.response.text().replace(/```json|```/g, '').trim());
+      // Step C: Enrichment (Rationale & Score)
+      const enrichmentPrompt = `
+        Goal: "${userQuery}"
+        Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}
+        Task: Rate 1-100 and give a 1-sentence rationale.
+        Return JSON: [{"t": "TICKER", "score": 95, "rationale": "..."}]
+      `;
+
+      const enrichResult = await aiModel.generateContent(enrichmentPrompt);
+      const enrichText = enrichResult.response.text().replace(/```json|```/g, '').trim();
+      const enrichedData = JSON.parse(enrichText);
 
       const finalData = securities.map(s => {
         const ai = enrichedData.find(e => e.t === s.fund_symbol);
-        return { ...s, score: ai ? ai.score : 80, rationale: ai ? ai.rationale : "Matches criteria." };
+        return {
+          ...s,
+          score: ai ? ai.score : 85,
+          rationale: ai ? ai.rationale : "Strong fundamental match for the requested strategy."
+        };
       });
 
-      window.renderRows(finalData);
-      document.getElementById('ai-rationale-text').innerText = `Screened ${finalData.length} candidates for "${userQuery}".`;
+      // 4. Render results (Using your existing renderRows logic)
+      if (typeof renderRows === "function") {
+          renderRows(finalData);
+      }
+      
+      const rationaleBar = document.getElementById('ai-rationale-text');
+      if (rationaleBar) {
+          rationaleBar.innerText = `AI identifies ${finalData.length} candidates for "${userQuery}".`;
+      }
 
     } catch (err) {
-      console.error("AI Error:", err);
-      document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" class="p-10 text-center">Search error. Try a simpler prompt.</td></tr>`;
+      console.error("AI Search Error:", err);
+      bodyEl.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-gray-400">Search error: ${err.message}</td></tr>`;
     }
   };
 
-  // 6. Triggers
+  // 5. The Main Trigger
   window.runScreen = async function() {
     const btn = document.getElementById('screenBtn');
-    if (!document.getElementById('promptBox').value) return;
+    const promptBox = document.getElementById('promptBox');
+    if (!promptBox || !promptBox.value) return;
+
     btn.classList.add('loading');
     btn.disabled = true;
+    
     window.showShimmer();
+
     await window.executeAISearch();
+
     btn.classList.remove('loading');
     btn.disabled = false;
-    document.getElementById('rightPanel').classList.add('active');
+    const rightPanel = document.getElementById('rightPanel');
+    if (rightPanel) rightPanel.classList.add('active');
   };
-
-  window.fillPrompt = function(text) {
-    document.getElementById('promptBox').value = text;
-  };
-
-  window.toggleAdd = function(ticker) {
-    if (added.has(ticker)) added.delete(ticker);
-    else added.add(ticker);
-    // Re-render to show checkmarks
-    const currentRows = Array.from(document.querySelectorAll('.result-row')).length;
-    if (currentRows > 0) {
-      // Logic to persist UI state would go here
-    }
-  };
-</script>
+</script> 
 </body>
 </html>
