@@ -979,23 +979,24 @@ function selectOne(el, group) {
 
 async function runScreen() {
   const btn = document.getElementById('screenBtn');
-  const panel = document.getElementById('rightPanel');
   const userQuery = document.getElementById('promptBox').value;
 
-  if (!userQuery) return alert("Please describe what you are looking for.");
+  if (!userQuery) return alert("Please tell the AI what you're looking for.");
 
   btn.classList.add('loading');
   btn.disabled = true;
 
-  // 1. Show shimmer loading state (keep your existing innerHTML shimmer logic here)
-  panel.innerHTML = `...`; // (Insert your existing shimmer HTML)
+  // 1. Start the Shimmer effect immediately
+  showShimmer();
 
   try {
-    // 2. Run the AI Search Bridge
+    // 2. Call the AI Search Bridge
     await executeAISearch(); 
+    
+    // 3. Update the UI state
+    document.getElementById('rightPanel').classList.add('active');
   } catch (err) {
     console.error("Screening failed:", err);
-    panel.innerHTML = `<div class="empty-state">Error connecting to AI. Please check your API key.</div>`;
   } finally {
     btn.classList.remove('loading');
     btn.disabled = false;
@@ -1190,7 +1191,7 @@ const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function executeAISearch() {
   const userQuery = document.getElementById('promptBox').value;
-  const resultLimit = document.querySelector('.chip.active')?.innerText || 10;
+  const resultLimit = parseInt(document.querySelector('.chip.active')?.innerText) || 10;
   
   if (!userQuery) return;
 
