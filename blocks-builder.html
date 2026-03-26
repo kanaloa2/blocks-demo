@@ -892,7 +892,7 @@ body {
   </div>
 </div>
 
-  <script type="importmap">
+<script type="importmap">
   {
     "imports": {
       "@google/generative-ai": "https://esm.run/@google/generative-ai"
@@ -903,17 +903,15 @@ body {
 <script type="module">
   import { GoogleGenerativeAI } from "@google/generative-ai";
 
-  // 2. Initialize Gemini (Replace with your actual key)
   const API_KEY = "AIzaSyBx8HQWQuqwd3MMeEsmM3IrVFwygKr8OWc"; 
   const genAI = new GoogleGenerativeAI(API_KEY);
   
-  // Use 'aiModel' to avoid conflicts with other 'model' variables
+  // FIXED: Added 'models/' prefix to resolve the 404 error
   const aiModel = genAI.getGenerativeModel({ 
-    model: "gemini-1.5-flash",
+    model: "models/gemini-1.5-flash", 
     systemInstruction: "You are a WealthTech API. Return ONLY strictly valid JSON. No conversational text."
   });
 
-  // 3. UI Helpers (Attached to window so HTML buttons can see them)
   window.showShimmer = function() {
     const body = document.getElementById('resultsBody');
     if(!body) return;
@@ -924,14 +922,17 @@ body {
     `).join('');
   };
 
-  // 4. The Logic Bridge
   window.executeAISearch = async function() {
-    const userQuery = document.getElementById('promptBox').value;
+    const promptEl = document.getElementById('promptBox');
+    const bodyEl = document.getElementById('resultsBody');
+    if (!promptEl || !bodyEl) return;
+
+    const userQuery = promptEl.value;
     const activeChip = document.querySelector('.chip.active');
     const resultLimit = activeChip ? parseInt(activeChip.innerText) : 10;
 
     try {
-      // Step A: Translate Intent to SQL Filters
+      // Step A: Translate Intent
       const sqlPrompt = `
         Table: 'security_universe'
         Columns: [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta]
@@ -940,7 +941,8 @@ body {
       `;
       
       const sqlResult = await aiModel.generateContent(sqlPrompt);
-      const queryParams = JSON.parse(sqlResult.response.text().replace(/```json|```/g, ''));
+      const sqlText = sqlResult.response.text().replace(/```json|```/g, '').trim();
+      const queryParams = JSON.parse(sqlText);
 
       // Step B: Fetch from Supabase
       let query = _supabase.from('security_universe').select('*');
@@ -948,9 +950,9 @@ body {
       if (queryParams.price_lt) query = query.lt('last_price', queryParams.price_lt);
       
       const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
-      if (error || !securities.length) throw new Error("No data found");
+      if (error || !securities || securities.length === 0) throw new Error("No securities found");
 
-      // Step C: Enrichment (The Magic)
+      // Step C: Enrichment
       const enrichmentPrompt = `
         Goal: "${userQuery}"
         Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}
@@ -959,7 +961,8 @@ body {
       `;
 
       const enrichResult = await aiModel.generateContent(enrichmentPrompt);
-      const enrichedData = JSON.parse(enrichResult.response.text().replace(/```json|```/g, ''));
+      const enrichText = enrichResult.response.text().replace(/```json|```/g, '').trim();
+      const enrichedData = JSON.parse(enrichText);
 
       const finalData = securities.map(s => {
         const ai = enrichedData.find(e => e.t === s.fund_symbol);
@@ -970,34 +973,38 @@ body {
         };
       });
 
-      // Use your existing renderRows function (ensure it's defined in this module or app.js)
-      renderRows(finalData);
+      // Ensure renderRows is available in the global scope or defined here
+      if (typeof renderRows === "function") {
+          renderRows(finalData);
+      }
       
-      document.getElementById('ai-rationale-text').innerText = 
-        `AI screened ${finalData.length} candidates for "${userQuery}" based on fund strategy.`;
+      const rationaleBar = document.getElementById('ai-rationale-text');
+      if (rationaleBar) {
+          rationaleBar.innerText = `AI screened ${finalData.length} candidates for "${userQuery}" based on fund strategy.`;
+      }
 
     } catch (err) {
-      console.error("AI Error:", err);
-      document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" class="p-10 text-center">AI Search failed. Try a different query.</td></tr>`;
+      console.error("AI Error Details:", err);
+      bodyEl.innerHTML = `<tr><td colspan="8" class="p-10 text-center text-gray-400">Search failed: ${err.message}. Try a broader request.</td></tr>`;
     }
   };
 
-  // 5. The Trigger
   window.runScreen = async function() {
     const btn = document.getElementById('screenBtn');
-    if (!document.getElementById('promptBox').value) return;
+    const promptBox = document.getElementById('promptBox');
+    if (!promptBox || !promptBox.value) return;
 
     btn.classList.add('loading');
     btn.disabled = true;
-    showShimmer();
+    window.showShimmer();
 
-    await executeAISearch();
+    await window.executeAISearch();
 
     btn.classList.remove('loading');
     btn.disabled = false;
-    document.getElementById('rightPanel').classList.add('active');
+    const rightPanel = document.getElementById('rightPanel');
+    if (rightPanel) rightPanel.classList.add('active');
   };
 </script>
-
 </body>
 </html>
