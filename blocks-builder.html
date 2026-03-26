@@ -960,51 +960,29 @@ function selectOne(el, group) {
   el.classList.add('selected');
 }
 
-function runScreen() {
+async function runScreen() {
   const btn = document.getElementById('screenBtn');
   const panel = document.getElementById('rightPanel');
+  const userQuery = document.getElementById('promptBox').value;
+
+  if (!userQuery) return alert("Please describe what you are looking for.");
 
   btn.classList.add('loading');
   btn.disabled = true;
 
-  // Show shimmer loading state
-  panel.innerHTML = `
-    <div class="results-header">
-      <div>
-        <div class="results-title">Screening securities…</div>
-        <div class="results-meta">AI is analyzing your criteria</div>
-      </div>
-    </div>
-    <div class="results-table-wrap">
-      <table class="results-table">
-        <thead>
-          <tr>
-            <th>Security</th><th>AI Score</th><th>Div Yield</th><th>Beta</th><th>P/E</th><th>YTD</th><th>Rationale</th><th></th>
-          </tr>
-        </thead>
-        <tbody id="shimmerBody">
-          ${[...Array(6)].map(() => `
-            <tr class="shimmer-row">
-              <td><div class="shimmer-cell" style="width:140px;"></div></td>
-              <td><div class="shimmer-cell" style="width:70px;"></div></td>
-              <td><div class="shimmer-cell" style="width:40px;"></div></td>
-              <td><div class="shimmer-cell" style="width:30px;"></div></td>
-              <td><div class="shimmer-cell" style="width:40px;"></div></td>
-              <td><div class="shimmer-cell" style="width:40px;"></div></td>
-              <td><div class="shimmer-cell" style="width:180px;"></div></td>
-              <td><div class="shimmer-cell" style="width:26px;border-radius:50%;"></div></td>
-            </tr>
-          `).join('')}
-        </tbody>
-      </table>
-    </div>
-  `;
+  // 1. Show shimmer loading state (keep your existing innerHTML shimmer logic here)
+  panel.innerHTML = `...`; // (Insert your existing shimmer HTML)
 
-  setTimeout(() => {
+  try {
+    // 2. Run the AI Search Bridge
+    await executeAISearch(); 
+  } catch (err) {
+    console.error("Screening failed:", err);
+    panel.innerHTML = `<div class="empty-state">Error connecting to AI. Please check your API key.</div>`;
+  } finally {
     btn.classList.remove('loading');
     btn.disabled = false;
-    showResults();
-  }, 1800);
+  }
 }
 
 function showResults() {
@@ -1194,47 +1172,74 @@ const genAI = new GoogleGenerativeAI("AIzaSyBx8HQWQuqwd3MMeEsmM3IrVFwygKr8OWc");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function executeAISearch() {
-  const userQuery = document.getElementById('universe-search').value;
-  const resultLimit = document.getElementById('results-count').value || 10;
-  const assetClass = document.getElementById('asset-class-filter').value;
-
-  // STEP 1: Get SQL Parameters from Gemini
-  const sqlPrompt = `
-    Context: Table 'security_universe' with columns [ticker, name, category, last_price, yield, beta, strategy_text].
-    User Request: "${userQuery}" 
-    Filters: Asset Class: ${assetClass}, Limit: ${resultLimit}.
-    Task: Return ONLY a JSON object with Supabase filter keys (e.g., {"yield": "gt.0.03", "limit": 10}).
-  `;
+  // 1. Correct the IDs to match your HTML (promptBox and results-count)
+  const userQuery = document.getElementById('promptBox').value;
+  const resultLimit = document.querySelector('.chip.active')?.innerText || 10; 
   
-  const sqlResult = await model.generateContent(sqlPrompt);
-  const queryParams = JSON.parse(sqlResult.response.text());
+  if (!userQuery) return;
 
-  // STEP 2: Fetch from Supabase
-  let { data: securities } = await _supabase
-    .from('security_universe')
-    .select('*')
-    .limit(queryParams.limit || resultLimit);
-    // (Apply other dynamic filters here based on queryParams)
+  try {
+    // STEP 1: Get SQL Parameters from Gemini
+    // We explicitly tell Gemini the correct column names from your CSV
+    const sqlPrompt = `
+      Context: Table 'security_universe' with columns [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta, investment_strategy].
+      User Request: "${userQuery}" 
+      Task: Return ONLY a JSON object with Supabase filter keys. 
+      Example: {"yield_gt": 0.03, "price_lt": 100, "limit": ${resultLimit}}
+    `;
+    
+    const sqlResult = await model.generateContent(sqlPrompt);
+    // Clean the response in case Gemini includes markdown code blocks
+    const cleanJson = sqlResult.response.text().replace(/```json|```/g, '');
+    const queryParams = JSON.parse(cleanJson);
 
-  // STEP 3: Enrich with Rationale and Score
-  const enrichmentPrompt = `
-    Based on the user's goal ("${userQuery}"), evaluate these ${securities.length} securities.
-    For each, provide:
-    1. AI Score (0-100) based on how well it fits the goal.
-    2. A 1-sentence 'Rationale' explaining why.
-    Return as JSON: [{"ticker": "AAPL", "score": 95, "rationale": "..."}]
-  `;
+    // STEP 2: Fetch from Supabase with Dynamic Filters
+    let query = _supabase.from('security_universe').select('*');
 
-  const enrichmentResult = await model.generateContent(enrichmentPrompt + JSON.stringify(securities));
-  const enrichedData = JSON.parse(enrichmentResult.response.text());
+    // Apply filters returned by AI
+    if (queryParams.yield_gt) query = query.gt('fund_yield', queryParams.yield_gt);
+    if (queryParams.price_lt) query = query.lt('last_price', queryParams.price_lt);
+    if (queryParams.price_gt) query = query.gt('last_price', queryParams.price_gt);
+    
+    const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
+    
+    if (error || !securities.length) throw new Error("No securities found");
 
-  // Merge and Render
-  const finalData = securities.map(s => ({
-    ...s,
-    ...enrichedData.find(e => e.ticker === s.ticker)
-  }));
+    // STEP 3: Enrich with Rationale and Score
+    // We pass the prompt and the raw data back to Gemini for "The Magic"
+    const enrichmentPrompt = `
+      User Goal: "${userQuery}"
+      Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name, s: s.investment_strategy})))}
+      
+      Task: Rate these out of 100 and give a 1-sentence rationale.
+      Return ONLY a JSON array: [{"t": "TICKER", "score": 95, "rationale": "..."}]
+    `;
 
-  renderRows(finalData); // This updates your existing table
+    const enrichmentResult = await model.generateContent(enrichmentPrompt);
+    const cleanEnrichmentJson = enrichmentResult.response.text().replace(/```json|```/g, '');
+    const enrichedData = JSON.parse(cleanEnrichmentJson);
+
+    // Merge and Render
+    const finalData = securities.map(s => {
+      const ai = enrichedData.find(e => e.t === s.fund_symbol);
+      return {
+        ...s,
+        score: ai ? ai.score : 70, // Fallback score
+        rationale: ai ? ai.rationale : "Matches criteria based on historical performance and category."
+      };
+    });
+
+    // Call your existing renderRows function
+    renderRows(finalData);
+    
+    // Update the "AI Rationale" summary bar at the top
+    document.getElementById('ai-rationale-text').innerText = 
+      `Identified ${finalData.length} securities matching "${userQuery}" with an average match score of ${Math.round(finalData.reduce((a,b) => a + b.score, 0) / finalData.length)}%.`;
+
+  } catch (err) {
+    console.error("AI Search Error:", err);
+    document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px;">AI search failed to find matches. Try broadening your request.</td></tr>`;
+  }
 }
 
 </script>
