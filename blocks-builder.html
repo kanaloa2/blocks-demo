@@ -14,6 +14,18 @@
 <title>Blocks — Block Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  @keyframes shimmer {
+  0% { background-position: -468px 0; }
+  100% { background-position: 468px 0; }
+}
+.shimmer-line {
+  height: 12px;
+  width: 100%;
+  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
+  background-size: 800px 104px;
+  animation: shimmer 1.25s infinite linear;
+  border-radius: 4px;
+}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -881,6 +893,11 @@ body {
 </div>
 
 <script>
+  const genAI = new GoogleGenerativeAI("YOUR_GEMINI_API_KEY");
+const model = genAI.getGenerativeModel({ 
+  model: "gemini-1.5-flash",
+  systemInstruction: "You are a WealthTech data engine. Always return strictly valid JSON. No conversational text. Use the schema provided in prompts."
+});
 const SECURITIES = [
   {
     ticker: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', color: '#FAECE7', tcolor: '#C94E28',
@@ -1172,76 +1189,72 @@ const genAI = new GoogleGenerativeAI("AIzaSyBx8HQWQuqwd3MMeEsmM3IrVFwygKr8OWc");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function executeAISearch() {
-  // 1. Correct the IDs to match your HTML (promptBox and results-count)
   const userQuery = document.getElementById('promptBox').value;
-  const resultLimit = document.querySelector('.chip.active')?.innerText || 10; 
+  const resultLimit = document.querySelector('.chip.active')?.innerText || 10;
   
   if (!userQuery) return;
 
   try {
-    // STEP 1: Get SQL Parameters from Gemini
-    // We explicitly tell Gemini the correct column names from your CSV
+    // STEP 1: Get SQL Filter Parameters
     const sqlPrompt = `
-      Context: Table 'security_universe' with columns [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta, investment_strategy].
-      User Request: "${userQuery}" 
-      Task: Return ONLY a JSON object with Supabase filter keys. 
-      Example: {"yield_gt": 0.03, "price_lt": 100, "limit": ${resultLimit}}
+      Table: 'security_universe'
+      Columns: [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta]
+      User Request: "${userQuery}"
+      Task: Return JSON for Supabase filters. Example: {"yield_gt": 0.04, "limit": ${resultLimit}}
     `;
     
     const sqlResult = await model.generateContent(sqlPrompt);
-    // Clean the response in case Gemini includes markdown code blocks
-    const cleanJson = sqlResult.response.text().replace(/```json|```/g, '');
-    const queryParams = JSON.parse(cleanJson);
+    const queryParams = JSON.parse(sqlResult.response.text().replace(/```json|```/g, ''));
 
-    // STEP 2: Fetch from Supabase with Dynamic Filters
+    // STEP 2: Fetch from Supabase
     let query = _supabase.from('security_universe').select('*');
-
-    // Apply filters returned by AI
     if (queryParams.yield_gt) query = query.gt('fund_yield', queryParams.yield_gt);
     if (queryParams.price_lt) query = query.lt('last_price', queryParams.price_lt);
-    if (queryParams.price_gt) query = query.gt('last_price', queryParams.price_gt);
     
     const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
-    
     if (error || !securities.length) throw new Error("No securities found");
 
-    // STEP 3: Enrich with Rationale and Score
-    // We pass the prompt and the raw data back to Gemini for "The Magic"
+    // STEP 3: The Magic (Score & Rationale)
+    // We send only the essential data to save tokens and speed up the response
     const enrichmentPrompt = `
       User Goal: "${userQuery}"
-      Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name, s: s.investment_strategy})))}
-      
-      Task: Rate these out of 100 and give a 1-sentence rationale.
-      Return ONLY a JSON array: [{"t": "TICKER", "score": 95, "rationale": "..."}]
+      Securities: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}
+      Task: Rate each 1-100 and give a 1-sentence rationale.
+      Return JSON: [{"t": "TICKER", "score": 95, "rationale": "..."}]
     `;
 
-    const enrichmentResult = await model.generateContent(enrichmentPrompt);
-    const cleanEnrichmentJson = enrichmentResult.response.text().replace(/```json|```/g, '');
-    const enrichedData = JSON.parse(cleanEnrichmentJson);
+    const enrichResult = await model.generateContent(enrichmentPrompt);
+    const enrichedData = JSON.parse(enrichResult.response.text().replace(/```json|```/g, ''));
 
-    // Merge and Render
+    // Final Merge
     const finalData = securities.map(s => {
       const ai = enrichedData.find(e => e.t === s.fund_symbol);
       return {
         ...s,
-        score: ai ? ai.score : 70, // Fallback score
-        rationale: ai ? ai.rationale : "Matches criteria based on historical performance and category."
+        score: ai ? ai.score : 75, // Default fallback
+        rationale: ai ? ai.rationale : "Matches portfolio criteria."
       };
     });
 
-    // Call your existing renderRows function
     renderRows(finalData);
     
-    // Update the "AI Rationale" summary bar at the top
+    // Update the AI Summary Bar
     document.getElementById('ai-rationale-text').innerText = 
-      `Identified ${finalData.length} securities matching "${userQuery}" with an average match score of ${Math.round(finalData.reduce((a,b) => a + b.score, 0) / finalData.length)}%.`;
+      `Identified ${finalData.length} securities for "${userQuery}" with high alignment to your strategy.`;
 
   } catch (err) {
-    console.error("AI Search Error:", err);
-    document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" style="text-align:center; padding: 40px;">AI search failed to find matches. Try broadening your request.</td></tr>`;
+    console.error("AI Bridge Error:", err);
+    document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" class="p-10 text-center">AI could not find exact matches. Try simplifying your request.</td></tr>`;
   }
 }
-
+function showShimmer() {
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = Array(5).fill(0).map(() => `
+    <tr>
+      <td colspan="8"><div class="shimmer-line" style="margin: 10px 0;"></div></td>
+    </tr>
+  `).join('');
+}
 </script>
 </body>
 </html>
