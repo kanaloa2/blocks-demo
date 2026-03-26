@@ -1070,40 +1070,63 @@ function showResults() {
 
 function renderRows(data) {
   const body = document.getElementById('resultsBody');
-  body.innerHTML = data.map((s, i) => `
-    <tr class="result-row" style="animation-delay:${i * 0.045}s">
-      <td>
-        <div class="ticker-cell">
-          <div class="sec-icon" style="background:${s.color};color:${s.tcolor};">${s.ticker.slice(0,3)}</div>
-          <div>
-            <div class="ticker">${s.ticker}</div>
-            <div class="sec-name">${s.name}</div>
+  if (!body) return;
+
+  body.innerHTML = data.map((s, i) => {
+    // 1. Map Supabase/AI data to template variables
+    // Use || as a fallback for missing AI scores or rationales
+    const score = s.score || 0; 
+    const rationale = s.rationale || "Analyzing security fit...";
+    const yieldVal = s.fund_yield ? (s.fund_yield * 100).toFixed(2) + '%' : '0.00%';
+    const betaVal = s.beta ? parseFloat(s.beta).toFixed(2) : 'N/A';
+    const peVal = s.fund_price_earning_ratio ? parseFloat(s.fund_price_earning_ratio).toFixed(1) + 'x' : '—';
+    
+    // 2. Dynamic styling for AI Score
+    const scoreColor = score > 80 ? 'var(--green)' : score > 60 ? 'var(--amber)' : 'var(--text3)';
+
+    return `
+      <tr class="result-row" style="animation-delay:${i * 0.045}s">
+        <td>
+          <div class="ticker-cell">
+            <div class="sec-icon" style="background:var(--purple-lt); color:var(--purple);">
+              ${s.fund_symbol ? s.fund_symbol.slice(0, 3) : '??'}
+            </div>
+            <div>
+              <div class="ticker">${s.fund_symbol || s.ticker}</div>
+              <div class="sec-name">${s.fund_short_name || s.name || 'Unknown Security'}</div>
+            </div>
           </div>
-        </div>
-      </td>
-      <td>
-        <div class="score-bar-wrap">
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:${s.score}%;"></div></div>
-          <div class="score-num">${s.score}</div>
-        </div>
-      </td>
-      <td><span class="stat up">${s.div}</span></td>
-      <td><span class="stat">${s.beta}</span></td>
-      <td><span class="stat muted">${s.pe}</span></td>
-      <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${parseFloat(s.ytd) >= 0 ? '+' : ''}${s.ytd}%</span></td>
-      <td>
-        <div>
-          <span class="tag-small" style="background:${s.tagBg};color:${s.tagColor};">${s.tag}</span>
-          <div class="rationale-snippet" style="margin-top:4px;">${s.rationale}</div>
-        </div>
-      </td>
-      <td>
-        <div class="add-btn-row ${added.has(s.ticker) ? 'added' : ''}" id="add-${s.ticker}" onclick="toggleAdd('${s.ticker}')">
-          ${added.has(s.ticker) ? '✓' : '+'}
-        </div>
-      </td>
-    </tr>
-  `).join('');
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar-track">
+              <div class="score-bar-fill" style="width:${score}%; background:${scoreColor};"></div>
+            </div>
+            <div class="score-num">${score}</div>
+          </div>
+        </td>
+        <td><span class="stat up">${yieldVal}</span></td>
+        <td><span class="stat">${betaVal}</span></td>
+        <td><span class="stat muted">${peVal}</span></td>
+        <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${s.ytd || '0.0'}%</span></td>
+        <td>
+          <div>
+            <span class="tag-small" style="background:var(--purple-lt); color:var(--purple);">
+              ${s.fund_category || 'General'}
+            </span>
+            <div class="rationale-snippet" style="margin-top:4px;">${rationale}</div>
+          </div>
+        </td>
+        <td>
+          <div class="add-btn-row ${added.has(s.fund_symbol) ? 'added' : ''}" 
+               id="add-${s.fund_symbol}" 
+               onclick="toggleAdd('${s.fund_symbol}')">
+            ${added.has(s.fund_symbol) ? '✓' : '+'}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function toggleAdd(ticker) {
@@ -1167,7 +1190,7 @@ function closeMobileMenu() {
 <script src="js/app.js"></script>
 <script>
   // 1. Setup Gemini 1.5 Flash
-const genAI = new GoogleGenerativeAI("YOUR_GEMINI_API_KEY");
+const genAI = new GoogleGenerativeAI("AIzaSyBx8HQWQuqwd3MMeEsmM3IrVFwygKr8OWc");
 const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
 async function executeAISearch() {
@@ -1213,22 +1236,7 @@ async function executeAISearch() {
 
   renderRows(finalData); // This updates your existing table
 }
-  // Update your renderRows function inside blocks-builder (1).html
-function renderRows(data) {
-  const container = document.getElementById('security-results');
-  container.innerHTML = data.map(s => `
-    <div class="row-item">
-      <div class="col-ticker">
-        <strong>${s.ticker}</strong>
-        <span class="ai-score-pill ${s.score > 85 ? 'high' : 'med'}">${s.score}% Match</span>
-      </div>
-      <div class="col-name">${s.name}</div>
-      <div class="col-rationale italic text-blue-700">"${s.rationale}"</div>
-      <div class="col-price">$${s.last_price}</div>
-      <button onclick="addToBlock('${s.ticker}')">Add</button>
-    </div>
-  `).join('');
-}
+
 </script>
 </body>
 </html>
