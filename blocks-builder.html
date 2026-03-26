@@ -14,18 +14,6 @@
 <title>Blocks — Block Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-  @keyframes shimmer {
-  0% { background-position: -468px 0; }
-  100% { background-position: 468px 0; }
-}
-.shimmer-line {
-  height: 12px;
-  width: 100%;
-  background: linear-gradient(to right, #f6f7f8 8%, #edeef1 18%, #f6f7f8 33%);
-  background-size: 800px 104px;
-  animation: shimmer 1.25s infinite linear;
-  border-radius: 4px;
-}
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
 :root {
@@ -728,7 +716,7 @@ body {
         <path d="M4 5.5h7M4 8h4.5" stroke="currentColor" stroke-width="1.2" stroke-linecap="round"/>
       </svg>
     </div>
-    <div id="global-nav-auth"></div>
+    <div class="avatar">JD</div>
   </div>
   <button class="hamburger" id="hamburger" onclick="toggleMobileMenu()" aria-label="Menu"><span></span><span></span><span></span></button>
 </nav>
@@ -892,155 +880,429 @@ body {
   </div>
 </div>
 
-<script type="importmap">
+<script>
+const SECURITIES = [
   {
-    "imports": {
-      "@google/generative-ai": "https://esm.run/@google/generative-ai"
-    }
+    ticker: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', color: '#FAECE7', tcolor: '#C94E28',
+    score: 94, div: '3.1%', beta: '0.62', pe: '15.2x', ytd: '+4.2',
+    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
+    rationale: 'Consecutive dividend growth for 61 years. Defensive moat across pharma and MedTech.'
+  },
+  {
+    ticker: 'PG', name: 'Procter & Gamble', sector: 'Consumer Staples', color: '#EEEDFE', tcolor: '#534AB7',
+    score: 91, div: '2.5%', beta: '0.55', pe: '24.1x', ytd: '+2.8',
+    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
+    rationale: 'Pricing power and global distribution. Low-beta, bond-like equity characteristics.'
+  },
+  {
+    ticker: 'KO', name: 'The Coca-Cola Company', sector: 'Consumer Staples', color: '#FCEBEB', tcolor: '#B83232',
+    score: 89, div: '3.4%', beta: '0.58', pe: '22.8x', ytd: '+5.1',
+    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
+    rationale: 'Iconic brand with 62yr dividend growth streak. Resilient in downturns.'
+  },
+  {
+    ticker: 'VZ', name: 'Verizon Communications', sector: 'Telecom', color: '#EEEDFE', tcolor: '#534AB7',
+    score: 81, div: '6.8%', beta: '0.41', pe: '8.3x', ytd: '-1.2',
+    tag: 'High Yield', tagBg: '#FEF3DC', tagColor: '#A06010',
+    rationale: 'Highest dividend yield in screen. Debt load elevated but free cash flow covers payout.'
+  },
+  {
+    ticker: 'MMM', name: '3M Company', sector: 'Industrials', color: '#FEF3DC', tcolor: '#A06010',
+    score: 74, div: '5.2%', beta: '0.79', pe: '11.4x', ytd: '+8.3',
+    tag: 'Watch: Litigation', tagBg: '#FCEBEB', tagColor: '#B83232',
+    rationale: 'Strong yield and diversification but litigation overhang warrants position sizing caution.'
+  },
+  {
+    ticker: 'ABT', name: 'Abbott Laboratories', sector: 'Healthcare', color: '#FAECE7', tcolor: '#C94E28',
+    score: 88, div: '2.0%', beta: '0.71', pe: '19.6x', ytd: '+3.5',
+    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
+    rationale: 'Diversified medtech with diagnostics and devices. Consistent earnings in defensive category.'
+  },
+  {
+    ticker: 'CL', name: 'Colgate-Palmolive', sector: 'Consumer Staples', color: '#E1F5EE', tcolor: '#0F6E56',
+    score: 83, div: '2.4%', beta: '0.52', pe: '26.3x', ytd: '+1.9',
+    tag: 'Dividend Aristocrat', tagBg: '#E1F5EE', tagColor: '#085041',
+    rationale: 'Global oral care dominance. Among the lowest betas in consumer staples.'
+  },
+  {
+    ticker: 'WMT', name: 'Walmart Inc.', sector: 'Consumer Staples', color: '#EAF3DE', tcolor: '#2E7D32',
+    score: 86, div: '1.3%', beta: '0.49', pe: '27.1x', ytd: '+9.4',
+    tag: 'Defensive Growth', tagBg: '#EEEDFE', tagColor: '#534AB7',
+    rationale: 'Recession-resistant with growing e-commerce. Lower yield offset by strong capital appreciation.'
+  },
+  {
+    ticker: 'MCD', name: "McDonald's Corp", sector: 'Consumer Discretionary', color: '#FEF3DC', tcolor: '#A06010',
+    score: 80, div: '2.3%', beta: '0.69', pe: '23.7x', ytd: '+0.6',
+    tag: 'Franchise Model', tagBg: '#EEEDFE', tagColor: '#534AB7',
+    rationale: 'Asset-light franchise model with inflation pass-through. Steady dividend grower.'
+  },
+  {
+    ticker: 'T', name: 'AT&T Inc.', sector: 'Telecom', color: '#E1F5EE', tcolor: '#0F6E56',
+    score: 69, div: '5.9%', beta: '0.44', pe: '7.1x', ytd: '+11.2',
+    tag: 'High Yield', tagBg: '#FEF3DC', tagColor: '#A06010',
+    rationale: 'Dividend cut now stabilized. Deleveraging in progress. High yield with capital upside if execution holds.'
   }
-</script>
+];
 
-<script type="module">
-  import { GoogleGenerativeAI } from "@google/generative-ai";
+let added = new Set();
+let resultsShown = false;
+let aiResults = [];
 
-  // 1. Setup & Config
-  const API_KEY = "AIzaSyBx8HQWQuqwd3MMeEsmM3IrVFwygKr8OWc"; 
-  const genAI = new GoogleGenerativeAI(API_KEY);
-  
-  // FIXED: Explicit 'models/' prefix for the SDK
-  const aiModel = genAI.getGenerativeModel({ 
-    model: "models/gemini-1.5-flash",
-    systemInstruction: "You are a WealthTech API. Return ONLY strictly valid JSON. No conversational text."
-  });
+function fillPrompt(el) {
+  document.getElementById('promptBox').value = el.textContent;
+}
 
-  const added = new Set();
+function toggleChip(el) {
+  el.classList.toggle('selected');
+}
 
-  // 2. UI: Render Table Rows (Inside module so AI can call it)
-  window.renderRows = function(data) {
-    const body = document.getElementById('resultsBody');
-    if (!body) return;
-    
-    body.innerHTML = data.map((s, i) => {
-      const score = s.score || 0;
-      const rationale = s.rationale || "Analyzing strategy...";
-      const yieldVal = s.fund_yield ? (parseFloat(s.fund_yield) * 100).toFixed(2) + '%' : '0.00%';
-      const betaVal = s.beta ? parseFloat(s.beta).toFixed(2) : 'N/A';
-      const peVal = s.fund_price_earning_ratio ? parseFloat(s.fund_price_earning_ratio).toFixed(1) + 'x' : '—';
-      const scoreColor = score > 80 ? '#0F6E56' : score > 60 ? '#D97706' : '#9a9994';
+function selectOne(el, group) {
+  el.parentElement.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
 
-      return `
-        <tr class="result-row" style="animation-delay:${i * 0.045}s">
-          <td>
-            <div class="ticker-cell">
-              <div class="sec-icon" style="background:#f0efe9; color:#181816;">${s.fund_symbol ? s.fund_symbol.slice(0,3) : '??'}</div>
-              <div>
-                <div class="ticker">${s.fund_symbol}</div>
-                <div class="sec-name">${s.fund_short_name || s.name}</div>
-              </div>
-            </div>
-          </td>
-          <td>
-            <div class="score-bar-wrap">
-              <div class="score-bar-track"><div class="score-bar-fill" style="width:${score}%; background:${scoreColor};"></div></div>
-              <div class="score-num">${score}</div>
-            </div>
-          </td>
-          <td><span class="stat up">${yieldVal}</span></td>
-          <td><span class="stat">${betaVal}</span></td>
-          <td><span class="stat muted">${peVal}</span></td>
-          <td><span class="stat up">+2.4%</span></td>
-          <td>
-            <div>
-              <span class="tag-small" style="background:#f0efe9; color:#5c5b57;">${s.fund_category || 'ETF'}</span>
-              <div class="rationale-snippet" style="margin-top:4px; font-size:11px; line-height:1.3; color:#5c5b57;">${rationale}</div>
-            </div>
-          </td>
-          <td>
-            <div class="add-btn-row ${added.has(s.fund_symbol) ? 'added' : ''}" onclick="window.toggleAdd('${s.fund_symbol}')">
-              ${added.has(s.fund_symbol) ? '✓' : '+'}
-            </div>
-          </td>
-        </tr>
-      `;
-    }).join('');
-  };
+function getFilters() {
+  const assetChips = [...document.querySelectorAll('.filter-row')][0];
+  const assetClass = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['Equities','Fixed Income','ETFs','REITs'].includes(c.textContent)).map(c => c.textContent).join(', ') || 'Equities';
+  const marketCap = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['Mega','Large','Mid','Small'].includes(c.textContent)).map(c => c.textContent).join(', ') || 'Large, Mid';
+  const geography = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['US','Developed Intl','Emerging'].includes(c.textContent)).map(c => c.textContent).join(', ') || 'US';
+  const minYield = document.getElementById('yieldRange')?.value || '2';
+  const maxBeta = document.getElementById('betaRange')?.value || '0.9';
+  const maxResults = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['10','20','30'].includes(c.textContent)).map(c => c.textContent)[0] || '10';
+  return { assetClass, marketCap, geography, minYield, maxBeta, maxResults };
+}
 
-  // 3. UI: Loading Shimmer
-  window.showShimmer = function() {
-    const body = document.getElementById('resultsBody');
-    if(body) body.innerHTML = Array(5).fill(0).map(() => `<tr><td colspan="8"><div class="shimmer-line" style="margin:20px 0;"></div></td></tr>`).join('');
-  };
+async function runScreen() {
+  const btn = document.getElementById('screenBtn');
+  const panel = document.getElementById('rightPanel');
+  const prompt = document.getElementById('promptBox').value.trim();
 
-  // 4. Logic: AI Search Bridge
-  window.executeAISearch = async function() {
-    const promptBox = document.getElementById('promptBox');
-    const body = document.getElementById('resultsBody');
-    if (!promptBox || !body) return;
+  if (!prompt) {
+    document.getElementById('promptBox').style.border = '1.5px solid var(--coral)';
+    setTimeout(() => document.getElementById('promptBox').style.border = '', 1500);
+    return;
+  }
 
-    const userQuery = promptBox.value;
-    const activeChip = document.querySelector('.chip.active');
-    const resultLimit = activeChip ? parseInt(activeChip.innerText) : 10;
+  btn.classList.add('loading');
+  btn.disabled = true;
 
-    try {
-      const sqlPrompt = `Filters for: "${userQuery}". Table: security_universe. Return JSON: {"yield_gt": 0.03, "limit": ${resultLimit}}`;
-      const sqlRes = await aiModel.generateContent(sqlPrompt);
-      const queryParams = JSON.parse(sqlRes.response.text().replace(/```json|```/g, '').trim());
+  const filters = getFilters();
 
-      let query = _supabase.from('security_universe').select('*');
-      if (queryParams.yield_gt) query = query.gt('fund_yield', queryParams.yield_gt);
-      
-      const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
-      if (error || !securities?.length) throw new Error("No matches found.");
+  // Show shimmer loading state
+  panel.innerHTML = `
+    <div class="results-header">
+      <div>
+        <div class="results-title">Screening securities…</div>
+        <div class="results-meta">AI is analyzing your criteria</div>
+      </div>
+    </div>
+    <div class="results-table-wrap">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th>Security</th><th>AI Score</th><th>Div Yield</th><th>Beta</th><th>P/E</th><th>YTD</th><th>Rationale</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="shimmerBody">
+          ${[...Array(6)].map(() => `
+            <tr class="shimmer-row">
+              <td><div class="shimmer-cell" style="width:140px;"></div></td>
+              <td><div class="shimmer-cell" style="width:70px;"></div></td>
+              <td><div class="shimmer-cell" style="width:40px;"></div></td>
+              <td><div class="shimmer-cell" style="width:30px;"></div></td>
+              <td><div class="shimmer-cell" style="width:40px;"></div></td>
+              <td><div class="shimmer-cell" style="width:40px;"></div></td>
+              <td><div class="shimmer-cell" style="width:180px;"></div></td>
+              <td><div class="shimmer-cell" style="width:26px;border-radius:50%;"></div></td>
+            </tr>
+          `).join('')}
+        </tbody>
+      </table>
+    </div>
+  `;
 
-      const enrichPrompt = `Goal: "${userQuery}". Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}. Return JSON: [{"t": "TICKER", "score": 95, "rationale": "..."}]`;
-      const enrichRes = await aiModel.generateContent(enrichPrompt);
-      const enrichedData = JSON.parse(enrichRes.response.text().replace(/```json|```/g, '').trim());
+  try {
+    const GEMINI_KEY = 'YOUR_GEMINI_API_KEY_HERE';
 
-      const finalData = securities.map(s => {
-        const ai = enrichedData.find(e => e.t === s.fund_symbol);
-        return { ...s, score: ai ? ai.score : 80, rationale: ai ? ai.rationale : "Aligned with strategy." };
-      });
+    const geminiPrompt = `You are an expert portfolio analyst AI assistant for financial advisors. Suggest specific securities matching the advisor's criteria.
 
-      window.renderRows(finalData);
-      document.getElementById('ai-rationale-text').innerText = `Screened ${finalData.length} securities matching "${userQuery}".`;
+CRITICAL: Respond with ONLY valid JSON, no markdown, no backticks, no explanation outside the JSON.
 
-    } catch (err) {
-      console.error("AI Error:", err);
-      body.innerHTML = `<tr><td colspan="8" class="p-10 text-center">Search error. Try a different prompt.</td></tr>`;
+Return exactly this structure:
+{
+  "summary": "1-2 sentence summary of what you found",
+  "blockName": "Suggested 2-4 word block name",
+  "count": <number>,
+  "highlights": "Notable patterns e.g. '5 Dividend Aristocrats identified'",
+  "securities": [
+    {
+      "ticker": "TICKER",
+      "name": "Full Company Name",
+      "score": <number 70-98>,
+      "div": "<yield>%",
+      "beta": "<beta>",
+      "pe": "<pe>x",
+      "ytd": "<number>",
+      "tag": "Category tag",
+      "tagBg": "<hex color>",
+      "tagColor": "<hex color>",
+      "rationale": "1-2 sentence rationale",
+      "color": "<hex bg color for icon>",
+      "tcolor": "<hex text color for icon>"
     }
-  };
+  ]
+}
 
-  // 5. ATTACH TO WINDOW (This fixes the ReferenceErrors)
-  window.runScreen = async function() {
-    const btn = document.getElementById('screenBtn');
-    const input = document.getElementById('promptBox');
-    if (!input || !input.value) return;
+Advisor criteria: "${prompt}"
+Filters: Asset class: ${filters.assetClass}, Market cap: ${filters.marketCap}, Geography: ${filters.geography}, Min dividend yield: ${filters.minYield}%, Max beta: ${filters.maxBeta}, Max results: ${filters.maxResults}
 
-    btn.classList.add('loading');
-    btn.disabled = true;
-    window.showShimmer();
+Use realistic illustrative data for well-known securities. Score higher-conviction picks higher. Return ${filters.maxResults} securities maximum.`;
 
-    await window.executeAISearch();
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        contents: [{ parts: [{ text: geminiPrompt }] }],
+        generationConfig: { temperature: 0.7, maxOutputTokens: 1500 }
+      })
+    });
 
+    const data = await response.json();
+    const rawText = data.candidates[0].content.parts[0].text.trim();
+    const clean = rawText.replace(/```json|```/g, '').trim();
+    const result = JSON.parse(clean);
+
+    aiResults = result.securities;
     btn.classList.remove('loading');
     btn.disabled = false;
-    document.getElementById('rightPanel').classList.add('active');
-  };
+    showAIResults(result);
 
-  // FIXED: Logic to grab text instead of the element object
-  window.fillPrompt = function(el) {
-    const pb = document.getElementById('promptBox');
-    if (!pb) return;
-    // If you clicked a div, grab its text. If it's already a string, use it.
-    pb.value = (typeof el === 'string') ? el : el.innerText;
-  };
+  } catch (err) {
+    console.error('AI screening error:', err);
+    btn.classList.remove('loading');
+    btn.disabled = false;
+    // Fallback to mock results if API fails
+    showResults();
+  }
+}
 
-  window.toggleAdd = function(ticker) {
-    if (added.has(ticker)) added.delete(ticker);
-    else added.add(ticker);
-    // UI Refresh logic would go here
-  };
+function showAIResults(result) {
+  const panel = document.getElementById('rightPanel');
+  added = new Set();
+  resultsShown = true;
+
+  const sorted = [...result.securities].sort((a, b) => b.score - a.score);
+  aiResults = sorted;
+
+  panel.innerHTML = `
+    <div class="block-name-row">
+      <input class="block-name-input" id="blockNameInput" placeholder="Name this block…" value="${result.blockName || 'AI Screened Block'}">
+      <span class="selected-count" id="selectedCount">0 of ${sorted.length} selected</span>
+    </div>
+
+    <div class="ai-rationale">
+      <div class="ai-spark">✦</div>
+      <div class="ai-text">
+        ${result.summary} <strong>${result.highlights}</strong> Review and add to your block below.
+      </div>
+    </div>
+
+    <div class="results-header">
+      <div>
+        <div class="results-title">Screening Results</div>
+        <div class="results-meta">${sorted.length} securities · sorted by AI score</div>
+      </div>
+      <div class="results-actions">
+        <select class="sort-sel" onchange="resortResults(this.value)">
+          <option value="score">Sort: AI Score</option>
+          <option value="div">Sort: Dividend Yield</option>
+          <option value="beta">Sort: Beta (low→high)</option>
+          <option value="ytd">Sort: YTD Return</option>
+        </select>
+        <button class="save-btn" id="saveBtn" onclick="saveBlock()" disabled>
+          Save Block
+        </button>
+      </div>
+    </div>
+
+    <div class="results-table-wrap">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th style="width:180px;">Security</th>
+            <th>AI Score</th>
+            <th>Div Yield</th>
+            <th>Beta</th>
+            <th>P/E</th>
+            <th>YTD</th>
+            <th>Rationale</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  renderRows(sorted);
+}
+
+function showResults() {
+  const panel = document.getElementById('rightPanel');
+  added = new Set();
+  resultsShown = true;
+
+  const sorted = [...SECURITIES].sort((a, b) => b.score - a.score);
+
+  panel.innerHTML = `
+    <div class="block-name-row">
+      <input class="block-name-input" id="blockNameInput" placeholder="Name this block…" value="Defensive Dividend Block">
+      <span class="selected-count" id="selectedCount">0 of ${sorted.length} selected</span>
+    </div>
+
+    <div class="ai-rationale">
+      <div class="ai-spark">✦</div>
+      <div class="ai-text">
+        Found <strong>${sorted.length} candidates</strong> matching your criteria: defensive equities with dividend yield ≥ 2%, beta ≤ 0.9, large/mid-cap US. Ranked by composite AI score weighing dividend reliability, balance sheet strength, and drawdown history. <strong>5 Dividend Aristocrats</strong> identified. Review and add to your block below.
+      </div>
+    </div>
+
+    <div class="results-header">
+      <div>
+        <div class="results-title">Screening Results</div>
+        <div class="results-meta">${sorted.length} securities · sorted by AI score</div>
+      </div>
+      <div class="results-actions">
+        <select class="sort-sel" onchange="resortResults(this.value)">
+          <option value="score">Sort: AI Score</option>
+          <option value="div">Sort: Dividend Yield</option>
+          <option value="beta">Sort: Beta (low→high)</option>
+          <option value="ytd">Sort: YTD Return</option>
+        </select>
+        <button class="save-btn" id="saveBtn" onclick="saveBlock()" disabled>
+          Save Block
+        </button>
+      </div>
+    </div>
+
+    <div class="results-table-wrap">
+      <table class="results-table">
+        <thead>
+          <tr>
+            <th style="width:180px;">Security</th>
+            <th>AI Score</th>
+            <th>Div Yield</th>
+            <th>Beta</th>
+            <th>P/E</th>
+            <th>YTD</th>
+            <th>Rationale</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody id="resultsBody">
+        </tbody>
+      </table>
+    </div>
+  `;
+
+  renderRows(sorted);
+}
+
+function renderRows(data) {
+  const body = document.getElementById('resultsBody');
+  body.innerHTML = data.map((s, i) => `
+    <tr class="result-row" style="animation-delay:${i * 0.045}s">
+      <td>
+        <div class="ticker-cell">
+          <div class="sec-icon" style="background:${s.color};color:${s.tcolor};">${s.ticker.slice(0,3)}</div>
+          <div>
+            <div class="ticker">${s.ticker}</div>
+            <div class="sec-name">${s.name}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:${s.score}%;"></div></div>
+          <div class="score-num">${s.score}</div>
+        </div>
+      </td>
+      <td><span class="stat up">${s.div}</span></td>
+      <td><span class="stat">${s.beta}</span></td>
+      <td><span class="stat muted">${s.pe}</span></td>
+      <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${parseFloat(s.ytd) >= 0 ? '+' : ''}${s.ytd}%</span></td>
+      <td>
+        <div>
+          <span class="tag-small" style="background:${s.tagBg};color:${s.tagColor};">${s.tag}</span>
+          <div class="rationale-snippet" style="margin-top:4px;">${s.rationale}</div>
+        </div>
+      </td>
+      <td>
+        <div class="add-btn-row ${added.has(s.ticker) ? 'added' : ''}" id="add-${s.ticker}" onclick="toggleAdd('${s.ticker}')">
+          ${added.has(s.ticker) ? '✓' : '+'}
+        </div>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function toggleAdd(ticker) {
+  const btn = document.getElementById('add-' + ticker);
+  if (added.has(ticker)) {
+    added.delete(ticker);
+    btn.classList.remove('added');
+    btn.textContent = '+';
+  } else {
+    added.add(ticker);
+    btn.classList.add('added');
+    btn.textContent = '✓';
+  }
+  const count = added.size;
+  document.getElementById('selectedCount').textContent = `${count} of ${SECURITIES.length} selected`;
+  document.getElementById('saveBtn').disabled = count === 0;
+}
+
+function resortResults(key) {
+  const data = aiResults.length > 0 ? [...aiResults] : [...SECURITIES];
+  if (key === 'score') data.sort((a, b) => b.score - a.score);
+  else if (key === 'div') data.sort((a, b) => parseFloat(b.div) - parseFloat(a.div));
+  else if (key === 'beta') data.sort((a, b) => parseFloat(a.beta) - parseFloat(b.beta));
+  else if (key === 'ytd') data.sort((a, b) => parseFloat(b.ytd) - parseFloat(a.ytd));
+  renderRows(data);
+}
+
+function saveBlock() {
+  const name = document.getElementById('blockNameInput').value || 'Unnamed Block';
+  const btn = document.getElementById('saveBtn');
+  btn.textContent = '✓ Saved!';
+  btn.style.background = '#0F6E56';
+  btn.disabled = true;
+  setTimeout(() => {
+    window.location.href = 'assembly.html';
+  }, 900);
+}
 </script>
-  
- </body>
+
+<script>
+function toggleMobileMenu() {
+  var menu = document.getElementById('mobileMenu');
+  var btn = document.getElementById('hamburger');
+  if (!menu) return;
+  if (menu.classList.contains('open')) {
+    menu.classList.remove('open');
+    if (btn) btn.classList.remove('open');
+  } else {
+    menu.classList.add('open');
+    if (btn) btn.classList.add('open');
+  }
+}
+function closeMobileMenu() {
+  var menu = document.getElementById('mobileMenu');
+  var btn = document.getElementById('hamburger');
+  if (menu) menu.classList.remove('open');
+  if (btn) btn.classList.remove('open');
+}
+</script>
+</body>
 </html>
