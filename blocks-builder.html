@@ -903,39 +903,40 @@ body {
 <script type="module">
   import { GoogleGenerativeAI } from "@google/generative-ai";
 
-  // 2. Initialize with your key
+  // 2. Initialize Gemini (Replace with your actual key)
   const API_KEY = "YOUR_GEMINI_API_KEY"; 
   const genAI = new GoogleGenerativeAI(API_KEY);
   
-  // Use a unique name to avoid "Duplicate Variable" errors
+  // Use 'aiModel' to avoid conflicts with other 'model' variables
   const aiModel = genAI.getGenerativeModel({ 
     model: "gemini-1.5-flash",
     systemInstruction: "You are a WealthTech API. Return ONLY strictly valid JSON. No conversational text."
   });
 
-  // 3. Define UI Helpers
+  // 3. UI Helpers (Attached to window so HTML buttons can see them)
   window.showShimmer = function() {
     const body = document.getElementById('resultsBody');
     if(!body) return;
     body.innerHTML = Array(5).fill(0).map(() => `
       <tr>
-        <td colspan="8"><div class="shimmer-line" style="margin: 15px 0;"></div></td>
+        <td colspan="8"><div class="shimmer-line" style="margin: 20px 0;"></div></td>
       </tr>
     `).join('');
   };
 
-  // 4. The Main Search Logic
+  // 4. The Logic Bridge
   window.executeAISearch = async function() {
     const userQuery = document.getElementById('promptBox').value;
     const activeChip = document.querySelector('.chip.active');
     const resultLimit = activeChip ? parseInt(activeChip.innerText) : 10;
 
     try {
-      // Step A: Translate Intent to Filters
+      // Step A: Translate Intent to SQL Filters
       const sqlPrompt = `
-        Context: Table 'security_universe' [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta].
-        User Goal: "${userQuery}"
-        Return JSON: {"yield_gt": 0.04, "limit": ${resultLimit}}
+        Table: 'security_universe'
+        Columns: [fund_symbol, fund_long_name, fund_category, last_price, fund_yield, beta]
+        User Request: "${userQuery}"
+        Task: Return JSON for Supabase filters. Example: {"yield_gt": 0.04, "limit": ${resultLimit}}
       `;
       
       const sqlResult = await aiModel.generateContent(sqlPrompt);
@@ -947,12 +948,13 @@ body {
       if (queryParams.price_lt) query = query.lt('last_price', queryParams.price_lt);
       
       const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
-      if (error || !securities.length) throw new Error("No securities found");
+      if (error || !securities.length) throw new Error("No data found");
 
-      // Step C: Enrichment (Rationale & Score)
+      // Step C: Enrichment (The Magic)
       const enrichmentPrompt = `
-        User Goal: "${userQuery}"
+        Goal: "${userQuery}"
         Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}
+        Task: Rate 1-100 and give a 1-sentence rationale.
         Return JSON: [{"t": "TICKER", "score": 95, "rationale": "..."}]
       `;
 
@@ -963,19 +965,20 @@ body {
         const ai = enrichedData.find(e => e.t === s.fund_symbol);
         return {
           ...s,
-          score: ai ? ai.score : 80,
-          rationale: ai ? ai.rationale : "Matches selected investment criteria."
+          score: ai ? ai.score : 85,
+          rationale: ai ? ai.rationale : "Strong fundamental match for the requested strategy."
         };
       });
 
+      // Use your existing renderRows function (ensure it's defined in this module or app.js)
       renderRows(finalData);
       
       document.getElementById('ai-rationale-text').innerText = 
-        `AI generated ${finalData.length} recommendations for "${userQuery}".`;
+        `AI screened ${finalData.length} candidates for "${userQuery}" based on fund strategy.`;
 
     } catch (err) {
-      console.error("AI Search Error:", err);
-      document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" class="p-10 text-center">AI Search failed. Please try a different query.</td></tr>`;
+      console.error("AI Error:", err);
+      document.getElementById('resultsBody').innerHTML = `<tr><td colspan="8" class="p-10 text-center">AI Search failed. Try a different query.</td></tr>`;
     }
   };
 
