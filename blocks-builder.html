@@ -1165,5 +1165,70 @@ function closeMobileMenu() {
 </script>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="js/app.js"></script>
+<script>
+  // 1. Setup Gemini 1.5 Flash
+const genAI = new GoogleGenerativeAI("YOUR_GEMINI_API_KEY");
+const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+async function executeAISearch() {
+  const userQuery = document.getElementById('universe-search').value;
+  const resultLimit = document.getElementById('results-count').value || 10;
+  const assetClass = document.getElementById('asset-class-filter').value;
+
+  // STEP 1: Get SQL Parameters from Gemini
+  const sqlPrompt = `
+    Context: Table 'security_universe' with columns [ticker, name, category, last_price, yield, beta, strategy_text].
+    User Request: "${userQuery}" 
+    Filters: Asset Class: ${assetClass}, Limit: ${resultLimit}.
+    Task: Return ONLY a JSON object with Supabase filter keys (e.g., {"yield": "gt.0.03", "limit": 10}).
+  `;
+  
+  const sqlResult = await model.generateContent(sqlPrompt);
+  const queryParams = JSON.parse(sqlResult.response.text());
+
+  // STEP 2: Fetch from Supabase
+  let { data: securities } = await _supabase
+    .from('security_universe')
+    .select('*')
+    .limit(queryParams.limit || resultLimit);
+    // (Apply other dynamic filters here based on queryParams)
+
+  // STEP 3: Enrich with Rationale and Score
+  const enrichmentPrompt = `
+    Based on the user's goal ("${userQuery}"), evaluate these ${securities.length} securities.
+    For each, provide:
+    1. AI Score (0-100) based on how well it fits the goal.
+    2. A 1-sentence 'Rationale' explaining why.
+    Return as JSON: [{"ticker": "AAPL", "score": 95, "rationale": "..."}]
+  `;
+
+  const enrichmentResult = await model.generateContent(enrichmentPrompt + JSON.stringify(securities));
+  const enrichedData = JSON.parse(enrichmentResult.response.text());
+
+  // Merge and Render
+  const finalData = securities.map(s => ({
+    ...s,
+    ...enrichedData.find(e => e.ticker === s.ticker)
+  }));
+
+  renderRows(finalData); // This updates your existing table
+}
+  // Update your renderRows function inside blocks-builder (1).html
+function renderRows(data) {
+  const container = document.getElementById('security-results');
+  container.innerHTML = data.map(s => `
+    <div class="row-item">
+      <div class="col-ticker">
+        <strong>${s.ticker}</strong>
+        <span class="ai-score-pill ${s.score > 85 ? 'high' : 'med'}">${s.score}% Match</span>
+      </div>
+      <div class="col-name">${s.name}</div>
+      <div class="col-rationale italic text-blue-700">"${s.rationale}"</div>
+      <div class="col-price">$${s.last_price}</div>
+      <button onclick="addToBlock('${s.ticker}')">Add</button>
+    </div>
+  `).join('');
+}
+</script>
 </body>
 </html>
