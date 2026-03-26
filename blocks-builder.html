@@ -892,7 +892,7 @@ body {
   </div>
 </div>
 
-  <script type="importmap">
+<script type="importmap">
   {
     "imports": {
       "@google/generative-ai": "https://esm.run/@google/generative-ai"
@@ -906,6 +906,8 @@ body {
   // 1. Setup & Config
   const API_KEY = "AIzaSyBx8HQWQuqwd3MMeEsmM3IrVFwygKr8OWc"; 
   const genAI = new GoogleGenerativeAI(API_KEY);
+  
+  // FIXED: Explicit 'models/' prefix for the SDK
   const aiModel = genAI.getGenerativeModel({ 
     model: "models/gemini-1.5-flash",
     systemInstruction: "You are a WealthTech API. Return ONLY strictly valid JSON. No conversational text."
@@ -913,7 +915,7 @@ body {
 
   const added = new Set();
 
-  // 2. UI: Render Table Rows (Moved inside module for access)
+  // 2. UI: Render Table Rows (Inside module so AI can call it)
   window.renderRows = function(data) {
     const body = document.getElementById('resultsBody');
     if (!body) return;
@@ -980,7 +982,7 @@ body {
     const resultLimit = activeChip ? parseInt(activeChip.innerText) : 10;
 
     try {
-      const sqlPrompt = `Supabase filter for: "${userQuery}". Columns: [fund_symbol, fund_yield]. JSON: {"yield_gt": 0.03, "limit": ${resultLimit}}`;
+      const sqlPrompt = `Filters for: "${userQuery}". Table: security_universe. Return JSON: {"yield_gt": 0.03, "limit": ${resultLimit}}`;
       const sqlRes = await aiModel.generateContent(sqlPrompt);
       const queryParams = JSON.parse(sqlRes.response.text().replace(/```json|```/g, '').trim());
 
@@ -988,19 +990,19 @@ body {
       if (queryParams.yield_gt) query = query.gt('fund_yield', queryParams.yield_gt);
       
       const { data: securities, error } = await query.limit(queryParams.limit || resultLimit);
-      if (error || !securities?.length) throw new Error("No securities found");
+      if (error || !securities?.length) throw new Error("No matches found.");
 
-      const enrichPrompt = `Goal: "${userQuery}". Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name}))) सौर. JSON array: [{"t": "TICKER", "score": 95, "rationale": "..."}]`;
+      const enrichPrompt = `Goal: "${userQuery}". Data: ${JSON.stringify(securities.map(s => ({t: s.fund_symbol, n: s.fund_short_name})))}. Return JSON: [{"t": "TICKER", "score": 95, "rationale": "..."}]`;
       const enrichRes = await aiModel.generateContent(enrichPrompt);
       const enrichedData = JSON.parse(enrichRes.response.text().replace(/```json|```/g, '').trim());
 
       const finalData = securities.map(s => {
         const ai = enrichedData.find(e => e.t === s.fund_symbol);
-        return { ...s, score: ai ? ai.score : 80, rationale: ai ? ai.rationale : "Matches criteria." };
+        return { ...s, score: ai ? ai.score : 80, rationale: ai ? ai.rationale : "Aligned with strategy." };
       });
 
       window.renderRows(finalData);
-      document.getElementById('ai-rationale-text').innerText = `Screened ${finalData.length} candidates for "${userQuery}".`;
+      document.getElementById('ai-rationale-text').innerText = `Screened ${finalData.length} securities matching "${userQuery}".`;
 
     } catch (err) {
       console.error("AI Error:", err);
@@ -1008,7 +1010,7 @@ body {
     }
   };
 
-  // 5. GLOBAL TRIGGERS (Fixed for onclick access)
+  // 5. ATTACH TO WINDOW (This fixes the ReferenceErrors)
   window.runScreen = async function() {
     const btn = document.getElementById('screenBtn');
     const input = document.getElementById('promptBox');
@@ -1022,22 +1024,21 @@ body {
 
     btn.classList.remove('loading');
     btn.disabled = false;
-    const panel = document.getElementById('rightPanel');
-    if (panel) panel.classList.add('active');
+    document.getElementById('rightPanel').classList.add('active');
   };
 
-  // FIXED: Receives text directly or pulls innerText from the clicked element
+  // FIXED: Logic to grab text instead of the element object
   window.fillPrompt = function(el) {
     const pb = document.getElementById('promptBox');
     if (!pb) return;
-    // If 'el' is a string, use it. If it's an element (from onclick="fillPrompt(this)"), use its text.
+    // If you clicked a div, grab its text. If it's already a string, use it.
     pb.value = (typeof el === 'string') ? el : el.innerText;
   };
 
   window.toggleAdd = function(ticker) {
     if (added.has(ticker)) added.delete(ticker);
     else added.add(ticker);
-    // UI update logic here
+    // UI Refresh logic would go here
   };
 </script>
   
