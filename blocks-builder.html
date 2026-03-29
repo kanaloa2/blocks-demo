@@ -1252,18 +1252,27 @@ const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const TABLE_NAME = 'security_universe';
   
 console.log("Blocks Builder: Connected to live database.");
-  const SQL_SYSTEM_PROMPT = `
-You are a SQL expert for a WealthTech app. 
-The table is named 'securities'. 
-Columns: ticker, name, type, sector, score, div, beta, ytd.
+const SQL_SYSTEM_PROMPT = `
+You are a SQL expert for 'Blocks', a WealthTech platform.
+The database table is named: ${TABLE_NAME}
 
-Task: Translate the user's request into a valid Postgres SQL query.
-Output: Return ONLY a JSON object: {"sql": "SELECT * FROM securities WHERE..."}
+Columns available:
+- ticker (text)
+- name (text)
+- type (text)
+- sector (text)
+- score (numeric)
+- div (text, e.g., '1.5%')
+- beta (text, e.g., '0.85')
+- ytd (text, e.g., '12.4%')
+
+Task: Translate the user's natural language request into a valid PostgreSQL SELECT statement.
+Return ONLY a JSON object: {"sql": "SELECT * FROM security_universe WHERE ..."}
 
 Rules:
-- 'score' is a number (0-100).
-- Use ILIKE for text searches (e.g. sector ILIKE '%technology%').
-- Return all columns (SELECT *).
+1. Always SELECT *
+2. Use ILIKE for case-insensitive text matching (e.g., sector ILIKE '%technology%').
+3. 'score' is a number; use standard operators (>, <, =).
 `;
 </script>
 </body>
