@@ -975,67 +975,64 @@ const API_KEY = 'AIzaSyDJC77cxr1v19iyZKCrMD_NXUhgdQQW-GQ';
 async function runScreen() {
     const promptInput = document.getElementById('promptInput');
     const btn = document.getElementById('screenBtn');
-    const panel = document.getElementById('rightPanel');
     
+    // Find the selected limit chip (10, 20, or 30)
+    const activeLimitChip = document.querySelector('.filter-chip.selected');
+    const limitValue = activeLimitChip ? activeLimitChip.textContent : "10";
+
     if (!promptInput || !btn || btn.disabled) return;
     const prompt = promptInput.value;
-    const limit = document.querySelector('.filter-chip.selected')?.textContent || 10;
+    if (!prompt) return;
 
     btn.disabled = true;
-    btn.classList.add('loading');
-    btn.textContent = 'Generating SQL...';
+    btn.textContent = 'Refining Query...';
 
     try {
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
+        
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: `${SQL_SYSTEM_PROMPT}\n\nRequest: "${prompt}"\nLimit: ${limit}` }] }],
+                contents: [{ 
+                    parts: [{ 
+                        // Explicitly tell the AI the exact limit to use
+                        text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\n\nREQUIRED LIMIT: ${limitValue}` 
+                    }] 
+                }],
                 generationConfig: { responseMimeType: "application/json" }
             })
         });
 
-        // SAFETY CHECK: Handle 503 or other API errors
-        if (!response.ok) throw new Error(`AI Service Busy (Status ${response.status}). Please try again in a moment.`);
+        if (!response.ok) throw new Error("AI Service Busy");
 
         const aiData = await response.json();
+        const { sql } = JSON.parse(aiData.candidates[0].content.parts[0].text);
         
-        // SAFETY CHECK: Ensure the AI actually returned a candidate
-        if (!aiData.candidates || !aiData.candidates[0]) {
-            throw new Error("AI returned an empty response. Try a different prompt.");
-        }
+        console.log("🚀 AI-GENERATED SQL (WITH LIMIT):", sql);
 
-        const parsed = JSON.parse(aiData.candidates[0].content.parts[0].text);
-        const sqlCommand = parsed.sql;
-
-        console.log("🚀 AI-GENERATED SQL:", sqlCommand);
-
-        // EXECUTE VIA SUPABASE
-        const { data: results, error: dbError } = await _supabase.rpc('exec_sql', { query_text: sqlCommand });
+        const { data: results, error: dbError } = await _supabase.rpc('exec_sql', { query_text: sql });
 
         if (dbError) throw dbError;
 
         console.log("✅ SUPABASE RETURNED:", results.length, "rows");
 
-        if (!results || results.length === 0) {
-            panel.innerHTML = `<div class="empty-state">No matches found in your 966 rows for: "${prompt}"</div>`;
-        } else {
+        // UI Update
+        if (results && results.length > 0) {
             aiResults = results;
             showAIResults({
-                blockName: "SQL Bridge Validation",
-                summary: `Successfully generated and executed SQL.`,
-                highlights: `Query: ${sqlCommand}`,
+                blockName: "AI Screen: " + prompt.substring(0, 15),
+                summary: `Successfully executed: ${sql}`,
+                highlights: `Matched ${results.length} rows using ${limitValue} limit.`,
                 securities: results 
             });
         }
 
     } catch (err) {
-        console.error("Validation Failed:", err);
-        alert("System Note: " + err.message);
+        console.error("Screening Error:", err);
+        alert("Error: " + err.message);
     } finally {
         btn.disabled = false;
-        btn.classList.remove('loading');
         btn.textContent = '✦   Screen with AI';
     }
 }
@@ -1221,19 +1218,13 @@ const SQL_SYSTEM_PROMPT = `
 You are a SQL expert for 'Blocks'. The table is: ${TABLE_NAME}
 
 REAL COLUMNS:
-- ticker (text)
-- name (text)
-- category (text) -- Use this for sectors/asset classes
-- type (text) -- e.g., 'ETF', 'Stock'
-- yield (numeric) -- Use this for dividend requests
-- beta (numeric) 
-- ytd_return (numeric) -- Use this for performance requests
-- strategy_text (text) -- Use for thematic searches (e.g., 'innovation', 'defensive')
+- ticker, name, category, type, yield, beta, ytd_return, strategy_text
 
 RULES:
 1. Always SELECT *
-2. Use ILIKE for text matching on 'name', 'category', or 'strategy_text'.
-3. Return ONLY a JSON object: {"sql": "SELECT * FROM security_universe WHERE ..."}
+2. Use ILIKE for text matching.
+3. MANDATORY: You must ALWAYS include a LIMIT clause based on the user's request. If no limit is specified, use LIMIT 10.
+4. Return ONLY JSON: {"sql": "SELECT ... LIMIT X"}
 `;
 </script>
 </body>
