@@ -973,24 +973,33 @@ function getFilters() {
 }
 const API_KEY = 'AIzaSyDJC77cxr1v19iyZKCrMD_NXUhgdQQW-GQ';
 async function runScreen() {
-    const inputEl = document.getElementById('promptInput') || document.getElementById('searchInput');
+    // 1. Setup UI and Inputs
+    const promptInput = document.getElementById('promptBox');
     const btn = document.getElementById('screenBtn');
+    const panel = document.getElementById('rightPanel');
     
-    if (!inputEl || btn.disabled) return;
+    if (!promptInput || !btn || btn.disabled) return;
 
-    const prompt = inputEl.value;
-    if (!prompt) return;
+    const prompt = promptInput.value;
+    if (!prompt) {
+        alert("Please enter a description to screen.");
+        return;
+    }
 
+    // Set Loading State
     btn.disabled = true;
     btn.classList.add('loading');
-    btn.textContent = 'Checking Universe...';
+    btn.textContent = 'Analyzing Universe...';
 
     try {
-        // 1. Fetch Universe from Supabase
-        const { data: universe, error } = await _supabase.from('security_universe').select('*');
-        if (error) throw error;
+        // 2. Fetch the latest Security Universe from Supabase
+        const { data: universe, error: dbError } = await _supabase
+            .from('security_universe')
+            .select('*');
 
-        // 2. Setup AI Call with the 'latest' alias to bypass 404
+        if (dbError) throw new Error("Database Connection Failed: " + dbError.message);
+
+        // 3. Call Gemini using the EXACT alias you provided
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
         
         const apiResponse = await fetch(url, {
@@ -998,30 +1007,44 @@ async function runScreen() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ 
-                    parts: [{ text: `User Request: "${prompt}"\n\nDatabase: ${JSON.stringify(universe.map(s => ({ticker: s.ticker, sector: s.sector, score: s.score})))}\n\nTask: Return JSON object with tickers that match. Format: {"tickers": ["AAPL"]}` }] 
+                    parts: [{ 
+                        text: `User Request: "${prompt}"\n\nData: ${JSON.stringify(universe.map(s => ({ticker: s.ticker, sector: s.sector, score: s.score})))}\n\nTask: Return JSON only. Format: {"tickers": ["AAPL", "MSFT"]}` 
+                    }] 
                 }],
                 generationConfig: { responseMimeType: "application/json" }
             })
         });
 
-        // 3. Robust Error Checking
+        // 4. Robust Error Checking (avoids "Can't find variable" crash)
         if (!apiResponse.ok) {
             const errorData = await apiResponse.json();
-            // If even 'latest' is 429ed, we tell the user
-            if (apiResponse.status === 429) throw new Error("Google is busy (Rate Limit). Try again in 30 seconds.");
-            throw new Error(errorData.error?.message || "AI Connection Failed");
+            throw new Error(errorData.error?.message || `API Error: ${apiResponse.status}`);
         }
 
         const aiData = await apiResponse.json();
-        const matchedTickers = JSON.parse(aiData.candidates[0].content.parts[0].text).tickers;
+        const textResponse = aiData.candidates[0].content.parts[0].text;
         
-        // 4. Filter and Render
+        // Parse the tickers selected by the AI
+        const parsed = JSON.parse(textResponse);
+        const matchedTickers = parsed.tickers || [];
+
+        // 5. Filter the universe and Update UI
         aiResults = universe.filter(s => matchedTickers.includes(s.ticker));
-        renderRows(aiResults);
+        
+        if (aiResults.length === 0) {
+            panel.innerHTML = `<div class="empty-state"><div class="empty-title">No matches found</div><div class="empty-sub">Try broadening your criteria.</div></div>`;
+        } else {
+            showAIResults({
+                blockName: "AI Screen: " + prompt.substring(0, 20) + "...",
+                summary: `Found ${aiResults.length} securities matching your criteria.`,
+                highlights: "Ranked by AI relevance.",
+                securities: aiResults
+            });
+        }
 
     } catch (err) {
-        console.error("Screening Error:", err);
-        alert(err.message);
+        console.error("Detailed Screen Error:", err);
+        alert("Screening Error: " + err.message);
     } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
