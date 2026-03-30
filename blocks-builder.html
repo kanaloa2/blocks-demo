@@ -975,73 +975,57 @@ const API_KEY = 'AIzaSyDJC77cxr1v19iyZKCrMD_NXUhgdQQW-GQ';
 async function runScreen() {
     const promptInput = document.getElementById('promptInput');
     const btn = document.getElementById('screenBtn');
-    const panel = document.getElementById('rightPanel');
-    
-    // Get the limit from the selected filter chip (default to 10)
-    const limitChip = document.querySelector('.filter-section .filter-row:last-child .filter-chip.selected');
-    const limit = limitChip ? limitChip.textContent : 10;
     
     if (!promptInput || !btn || btn.disabled) return;
     const prompt = promptInput.value;
-    if (!prompt) return;
+    const limit = document.querySelector('.filter-chip.selected')?.textContent || 10;
 
     btn.disabled = true;
-    btn.classList.add('loading');
-
-    let sqlCommand = "";
+    btn.textContent = 'Mapping Prompt...';
 
     try {
-        // 1. GET SQL FROM GEMINI
+        // 1. GET THE SQL COMMAND
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
-        const aiResponse = await fetch(url, {
+        const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ 
-                    parts: [{ 
-                        text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\n\nConstraint: Include LIMIT ${limit}. Return JSON only: {"sql": "SELECT..."}` 
-                    }] 
-                }],
+                contents: [{ parts: [{ text: `${SQL_SYSTEM_PROMPT}\n\nRequest: "${prompt}"\n\nLimit to ${limit} results.` }] }],
                 generationConfig: { responseMimeType: "application/json" }
             })
         });
 
-        const aiData = await aiResponse.json();
-        const parsed = JSON.parse(aiData.candidates[0].content.parts[0].text);
-        sqlCommand = parsed.sql;
+        const data = await response.json();
+        const { sql } = JSON.parse(data.candidates[0].content.parts[0].text);
+        
+        console.log("🚀 AI VALIDATION - SQL Generated:", sql);
 
-        console.log("🚀 AI-GENERATED SQL:", sqlCommand);
+        // 2. EXECUTE ON SUPABASE
+        // Note: You must have created the 'exec_sql' function in your Supabase SQL Editor
+        const { data: results, error } = await _supabase.rpc('exec_sql', { query_text: sql });
 
-        // 2. EXECUTE SQL VIA SUPABASE RPC
-        // We use the 'exec_sql' function we created in Step 1
-        const { data: results, error: dbError } = await _supabase
-            .rpc('exec_sql', { query_text: sqlCommand });
+        if (error) throw error;
 
-        if (dbError) throw dbError;
+        console.log("✅ DB VALIDATION - Rows Found:", results.length);
 
-        console.log("✅ SUPABASE RETURNED:", results.length, "rows");
-
-        // 3. RENDER
-        if (!results || results.length === 0) {
-            panel.innerHTML = `<div class="empty-state">No matches found for that query.</div>`;
-        } else {
-            // Store results globally for sorting/saving
-            aiResults = results; 
-            
+        // 3. SHOW RESULTS
+        if (results && results.length > 0) {
+            aiResults = results; // Update global state
             showAIResults({
-                blockName: "AI Screen: " + prompt.substring(0, 15),
-                summary: `SQL Query: ${sqlCommand}`,
-                highlights: `Successfully queried 966 rows. Returned ${results.length} matches.`,
+                blockName: "Screen: " + prompt.substring(0, 15),
+                summary: `Successfully queried 966 securities using generated SQL.`,
+                highlights: `Query used: ${sql}`,
                 securities: results 
             });
+        } else {
+            alert("No matches found in the 966 rows for: " + prompt);
         }
 
     } catch (err) {
-        console.error("Validation Failed:", err);
-        alert("SQL Execution Error: " + err.message);
+        console.error("Bridge Error:", err);
+        alert("Validation Failed: " + err.message);
     } finally {
         btn.disabled = false;
-        btn.classList.remove('loading');
         btn.textContent = '✦   Screen with AI';
     }
 }
@@ -1154,36 +1138,23 @@ function renderRows(data) {
   if (!body) return;
 
   body.innerHTML = data.map((s, i) => `
-    <tr class="result-row" style="animation-delay:${i * 0.045}s">
+    <tr class="result-row" style="animation-delay:${i * 0.05}s">
       <td>
         <div class="ticker-cell">
-          <div class="sec-icon" style="background:#534AB7; color:white;">${(s.ticker || '???').slice(0,3)}</div>
-          <div>
-            <div class="ticker">${s.ticker}</div>
-            <div class="sec-name">${s.name || ''}</div>
-          </div>
+          <div class="sec-icon" style="background:#EEEDFE; color:#534AB7;">${(s.ticker || '???').slice(0,3)}</div>
+          <div><div class="ticker">${s.ticker}</div><div class="sec-name">${s.name || ''}</div></div>
         </div>
       </td>
-      <td>
-        <div class="score-bar-wrap">
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:${s.score || 0}%;"></div></div>
-          <div class="score-num">${s.score || 0}</div>
-        </div>
-      </td>
-      <td><span class="stat up">${s.div || '0%'}</span></td>
-      <td><span class="stat">${s.beta || '1.0'}</span></td>
-      <td><span class="stat muted">${s.pe || '-'}</span></td>
-      <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${s.ytd || '0'}%</span></td>
-      <td>
-        <div class="rationale-snippet">Based on ${s.sector} profile and score of ${s.score}.</div>
-      </td>
-      <td>
-        <div class="add-btn-row" onclick="toggleAdd('${s.ticker}')">+</div>
-      </td>
+      <td><div class="score-num">${s.score || 0}</div></td>
+      <td><span class="stat up">${s.yield || 0}%</span></td>
+      <td><span class="stat">${s.beta || 1}</span></td>
+      <td><span class="stat muted">${s.expense_ratio || '-'}</span></td>
+      <td><span class="stat ${parseFloat(s.ytd_return) >= 0 ? 'up' : 'down'}">${s.ytd_return || 0}%</span></td>
+      <td><div class="rationale-snippet">${s.category || 'Portfolio Candidate'}</div></td>
+      <td><div class="add-btn-row" onclick="toggleAdd('${s.ticker}')">+</div></td>
     </tr>
   `).join('');
 }
-
 function toggleAdd(ticker) {
   const btn = document.getElementById('add-' + ticker);
   if (added.has(ticker)) {
@@ -1252,26 +1223,23 @@ const TABLE_NAME = 'security_universe';
   
 console.log("Blocks Builder: Connected to live database.");
 const SQL_SYSTEM_PROMPT = `
-You are a SQL expert for 'Blocks', a WealthTech platform.
-The database table is named: ${TABLE_NAME}
+You are a SQL expert for 'Blocks'. The table is: ${TABLE_NAME}
 
-Columns available:
+COLUMNS:
 - ticker (text)
 - name (text)
-- type (text)
-- sector (text)
-- score (numeric)
-- div (text, e.g., '1.5%')
-- beta (text, e.g., '0.85')
-- ytd (text, e.g., '12.4%')
+- category (text) -- Use this for sectors/asset classes
+- type (text) -- e.g., 'ETF', 'Stock'
+- yield (numeric) -- Dividend yield (e.g., 2.5)
+- beta (numeric) -- Risk measure (e.g., 0.95)
+- ytd_return (numeric) -- Year-to-date performance
+- strategy_text (text) -- Deep description of the security
 
-Task: Translate the user's natural language request into a valid PostgreSQL SELECT statement.
-Return ONLY a JSON object: {"sql": "SELECT * FROM security_universe WHERE ..."}
-
-Rules:
+RULES:
 1. Always SELECT *
-2. Use ILIKE for case-insensitive text matching (e.g., sector ILIKE '%technology%').
-3. 'score' is a number; use standard operators (>, <, =).
+2. Use ILIKE for text matching on 'name', 'category', or 'strategy_text'.
+3. For "Energy", query: WHERE category ILIKE '%Energy%' OR strategy_text ILIKE '%Energy%'
+4. Return ONLY JSON: {"sql": "SELECT..."}
 `;
 </script>
 </body>
