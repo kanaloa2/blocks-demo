@@ -1003,131 +1003,113 @@ function getFilters() {
 }
 const API_KEY = 'AIzaSyCuH5Knch4jajliKp__-Yv_jQtW8poTmyA';
 async function runScreen() {
-    // 1. SELECT UI ELEMENTS
     const promptInput = document.getElementById('promptInput');
     const btn = document.getElementById('screenBtn');
     const panel = document.getElementById('rightPanel');
     
-    // Get the value from your existing limit chips (10, 20, or 30)
+    // 1. Get Limit from UI (Ensuring it's a number)
     const limitChips = document.querySelectorAll('.filter-row:last-child .filter-chip.selected');
-let limitValue = limitChips.length > 0 ? limitChips[0].textContent : "10";
-
-// Force it to be a number just in case
-limitValue = parseInt(limitValue);
-if (isNaN(limitValue)) limitValue = 10;
+    let limitValue = limitChips.length > 0 ? limitChips[0].textContent : "10";
+    limitValue = parseInt(limitValue) || 10;
 
     if (!promptInput || !btn || btn.disabled) return;
     const prompt = promptInput.value;
-    if (!prompt) {
-        alert("Please enter a prompt to screen the universe.");
-        return;
-    }
+    if (!prompt) return;
 
-    // 2. SET LOADING STATE
     btn.disabled = true;
     btn.classList.add('loading');
-    btn.textContent = '✦ Analyzing...';
+    btn.textContent = '✦ Analyzing Universe...';
 
     try {
-        // 3. FETCH SQL FROM GEMINI
+        // --- STAGE 1: GENERATE THE SQL ---
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
         
-        const response = await fetch(url, {
+        const sqlResponse = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ 
-                    parts: [{ 
-                        text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\n\nREQUIRED LIMIT: ${limitValue}` 
-                    }] 
+                    parts: [{ text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\nREQUIRED LIMIT: ${limitValue}` }] 
                 }],
                 generationConfig: { responseMimeType: "application/json" }
             })
         });
 
-        // 4. HANDLE RATE LIMITING (429)
-        if (response.status === 429) {
-            btn.textContent = '✦ AI Cooling Down...';
-            const msg = "Blocks is on the AI Free Tier. Please wait 30s for the rate limit to reset.";
-            console.warn(msg);
-            alert(msg);
-
-            setTimeout(() => {
-                btn.disabled = false;
-                btn.classList.remove('loading');
-                btn.textContent = '✦ Screen with AI';
-            }, 30000); 
-            return; 
+        if (sqlResponse.status === 429) {
+            alert("Rate limit hit. Please wait 30s.");
+            return;
         }
 
-        if (!response.ok) {
-            throw new Error(`AI Gateway Error: ${response.status}`);
-        }
+        const sqlData = await sqlResponse.json();
+        const parsedSql = JSON.parse(sqlData.candidates[0].content.parts[0].text);
+        const sqlCommand = parsedSql.sql;
 
-        // 5. PARSE AI RESPONSE
-        const aiData = await response.json();
-        if (!aiData.candidates || !aiData.candidates[0]) {
-            throw new Error("AI returned an empty response. Try rephrasing your request.");
-        }
+        console.log("🚀 STAGE 1 (SQL):", sqlCommand);
 
-        const cleanJsonText = aiData.candidates[0].content.parts[0].text;
-        const parsedData = JSON.parse(cleanJsonText);
-        const sqlCommand = parsedData.sql;
-
-        console.log("🚀 AI-GENERATED SQL:", sqlCommand);
-
-// 6. EXECUTE VIA SUPABASE RPC
+        // --- STAGE 2: EXECUTE ON SUPABASE ---
         let { data: results, error: dbError } = await _supabase.rpc('exec_sql', { 
             query_text: sqlCommand 
         });
 
-        // --- IMPROVED SMART FALLBACK ---
-if (!dbError && (!results || results.length === 0)) {
-    console.log("Zero results for strict query. Attempting fuzzy fallback...");
-    
-    // Clean the prompt to get a single keyword
-    const firstWord = prompt.split(' ')[0].replace(/[^a-zA-Z]/g, ''); 
-    
-    // Ensure limitValue is a clean number for the SQL string
-    const safeLimit = parseInt(limitValue) || 10;
-    
-    const fallbackQuery = `SELECT * FROM security_universe WHERE name ILIKE '%${firstWord}%' OR category ILIKE '%${firstWord}%' LIMIT ${safeLimit}`;
-    
-    console.log("🚀 FIXED FALLBACK SQL:", fallbackQuery);
-    
-    const fallbackResponse = await _supabase.rpc('exec_sql', { query_text: fallbackQuery });
-    results = fallbackResponse.data;
-}
+        // Smart Fallback if zero results
+        if (!dbError && (!results || results.length === 0)) {
+            const firstWord = prompt.split(' ')[0].replace(/[^a-zA-Z]/g, ''); 
+            const fallbackQuery = `SELECT * FROM security_universe WHERE name ILIKE '%${firstWord}%' OR category ILIKE '%${firstWord}%' LIMIT ${limitValue}`;
+            const fallback = await _supabase.rpc('exec_sql', { query_text: fallbackQuery });
+            results = fallback.data;
+        }
 
         if (dbError) throw dbError;
 
-        // 7. RENDER
+        // --- STAGE 3: GENERATE THE HUMAN NARRATIVE (PURPLE CARD) ---
+        // This is what makes it look like the original demo!
+        let narrativeSummary = `Found ${results.length} candidates matching your criteria.`;
+        
+        try {
+            const narrativeResponse = await fetch(url, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    contents: [{ 
+                        parts: [{ 
+                            text: `You are a high-end investment analyst. 
+                            The user asked for: "${prompt}"
+                            We found: ${results.length} securities in the database.
+                            
+                            Write a 2-sentence summary for the results card.
+                            DO NOT mention SQL, databases, or code.
+                            Example: "Found 10 candidates matching your criteria for defensive income. Ranked by AI score weighing dividend reliability and historical volatility."
+                            Current results include tickers like: ${results.slice(0,3).map(r => r.ticker).join(', ')}.`
+                        }] 
+                    }]
+                })
+            });
+            const narrativeData = await narrativeResponse.json();
+            narrativeSummary = narrativeData.candidates[0].content.parts[0].text;
+        } catch (e) {
+            console.warn("Narrative generation failed, using default.");
+        }
+
+        // --- STAGE 4: RENDER TO UI ---
         if (!results || results.length === 0) {
-            panel.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-title">No matches found</div>
-                    <div class="empty-sub">We couldn't find matches for "${prompt}". Try a simpler term like "Technology" or "Income".</div>
-                </div>`;
+            panel.innerHTML = `<div class="empty-state">No matches found for "${prompt}".</div>`;
         } else {
-            aiResults = results; 
+            aiResults = results; // Set global state
             showAIResults({
-                blockName: "AI Screen: " + (prompt.length > 20 ? prompt.substring(0,20) : prompt),
-                summary: `Successfully executed: ${sqlCommand}`,
-                highlights: `Filtered 966 rows. ${results.length > 0 ? 'Found matches.' : 'No direct matches.'}`,
+                blockName: "AI Screen: " + (prompt.length > 25 ? prompt.substring(0, 25) + "..." : prompt),
+                summary: narrativeSummary,
+                highlights: "Review and add to your portfolio block below.",
                 securities: results 
             });
         }
 
     } catch (err) {
-        console.error("Screening Failure:", err);
-        alert("System Note: " + err.message);
+        console.error("Full System Error:", err);
+        alert("Error: " + err.message);
     } finally {
-        // Reset button if we didn't enter the 429 timeout block
-        if (btn.textContent !== '✦ AI Cooling Down...') {
-            btn.disabled = false;
-            btn.classList.remove('loading');
-            btn.textContent = '✦ Screen with AI';
-        }
+        btn.disabled = false;
+        btn.classList.remove('loading');
+        btn.textContent = '✦ Screen with AI';
     }
 }
   
