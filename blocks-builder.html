@@ -973,21 +973,29 @@ function getFilters() {
 }
 const API_KEY = 'AIzaSyCuH5Knch4jajliKp__-Yv_jQtW8poTmyA';
 async function runScreen() {
+    // 1. SELECT UI ELEMENTS
     const promptInput = document.getElementById('promptInput');
     const btn = document.getElementById('screenBtn');
+    const panel = document.getElementById('rightPanel');
     
-    // Find the selected limit chip (10, 20, or 30)
+    // Get the value from your existing limit chips (10, 20, or 30)
     const activeLimitChip = document.querySelector('.filter-chip.selected');
     const limitValue = activeLimitChip ? activeLimitChip.textContent : "10";
 
     if (!promptInput || !btn || btn.disabled) return;
     const prompt = promptInput.value;
-    if (!prompt) return;
+    if (!prompt) {
+        alert("Please enter a prompt to screen the universe.");
+        return;
+    }
 
+    // 2. SET LOADING STATE
     btn.disabled = true;
-    btn.textContent = 'Refining Query...';
+    btn.classList.add('loading');
+    btn.textContent = '✦ Analyzing...';
 
     try {
+        // 3. FETCH SQL FROM GEMINI
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
         
         const response = await fetch(url, {
@@ -996,7 +1004,6 @@ async function runScreen() {
             body: JSON.stringify({
                 contents: [{ 
                     parts: [{ 
-                        // Explicitly tell the AI the exact limit to use
                         text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\n\nREQUIRED LIMIT: ${limitValue}` 
                     }] 
                 }],
@@ -1004,36 +1011,76 @@ async function runScreen() {
             })
         });
 
-        if (!response.ok) throw new Error("AI Service Busy");
+        // 4. HANDLE RATE LIMITING (429)
+        if (response.status === 429) {
+            btn.textContent = '✦ AI Cooling Down...';
+            const msg = "Blocks is on the AI Free Tier. Please wait 30s for the rate limit to reset.";
+            console.warn(msg);
+            alert(msg);
 
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.classList.remove('loading');
+                btn.textContent = '✦ Screen with AI';
+            }, 30000); 
+            return; 
+        }
+
+        if (!response.ok) {
+            throw new Error(`AI Gateway Error: ${response.status}`);
+        }
+
+        // 5. PARSE AI RESPONSE
         const aiData = await response.json();
-        const { sql } = JSON.parse(aiData.candidates[0].content.parts[0].text);
-        
-        console.log("🚀 AI-GENERATED SQL (WITH LIMIT):", sql);
+        if (!aiData.candidates || !aiData.candidates[0]) {
+            throw new Error("AI returned an empty response. Try rephrasing your request.");
+        }
 
-        const { data: results, error: dbError } = await _supabase.rpc('exec_sql', { query_text: sql });
+        const cleanJsonText = aiData.candidates[0].content.parts[0].text;
+        const parsedData = JSON.parse(cleanJsonText);
+        const sqlCommand = parsedData.sql;
+
+        console.log("🚀 AI-GENERATED SQL:", sqlCommand);
+
+        // 6. EXECUTE VIA SUPABASE RPC
+        // Ensure you have run the 'create function exec_sql...' in your Supabase SQL Editor
+        const { data: results, error: dbError } = await _supabase.rpc('exec_sql', { 
+            query_text: sqlCommand 
+        });
 
         if (dbError) throw dbError;
 
         console.log("✅ SUPABASE RETURNED:", results.length, "rows");
 
-        // UI Update
-        if (results && results.length > 0) {
-            aiResults = results;
+        // 7. RENDER RESULTS
+        if (!results || results.length === 0) {
+            panel.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-title">No matches in your universe</div>
+                    <div class="empty-sub">The query "${prompt}" returned 0 results. Try broadening your criteria.</div>
+                </div>`;
+        } else {
+            // Store results globally for other functions (like 'Add to Portfolio')
+            aiResults = results; 
+
             showAIResults({
-                blockName: "AI Screen: " + prompt.substring(0, 15),
-                summary: `Successfully executed: ${sql}`,
-                highlights: `Matched ${results.length} rows using ${limitValue} limit.`,
+                blockName: "AI Screen: " + (prompt.length > 20 ? prompt.substring(0, 20) + "..." : prompt),
+                summary: `SQL Query: ${sqlCommand}`,
+                highlights: `Scanned 966 securities. Found ${results.length} matches within the ${limitValue} result limit.`,
                 securities: results 
             });
         }
 
     } catch (err) {
-        console.error("Screening Error:", err);
-        alert("Error: " + err.message);
+        console.error("Screening Failure:", err);
+        alert("System Note: " + err.message);
     } finally {
-        btn.disabled = false;
-        btn.textContent = '✦   Screen with AI';
+        // Reset button if we didn't enter the 429 timeout block
+        if (btn.textContent !== '✦ AI Cooling Down...') {
+            btn.disabled = false;
+            btn.classList.remove('loading');
+            btn.textContent = '✦ Screen with AI';
+        }
     }
 }
   
