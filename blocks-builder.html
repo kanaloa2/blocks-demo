@@ -1026,7 +1026,10 @@ async function runScreen() {
         const parsed = JSON.parse(textResponse);
         const matchedTickers = parsed.tickers || [];
 
-        aiResults = universe.filter(s => matchedTickers.includes(s.ticker));
+        // Use a case-insensitive check to find matches in your universe
+      aiResults = universe.filter(s => 
+          matchedTickers.some(t => t.toUpperCase() === s.ticker.toUpperCase())
+        );
         
         if (aiResults.length === 0) {
             panel.innerHTML = `<div class="empty-state"><div class="empty-title">No matches found</div><div class="empty-sub">Try broadening your criteria.</div></div>`;
@@ -1158,40 +1161,52 @@ function showResults() {
 
 function renderRows(data) {
   const body = document.getElementById('resultsBody');
-  body.innerHTML = data.map((s, i) => `
-    <tr class="result-row" style="animation-delay:${i * 0.045}s">
-      <td>
-        <div class="ticker-cell">
-          <div class="sec-icon" style="background:${s.color};color:${s.tcolor};">${s.ticker.slice(0,3)}</div>
-          <div>
-            <div class="ticker">${s.ticker}</div>
-            <div class="sec-name">${s.name}</div>
+  if (!body) return;
+
+  body.innerHTML = data.map((s, i) => {
+    // Fallbacks for data missing from the Supabase table
+    const rowColor = s.color || '#EEEDFE'; 
+    const textColor = s.tcolor || '#534AB7';
+    const tagText = s.tag || 'AI Match';
+    const rationaleText = s.rationale || `Strong match for your criteria in the ${s.sector} sector.`;
+
+    return `
+      <tr class="result-row" style="animation-delay:${i * 0.045}s">
+        <td>
+          <div class="ticker-cell">
+            <div class="sec-icon" style="background:${rowColor};color:${textColor};">
+              ${(s.ticker || '???').slice(0,3)}
+            </div>
+            <div>
+              <div class="ticker">${s.ticker}</div>
+              <div class="sec-name">${s.name || ''}</div>
+            </div>
           </div>
-        </div>
-      </td>
-      <td>
-        <div class="score-bar-wrap">
-          <div class="score-bar-track"><div class="score-bar-fill" style="width:${s.score}%;"></div></div>
-          <div class="score-num">${s.score}</div>
-        </div>
-      </td>
-      <td><span class="stat up">${s.div}</span></td>
-      <td><span class="stat">${s.beta}</span></td>
-      <td><span class="stat muted">${s.pe}</span></td>
-      <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${parseFloat(s.ytd) >= 0 ? '+' : ''}${s.ytd}%</span></td>
-      <td>
-        <div>
-          <span class="tag-small" style="background:${s.tagBg};color:${s.tagColor};">${s.tag}</span>
-          <div class="rationale-snippet" style="margin-top:4px;">${s.rationale}</div>
-        </div>
-      </td>
-      <td>
-        <div class="add-btn-row ${added.has(s.ticker) ? 'added' : ''}" id="add-${s.ticker}" onclick="toggleAdd('${s.ticker}')">
-          ${added.has(s.ticker) ? '✓' : '+'}
-        </div>
-      </td>
-    </tr>
-  `).join('');
+        </td>
+        <td>
+          <div class="score-bar-wrap">
+            <div class="score-bar-track"><div class="score-bar-fill" style="width:${s.score}%;"></div></div>
+            <div class="score-num">${s.score}</div>
+          </div>
+        </td>
+        <td><span class="stat up">${s.div || '0%'}</span></td>
+        <td><span class="stat">${s.beta || '1.0'}</span></td>
+        <td><span class="stat muted">${s.pe || '-'}</span></td>
+        <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${parseFloat(s.ytd) >= 0 ? '+' : ''}${s.ytd || '0'}%</span></td>
+        <td>
+          <div>
+            <span class="tag-small" style="background: var(--purple-lt); color: var(--purple);">${tagText}</span>
+            <div class="rationale-snippet" style="margin-top:4px;">${rationaleText}</div>
+          </div>
+        </td>
+        <td>
+          <div class="add-btn-row ${added.has(s.ticker) ? 'added' : ''}" id="add-${s.ticker}" onclick="toggleAdd('${s.ticker}')">
+            ${added.has(s.ticker) ? '✓' : '+'}
+          </div>
+        </td>
+      </tr>
+    `;
+  }).join('');
 }
 
 function toggleAdd(ticker) {
