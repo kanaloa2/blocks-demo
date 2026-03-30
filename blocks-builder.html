@@ -973,8 +973,8 @@ function getFilters() {
 }
 const API_KEY = 'AIzaSyDJC77cxr1v19iyZKCrMD_NXUhgdQQW-GQ';
 async function runScreen() {
-    // 1. Setup UI and Inputs
-    const promptInput = document.getElementById('promptInput');
+    // 1. Setup UI and Inputs - CHANGED 'promptBox' to 'promptInput' to match your HTML
+    const promptInput = document.getElementById('promptInput'); 
     const btn = document.getElementById('screenBtn');
     const panel = document.getElementById('rightPanel');
     
@@ -999,7 +999,7 @@ async function runScreen() {
 
         if (dbError) throw new Error("Database Connection Failed: " + dbError.message);
 
-        // 3. Call Gemini using the EXACT alias you provided
+        // 3. Call Gemini
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
         
         const apiResponse = await fetch(url, {
@@ -1015,7 +1015,6 @@ async function runScreen() {
             })
         });
 
-        // 4. Robust Error Checking (avoids "Can't find variable" crash)
         if (!apiResponse.ok) {
             const errorData = await apiResponse.json();
             throw new Error(errorData.error?.message || `API Error: ${apiResponse.status}`);
@@ -1024,16 +1023,15 @@ async function runScreen() {
         const aiData = await apiResponse.json();
         const textResponse = aiData.candidates[0].content.parts[0].text;
         
-        // Parse the tickers selected by the AI
         const parsed = JSON.parse(textResponse);
         const matchedTickers = parsed.tickers || [];
 
-        // 5. Filter the universe and Update UI
         aiResults = universe.filter(s => matchedTickers.includes(s.ticker));
         
         if (aiResults.length === 0) {
             panel.innerHTML = `<div class="empty-state"><div class="empty-title">No matches found</div><div class="empty-sub">Try broadening your criteria.</div></div>`;
         } else {
+            // This function creates the element with id="resultsBody"
             showAIResults({
                 blockName: "AI Screen: " + prompt.substring(0, 20) + "...",
                 summary: `Found ${aiResults.length} securities matching your criteria.`,
@@ -1048,7 +1046,7 @@ async function runScreen() {
     } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
-        btn.textContent = 'Run Screen';
+        btn.textContent = '✦   Screen with AI'; // Restored original text
     }
 }
   
