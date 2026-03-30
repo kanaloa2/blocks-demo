@@ -1052,20 +1052,22 @@ if (isNaN(limitValue)) limitValue = 10;
         });
 
         // --- IMPROVED SMART FALLBACK ---
-        if (!dbError && (!results || results.length === 0)) {
-            console.log("Zero results for strict query. Attempting fuzzy fallback...");
-            
-            // Take the first word of the prompt (e.g., "Dividend")
-            const firstWord = prompt.split(' ')[0].replace(/[^a-zA-Z]/g, ''); 
-            
-            // Simpler fallback query: just search name or category for that first keyword
-            const fallbackQuery = `SELECT * FROM security_universe WHERE name ILIKE '%${firstWord}%' OR category ILIKE '%${firstWord}%' OR strategy_text ILIKE '%${firstWord}%' LIMIT ${limitValue}`;
-            
-            console.log("🚀 FALLBACK SQL:", fallbackQuery);
-            
-            const fallbackResponse = await _supabase.rpc('exec_sql', { query_text: fallbackQuery });
-            results = fallbackResponse.data;
-        }
+if (!dbError && (!results || results.length === 0)) {
+    console.log("Zero results for strict query. Attempting fuzzy fallback...");
+    
+    // Clean the prompt to get a single keyword
+    const firstWord = prompt.split(' ')[0].replace(/[^a-zA-Z]/g, ''); 
+    
+    // Ensure limitValue is a clean number for the SQL string
+    const safeLimit = parseInt(limitValue) || 10;
+    
+    const fallbackQuery = `SELECT * FROM security_universe WHERE name ILIKE '%${firstWord}%' OR category ILIKE '%${firstWord}%' LIMIT ${safeLimit}`;
+    
+    console.log("🚀 FIXED FALLBACK SQL:", fallbackQuery);
+    
+    const fallbackResponse = await _supabase.rpc('exec_sql', { query_text: fallbackQuery });
+    results = fallbackResponse.data;
+}
 
         if (dbError) throw dbError;
 
