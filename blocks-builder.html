@@ -1031,13 +1031,16 @@ async function runScreen() {
         if (aiResults.length === 0) {
             panel.innerHTML = `<div class="empty-state"><div class="empty-title">No matches found</div><div class="empty-sub">Try broadening your criteria.</div></div>`;
         } else {
-            // This function creates the element with id="resultsBody"
+            // 1. Create the table shell FIRST
             showAIResults({
                 blockName: "AI Screen: " + prompt.substring(0, 20) + "...",
                 summary: `Found ${aiResults.length} securities matching your criteria.`,
                 highlights: "Ranked by AI relevance.",
-                securities: aiResults
+                securities: aiResults // Passing the data here
             });
+            
+            // 2. NOW call renderRows to fill that specific shell
+            renderRows(aiResults);
         }
 
     } catch (err) {
@@ -1050,68 +1053,48 @@ async function runScreen() {
     }
 }
   
-function showAIResults(result) {
+function showAIResults(data) {
   const panel = document.getElementById('rightPanel');
-  added = new Set();
-  resultsShown = true;
-
-  const sorted = [...result.securities].sort((a, b) => b.score - a.score);
-  aiResults = sorted;
+  if (!panel) return;
 
   panel.innerHTML = `
-    <div class="block-name-row">
-      <input class="block-name-input" id="blockNameInput" placeholder="Name this block…" value="${result.blockName || 'AI Screened Block'}">
-      <span class="selected-count" id="selectedCount">0 of ${sorted.length} selected</span>
-    </div>
-
-    <div class="ai-rationale">
-      <div class="ai-spark">✦</div>
-      <div class="ai-text">
-        ${result.summary} <strong>${result.highlights}</strong> Review and add to your block below.
+    <div class="block-card animate-in">
+      <div class="block-header">
+        <div>
+          <div class="block-label">AI GENERATED BLOCK</div>
+          <div class="block-title">${data.blockName}</div>
+        </div>
+        <div class="add-all-btn" onclick="addAll('${data.blockName}')">+ Add Block to Portfolio</div>
       </div>
-    </div>
-
-    <div class="results-header">
-      <div>
-        <div class="results-title">Screening Results</div>
-        <div class="results-meta">${sorted.length} securities · sorted by AI score</div>
+      <div class="block-meta">
+        <div class="meta-item"><strong>Summary:</strong> ${data.summary}</div>
+        <div class="meta-item"><strong>AI Insight:</strong> ${data.highlights}</div>
       </div>
-      <div class="results-actions">
-        <select class="sort-sel" onchange="resortResults(this.value)">
-          <option value="score">Sort: AI Score</option>
-          <option value="div">Sort: Dividend Yield</option>
-          <option value="beta">Sort: Beta (low→high)</option>
-          <option value="ytd">Sort: YTD Return</option>
-        </select>
-        <button class="save-btn" id="saveBtn" onclick="saveBlock()" disabled>
-          Save Block
-        </button>
+      <div class="table-container">
+        <table class="results-table">
+          <thead>
+            <tr>
+              <th>Security</th>
+              <th>Quality Score</th>
+              <th>Div Yield</th>
+              <th>Beta</th>
+              <th>P/E</th>
+              <th>YTD</th>
+              <th>AI Rationale</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="resultsBody">
+            </tbody>
+        </table>
       </div>
-    </div>
-
-    <div class="results-table-wrap">
-      <table class="results-table">
-        <thead>
-          <tr>
-            <th style="width:180px;">Security</th>
-            <th>AI Score</th>
-            <th>Div Yield</th>
-            <th>Beta</th>
-            <th>P/E</th>
-            <th>YTD</th>
-            <th>Rationale</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody id="resultsBody">
-        </tbody>
-      </table>
     </div>
   `;
-
-  renderRows(sorted);
+  
+  // Important: We call renderRows AFTER setting the innerHTML above
+  renderRows(data.securities);
 }
-
+  
 function showResults() {
   const panel = document.getElementById('rightPanel');
   added = new Set();
