@@ -975,57 +975,67 @@ const API_KEY = 'AIzaSyDJC77cxr1v19iyZKCrMD_NXUhgdQQW-GQ';
 async function runScreen() {
     const promptInput = document.getElementById('promptInput');
     const btn = document.getElementById('screenBtn');
+    const panel = document.getElementById('rightPanel');
     
     if (!promptInput || !btn || btn.disabled) return;
     const prompt = promptInput.value;
     const limit = document.querySelector('.filter-chip.selected')?.textContent || 10;
 
     btn.disabled = true;
-    btn.textContent = 'Mapping Prompt...';
+    btn.classList.add('loading');
+    btn.textContent = 'Generating SQL...';
 
     try {
-        // 1. GET THE SQL COMMAND
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
         const response = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                contents: [{ parts: [{ text: `${SQL_SYSTEM_PROMPT}\n\nRequest: "${prompt}"\n\nLimit to ${limit} results.` }] }],
+                contents: [{ parts: [{ text: `${SQL_SYSTEM_PROMPT}\n\nRequest: "${prompt}"\nLimit: ${limit}` }] }],
                 generationConfig: { responseMimeType: "application/json" }
             })
         });
 
-        const data = await response.json();
-        const { sql } = JSON.parse(data.candidates[0].content.parts[0].text);
+        // SAFETY CHECK: Handle 503 or other API errors
+        if (!response.ok) throw new Error(`AI Service Busy (Status ${response.status}). Please try again in a moment.`);
+
+        const aiData = await response.json();
         
-        console.log("🚀 AI VALIDATION - SQL Generated:", sql);
+        // SAFETY CHECK: Ensure the AI actually returned a candidate
+        if (!aiData.candidates || !aiData.candidates[0]) {
+            throw new Error("AI returned an empty response. Try a different prompt.");
+        }
 
-        // 2. EXECUTE ON SUPABASE
-        // Note: You must have created the 'exec_sql' function in your Supabase SQL Editor
-        const { data: results, error } = await _supabase.rpc('exec_sql', { query_text: sql });
+        const parsed = JSON.parse(aiData.candidates[0].content.parts[0].text);
+        const sqlCommand = parsed.sql;
 
-        if (error) throw error;
+        console.log("🚀 AI-GENERATED SQL:", sqlCommand);
 
-        console.log("✅ DB VALIDATION - Rows Found:", results.length);
+        // EXECUTE VIA SUPABASE
+        const { data: results, error: dbError } = await _supabase.rpc('exec_sql', { query_text: sqlCommand });
 
-        // 3. SHOW RESULTS
-        if (results && results.length > 0) {
-            aiResults = results; // Update global state
+        if (dbError) throw dbError;
+
+        console.log("✅ SUPABASE RETURNED:", results.length, "rows");
+
+        if (!results || results.length === 0) {
+            panel.innerHTML = `<div class="empty-state">No matches found in your 966 rows for: "${prompt}"</div>`;
+        } else {
+            aiResults = results;
             showAIResults({
-                blockName: "Screen: " + prompt.substring(0, 15),
-                summary: `Successfully queried 966 securities using generated SQL.`,
-                highlights: `Query used: ${sql}`,
+                blockName: "SQL Bridge Validation",
+                summary: `Successfully generated and executed SQL.`,
+                highlights: `Query: ${sqlCommand}`,
                 securities: results 
             });
-        } else {
-            alert("No matches found in the 966 rows for: " + prompt);
         }
 
     } catch (err) {
-        console.error("Bridge Error:", err);
-        alert("Validation Failed: " + err.message);
+        console.error("Validation Failed:", err);
+        alert("System Note: " + err.message);
     } finally {
         btn.disabled = false;
+        btn.classList.remove('loading');
         btn.textContent = '✦   Screen with AI';
     }
 }
@@ -1146,29 +1156,14 @@ function renderRows(data) {
         </div>
       </td>
       <td><div class="score-num">${s.score || 0}</div></td>
-      <td><span class="stat up">${s.yield || 0}%</span></td>
-      <td><span class="stat">${s.beta || 1}</span></td>
+      <td><span class="stat up">${s.yield || '0'}%</span></td>
+      <td><span class="stat">${s.beta || '1.0'}</span></td>
       <td><span class="stat muted">${s.expense_ratio || '-'}</span></td>
-      <td><span class="stat ${parseFloat(s.ytd_return) >= 0 ? 'up' : 'down'}">${s.ytd_return || 0}%</span></td>
-      <td><div class="rationale-snippet">${s.category || 'Portfolio Candidate'}</div></td>
+      <td><span class="stat ${parseFloat(s.ytd_return) >= 0 ? 'up' : 'down'}">${s.ytd_return || '0'}%</span></td>
+      <td><div class="rationale-snippet">${s.category || 'Match'}</div></td>
       <td><div class="add-btn-row" onclick="toggleAdd('${s.ticker}')">+</div></td>
     </tr>
   `).join('');
-}
-function toggleAdd(ticker) {
-  const btn = document.getElementById('add-' + ticker);
-  if (added.has(ticker)) {
-    added.delete(ticker);
-    btn.classList.remove('added');
-    btn.textContent = '+';
-  } else {
-    added.add(ticker);
-    btn.classList.add('added');
-    btn.textContent = '✓';
-  }
-  const count = added.size;
-  document.getElementById('selectedCount').textContent = `${count} of ${SECURITIES.length} selected`;
-  document.getElementById('saveBtn').disabled = count === 0;
 }
 
 function resortResults(key) {
@@ -1225,21 +1220,20 @@ console.log("Blocks Builder: Connected to live database.");
 const SQL_SYSTEM_PROMPT = `
 You are a SQL expert for 'Blocks'. The table is: ${TABLE_NAME}
 
-COLUMNS:
+REAL COLUMNS:
 - ticker (text)
 - name (text)
 - category (text) -- Use this for sectors/asset classes
 - type (text) -- e.g., 'ETF', 'Stock'
-- yield (numeric) -- Dividend yield (e.g., 2.5)
-- beta (numeric) -- Risk measure (e.g., 0.95)
-- ytd_return (numeric) -- Year-to-date performance
-- strategy_text (text) -- Deep description of the security
+- yield (numeric) -- Use this for dividend requests
+- beta (numeric) 
+- ytd_return (numeric) -- Use this for performance requests
+- strategy_text (text) -- Use for thematic searches (e.g., 'innovation', 'defensive')
 
 RULES:
 1. Always SELECT *
 2. Use ILIKE for text matching on 'name', 'category', or 'strategy_text'.
-3. For "Energy", query: WHERE category ILIKE '%Energy%' OR strategy_text ILIKE '%Energy%'
-4. Return ONLY JSON: {"sql": "SELECT..."}
+3. Return ONLY a JSON object: {"sql": "SELECT * FROM security_universe WHERE ..."}
 `;
 </script>
 </body>
