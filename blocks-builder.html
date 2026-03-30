@@ -996,7 +996,8 @@ async function runScreen() {
 
         // 2. Call Gemini with a more specific instruction to avoid "Bad Requests"
         try {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${API_KEY}`;
+    // This uses the alias that Google keeps active for all projects
+const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
     console.log("Calling URL:", url); // Debugging line
 
     const response = await fetch(url, {
