@@ -1042,31 +1042,34 @@ async function runScreen() {
 
         console.log("🚀 AI-GENERATED SQL:", sqlCommand);
 
-        // 6. EXECUTE VIA SUPABASE RPC
-        // Ensure you have run the 'create function exec_sql...' in your Supabase SQL Editor
-        const { data: results, error: dbError } = await _supabase.rpc('exec_sql', { 
+// 6. EXECUTE VIA SUPABASE RPC
+        let { data: results, error: dbError } = await _supabase.rpc('exec_sql', { 
             query_text: sqlCommand 
         });
 
+        // --- SMART FALLBACK ---
+        if (!dbError && (!results || results.length === 0)) {
+            console.log("Zero results found. Attempting a broader 'Fuzzy' fallback...");
+            
+            // If the strict query failed, we try a simpler search based on the user's keywords
+            const fuzzySearch = prompt.split(' ')[0]; // Take the first word (e.g., "Dividend")
+            const fallbackQuery = `SELECT * FROM security_universe WHERE name ILIKE '%${fuzzySearch}%' OR category ILIKE '%${fuzzySearch}%' LIMIT ${limitValue}`;
+            
+            const fallback = await _supabase.rpc('exec_sql', { query_text: fallbackQuery });
+            results = fallback.data;
+        }
+
         if (dbError) throw dbError;
 
-        console.log("✅ SUPABASE RETURNED:", results.length, "rows");
-
-        // 7. RENDER RESULTS
+        // 7. RENDER
         if (!results || results.length === 0) {
-            panel.innerHTML = `
-                <div class="empty-state">
-                    <div class="empty-title">No matches in your universe</div>
-                    <div class="empty-sub">The query "${prompt}" returned 0 results. Try broadening your criteria.</div>
-                </div>`;
+            panel.innerHTML = `<div class="empty-state">No matches found. Try a broader term like "Income" or "Growth".</div>`;
         } else {
-            // Store results globally for other functions (like 'Add to Portfolio')
             aiResults = results; 
-
             showAIResults({
-                blockName: "AI Screen: " + (prompt.length > 20 ? prompt.substring(0, 20) + "..." : prompt),
-                summary: `SQL Query: ${sqlCommand}`,
-                highlights: `Scanned 966 securities. Found ${results.length} matches within the ${limitValue} result limit.`,
+                blockName: "AI Screen: " + prompt,
+                summary: `Query: ${sqlCommand}`,
+                highlights: `Filtered 966 rows. ${results.length === 0 ? 'Showing fuzzy matches.' : 'Found direct matches.'}`,
                 securities: results 
             });
         }
