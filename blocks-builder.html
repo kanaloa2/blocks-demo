@@ -975,81 +975,73 @@ const API_KEY = 'AIzaSyDJC77cxr1v19iyZKCrMD_NXUhgdQQW-GQ';
 async function runScreen() {
     const promptInput = document.getElementById('promptInput');
     const btn = document.getElementById('screenBtn');
-    const limitEl = document.getElementById('maxResults');
+    const panel = document.getElementById('rightPanel');
     
-    // 1. Initial Checks
+    // Get the limit from the selected filter chip (default to 10)
+    const limitChip = document.querySelector('.filter-section .filter-row:last-child .filter-chip.selected');
+    const limit = limitChip ? limitChip.textContent : 10;
+    
     if (!promptInput || !btn || btn.disabled) return;
     const prompt = promptInput.value;
-    const limit = limitEl ? limitEl.value : 10;
     if (!prompt) return;
 
     btn.disabled = true;
-    btn.textContent = 'Generating SQL...';
+    btn.classList.add('loading');
 
-    // Declare variables here so they are available to catch/finally
-    let apiResponse;
     let sqlCommand = "";
 
     try {
-        // 2. ASK AI FOR SQL
+        // 1. GET SQL FROM GEMINI
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
-        
-        apiResponse = await fetch(url, {
+        const aiResponse = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ 
                     parts: [{ 
-                        text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\n\nTask: Generate a SELECT statement. Max results: ${limit}. Return JSON only: {"sql": "SELECT..."}` 
+                        text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\n\nConstraint: Include LIMIT ${limit}. Return JSON only: {"sql": "SELECT..."}` 
                     }] 
                 }],
                 generationConfig: { responseMimeType: "application/json" }
             })
         });
 
-        if (!apiResponse.ok) {
-            const errData = await apiResponse.json();
-            throw new Error(errData.error?.message || "AI Error");
-        }
+        const aiData = await aiResponse.json();
+        const parsed = JSON.parse(aiData.candidates[0].content.parts[0].text);
+        sqlCommand = parsed.sql;
 
-        const aiData = await apiResponse.json();
-        const parsedData = JSON.parse(aiData.candidates[0].content.parts[0].text);
-        sqlCommand = parsedData.sql;
-
-        // --- VALIDATION LOG 1 ---
         console.log("🚀 AI-GENERATED SQL:", sqlCommand);
 
-        // 3. EXECUTE VIA SUPABASE
-        // Since we are validating the NL-to-SQL bridge, we'll use the prompt 
-        // to filter your 966 rows using Supabase's built-in filtering.
+        // 2. EXECUTE SQL VIA SUPABASE RPC
+        // We use the 'exec_sql' function we created in Step 1
         const { data: results, error: dbError } = await _supabase
-            .from('security_universe')
-            .select('*')
-            .or(`sector.ilike.%${prompt}%,name.ilike.%${prompt}%,ticker.ilike.%${prompt}%`)
-            .limit(limit);
+            .rpc('exec_sql', { query_text: sqlCommand });
 
         if (dbError) throw dbError;
 
-        // --- VALIDATION LOG 2 ---
-        console.log("✅ SUPABASE RETURNED:", results.length, "rows.");
+        console.log("✅ SUPABASE RETURNED:", results.length, "rows");
 
-        // 4. DISPLAY RESULTS
+        // 3. RENDER
         if (!results || results.length === 0) {
-            document.getElementById('rightPanel').innerHTML = `<div class="empty-state">No matches found in your 966 rows for: "${prompt}"</div>`;
+            panel.innerHTML = `<div class="empty-state">No matches found for that query.</div>`;
         } else {
+            // Store results globally for sorting/saving
+            aiResults = results; 
+            
             showAIResults({
-                blockName: "SQL Bridge Validation",
-                summary: `AI generated: "${sqlCommand}"`,
-                highlights: `Found ${results.length} matches in database.`,
+                blockName: "AI Screen: " + prompt.substring(0, 15),
+                summary: `SQL Query: ${sqlCommand}`,
+                highlights: `Successfully queried 966 rows. Returned ${results.length} matches.`,
                 securities: results 
             });
         }
 
     } catch (err) {
         console.error("Validation Failed:", err);
-        alert("Error: " + err.message);
+        alert("SQL Execution Error: " + err.message);
     } finally {
         btn.disabled = false;
+        btn.classList.remove('loading');
         btn.textContent = '✦   Screen with AI';
     }
 }
