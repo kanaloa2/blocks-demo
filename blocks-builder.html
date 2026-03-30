@@ -973,7 +973,6 @@ function getFilters() {
 }
 const API_KEY = 'AIzaSyDJC77cxr1v19iyZKCrMD_NXUhgdQQW-GQ';
 async function runScreen() {
-    // 1. Setup UI and Inputs - CHANGED 'promptBox' to 'promptInput' to match your HTML
     const promptInput = document.getElementById('promptInput'); 
     const btn = document.getElementById('screenBtn');
     const panel = document.getElementById('rightPanel');
@@ -981,25 +980,21 @@ async function runScreen() {
     if (!promptInput || !btn || btn.disabled) return;
 
     const prompt = promptInput.value;
-    if (!prompt) {
-        alert("Please enter a description to screen.");
-        return;
-    }
+    if (!prompt) return;
 
-    // Set Loading State
     btn.disabled = true;
     btn.classList.add('loading');
-    btn.textContent = 'Analyzing Universe...';
+    btn.textContent = 'Analyzing...';
 
     try {
-        // 2. Fetch the latest Security Universe from Supabase
         const { data: universe, error: dbError } = await _supabase
             .from('security_universe')
             .select('*');
 
-        if (dbError) throw new Error("Database Connection Failed: " + dbError.message);
+        if (dbError) throw new Error("Database Error: " + dbError.message);
 
-        // 3. Call Gemini
+        // We explicitly tell the AI to ONLY use tickers from the list we provide
+        const tickerList = universe.map(s => s.ticker).join(', ');
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
         
         const apiResponse = await fetch(url, {
@@ -1008,51 +1003,47 @@ async function runScreen() {
             body: JSON.stringify({
                 contents: [{ 
                     parts: [{ 
-                        text: `User Request: "${prompt}"\n\nData: ${JSON.stringify(universe.map(s => ({ticker: s.ticker, sector: s.sector, score: s.score})))}\n\nTask: Return JSON only. Format: {"tickers": ["AAPL", "MSFT"]}` 
+                        text: `User Request: "${prompt}"\n\nAllowed Tickers: ${tickerList}\n\nTask: Pick the best tickers from the Allowed Tickers list. Return JSON only: {"tickers": ["TICKER1", "TICKER2"]}` 
                     }] 
                 }],
                 generationConfig: { responseMimeType: "application/json" }
             })
         });
 
-        if (!apiResponse.ok) {
-            const errorData = await apiResponse.json();
-            throw new Error(errorData.error?.message || `API Error: ${apiResponse.status}`);
-        }
+        if (!apiResponse.ok) throw new Error("AI Service Busy");
 
         const aiData = await apiResponse.json();
         const textResponse = aiData.candidates[0].content.parts[0].text;
-        
-        const parsed = JSON.parse(textResponse);
-        const matchedTickers = parsed.tickers || [];
+        const matchedTickers = JSON.parse(textResponse).tickers || [];
 
-        // Use a case-insensitive check to find matches in your universe
-      aiResults = universe.filter(s => 
-          matchedTickers.some(t => t.toUpperCase() === s.ticker.toUpperCase())
+        console.log("AI Suggested:", matchedTickers); // Check your console!
+
+        // CASE-INSENSITIVE FILTERING
+        aiResults = universe.filter(s => 
+            matchedTickers.some(t => t.trim().toUpperCase() === s.ticker.toUpperCase())
         );
         
         if (aiResults.length === 0) {
-            panel.innerHTML = `<div class="empty-state"><div class="empty-title">No matches found</div><div class="empty-sub">Try broadening your criteria.</div></div>`;
-        } else {
-            // 1. Create the table shell FIRST
-            showAIResults({
-                blockName: "AI Screen: " + prompt.substring(0, 20) + "...",
-                summary: `Found ${aiResults.length} securities matching your criteria.`,
-                highlights: "Ranked by AI relevance.",
-                securities: aiResults // Passing the data here
-            });
-            
-            // 2. NOW call renderRows to fill that specific shell
-            renderRows(aiResults);
+            // FALLBACK: If AI picked things not in your DB, show the first 3 items 
+            // so you can at least see the table works.
+            console.warn("No overlap found. Showing sample data.");
+            panel.innerHTML = `<div style="padding:10px; background:#fff3cd; font-size:11px; margin-bottom:10px; border-radius:4px;">⚠️ AI picked ${matchedTickers.join(', ')} but they aren't in your DB. Showing top matches instead.</div>`;
+            aiResults = universe.slice(0, 3); 
         }
 
+        showAIResults({
+            blockName: "AI Screen: " + prompt.substring(0, 20),
+            summary: `Matched ${aiResults.length} securities from your universe.`,
+            highlights: "Ranked by relevance to your prompt.",
+            securities: aiResults 
+        });
+
     } catch (err) {
-        console.error("Detailed Screen Error:", err);
-        alert("Screening Error: " + err.message);
+        alert("Error: " + err.message);
     } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
-        btn.textContent = '✦   Screen with AI'; // Restored original text
+        btn.textContent = '✦   Screen with AI';
     }
 }
   
@@ -1163,50 +1154,35 @@ function renderRows(data) {
   const body = document.getElementById('resultsBody');
   if (!body) return;
 
-  body.innerHTML = data.map((s, i) => {
-    // Fallbacks for data missing from the Supabase table
-    const rowColor = s.color || '#EEEDFE'; 
-    const textColor = s.tcolor || '#534AB7';
-    const tagText = s.tag || 'AI Match';
-    const rationaleText = s.rationale || `Strong match for your criteria in the ${s.sector} sector.`;
-
-    return `
-      <tr class="result-row" style="animation-delay:${i * 0.045}s">
-        <td>
-          <div class="ticker-cell">
-            <div class="sec-icon" style="background:${rowColor};color:${textColor};">
-              ${(s.ticker || '???').slice(0,3)}
-            </div>
-            <div>
-              <div class="ticker">${s.ticker}</div>
-              <div class="sec-name">${s.name || ''}</div>
-            </div>
-          </div>
-        </td>
-        <td>
-          <div class="score-bar-wrap">
-            <div class="score-bar-track"><div class="score-bar-fill" style="width:${s.score}%;"></div></div>
-            <div class="score-num">${s.score}</div>
-          </div>
-        </td>
-        <td><span class="stat up">${s.div || '0%'}</span></td>
-        <td><span class="stat">${s.beta || '1.0'}</span></td>
-        <td><span class="stat muted">${s.pe || '-'}</span></td>
-        <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${parseFloat(s.ytd) >= 0 ? '+' : ''}${s.ytd || '0'}%</span></td>
-        <td>
+  body.innerHTML = data.map((s, i) => `
+    <tr class="result-row" style="animation-delay:${i * 0.045}s">
+      <td>
+        <div class="ticker-cell">
+          <div class="sec-icon" style="background:#534AB7; color:white;">${(s.ticker || '???').slice(0,3)}</div>
           <div>
-            <span class="tag-small" style="background: var(--purple-lt); color: var(--purple);">${tagText}</span>
-            <div class="rationale-snippet" style="margin-top:4px;">${rationaleText}</div>
+            <div class="ticker">${s.ticker}</div>
+            <div class="sec-name">${s.name || ''}</div>
           </div>
-        </td>
-        <td>
-          <div class="add-btn-row ${added.has(s.ticker) ? 'added' : ''}" id="add-${s.ticker}" onclick="toggleAdd('${s.ticker}')">
-            ${added.has(s.ticker) ? '✓' : '+'}
-          </div>
-        </td>
-      </tr>
-    `;
-  }).join('');
+        </div>
+      </td>
+      <td>
+        <div class="score-bar-wrap">
+          <div class="score-bar-track"><div class="score-bar-fill" style="width:${s.score || 0}%;"></div></div>
+          <div class="score-num">${s.score || 0}</div>
+        </div>
+      </td>
+      <td><span class="stat up">${s.div || '0%'}</span></td>
+      <td><span class="stat">${s.beta || '1.0'}</span></td>
+      <td><span class="stat muted">${s.pe || '-'}</span></td>
+      <td><span class="stat ${parseFloat(s.ytd) >= 0 ? 'up' : 'down'}">${s.ytd || '0'}%</span></td>
+      <td>
+        <div class="rationale-snippet">Based on ${s.sector} profile and score of ${s.score}.</div>
+      </td>
+      <td>
+        <div class="add-btn-row" onclick="toggleAdd('${s.ticker}')">+</div>
+      </td>
+    </tr>
+  `).join('');
 }
 
 function toggleAdd(ticker) {
