@@ -981,64 +981,46 @@ async function runScreen() {
     const prompt = inputEl.value;
     if (!prompt) return;
 
-    // UI Feedback & Rate Limit Protection
     btn.disabled = true;
     btn.classList.add('loading');
-    btn.textContent = 'Consulting AI...';
+    btn.textContent = 'Checking Universe...';
 
     try {
-        // 1. Fetch live data from Supabase
-        const { data: universe, error } = await _supabase
-            .from('security_universe')
-            .select('*');
-
+        // 1. Fetch Universe from Supabase
+        const { data: universe, error } = await _supabase.from('security_universe').select('*');
         if (error) throw error;
 
-        // 2. Call Gemini with a more specific instruction to avoid "Bad Requests"
-        try {
-    // This uses the alias that Google keeps active for all projects
-const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
-    console.log("Calling URL:", url); // Debugging line
-
-    const response = await fetch(url, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            contents: [{ parts: [{ text: `User Request: "${prompt}"\n\nDatabase: ${JSON.stringify(universe.map(s => ({ticker: s.ticker, sector: s.sector, score: s.score})))}` }] }],
-            generationConfig: { responseMimeType: "application/json" }
-        })
-    });
-
-    if (!response.ok) {
-        const errorText = await response.text();
-        console.error("Google API Raw Error:", errorText);
-        throw new Error(`Google Error ${response.status}: ${response.statusText}`);
-    }
-    
-    // ... rest of your code
-} catch (err) {
-    console.error("Full Error Object:", err);
-    alert("Screening Error: " + err.message);
-}
-
-        if (response.status === 429) {
-            throw new Error("Rate limit exceeded. Please wait 60 seconds.");
-        }
-
-        const aiData = await response.json();
+        // 2. Setup AI Call with the 'latest' alias to bypass 404
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
         
-        if (!aiData.candidates || !aiData.candidates[0].content) {
-            throw new Error("AI could not process this request.");
+        const apiResponse = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ 
+                    parts: [{ text: `User Request: "${prompt}"\n\nDatabase: ${JSON.stringify(universe.map(s => ({ticker: s.ticker, sector: s.sector, score: s.score})))}\n\nTask: Return JSON object with tickers that match. Format: {"tickers": ["AAPL"]}` }] 
+                }],
+                generationConfig: { responseMimeType: "application/json" }
+            })
+        });
+
+        // 3. Robust Error Checking
+        if (!apiResponse.ok) {
+            const errorData = await apiResponse.json();
+            // If even 'latest' is 429ed, we tell the user
+            if (apiResponse.status === 429) throw new Error("Google is busy (Rate Limit). Try again in 30 seconds.");
+            throw new Error(errorData.error?.message || "AI Connection Failed");
         }
 
+        const aiData = await apiResponse.json();
         const matchedTickers = JSON.parse(aiData.candidates[0].content.parts[0].text).tickers;
         
-        // 3. Filter and Render
+        // 4. Filter and Render
         aiResults = universe.filter(s => matchedTickers.includes(s.ticker));
         renderRows(aiResults);
 
     } catch (err) {
-        console.error("Blocks Error:", err.message);
+        console.error("Screening Error:", err);
         alert(err.message);
     } finally {
         btn.disabled = false;
