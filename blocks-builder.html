@@ -965,6 +965,19 @@ body {
 </div>
 
 <script>
+  const SQL_SYSTEM_PROMPT = `
+You are a Financial Data Expert. Your goal is to find matches in 'security_universe'.
+
+COLUMNS: ticker, name, category, type, yield, beta, ytd_return, strategy_text
+
+STRICT RULES:
+1. DO NOT use the word 'Equities' in the SQL. Use 'Stock' or 'ETF' if needed.
+2. If the user asks for "Dividend Aristocrats", search: (yield > 1.5 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%dividend%').
+3. If the user asks for "Low Beta", search: (beta < 1.0 AND beta > 0).
+4. Combine multiple themes with OR to ensure we get results (e.g., Theme A OR Theme B).
+5. Always end with LIMIT [Number].
+6. Return ONLY JSON: {"sql": "SELECT * FROM security_universe WHERE ... LIMIT X"}
+`;
 const SECURITIES = [
   {
     ticker: 'JNJ', name: 'Johnson & Johnson', sector: 'Healthcare', color: '#FAECE7', tcolor: '#C94E28',
@@ -1372,24 +1385,13 @@ function closeMobileMenu() {
   // Initialize Supabase
 const SUPABASE_URL = 'https://rytmoxxpoegllfbusykt.supabase.co';
 const SUPABASE_ANON_KEY = 'sb_publishable_r86loDzli-AOYkWFDKbe9A_X9-uATdk';
-const _supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// Remove 'const' so it uses the existing global variable from app.js if it exists
+_supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 // Important: Table name is security_universe
 const TABLE_NAME = 'security_universe';
   
 console.log("Blocks Builder: Connected to live database.");
-const SQL_SYSTEM_PROMPT = `
-You are a Financial Data Expert. Your goal is to find matches in 'security_universe'.
 
-COLUMNS: ticker, name, category, type, yield, beta, ytd_return, strategy_text
-
-STRICT RULES:
-1. DO NOT use the word 'Equities' in the SQL. Use 'Stock' or 'ETF' if needed.
-2. If the user asks for "Dividend Aristocrats", search: (yield > 1.5 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%dividend%').
-3. If the user asks for "Low Beta", search: (beta < 1.0 AND beta > 0).
-4. Combine multiple themes with OR to ensure we get results (e.g., Theme A OR Theme B).
-5. Always end with LIMIT [Number].
-6. Return ONLY JSON: {"sql": "SELECT * FROM security_universe WHERE ... LIMIT X"}
-`;
 </script>
   
 </body>
