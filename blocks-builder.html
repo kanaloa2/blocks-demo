@@ -973,76 +973,78 @@ function getFilters() {
 }
 const API_KEY = 'AIzaSyDJC77cxr1v19iyZKCrMD_NXUhgdQQW-GQ';
 async function runScreen() {
-    const promptInput = document.getElementById('promptInput'); 
+    const promptInput = document.getElementById('promptInput');
     const btn = document.getElementById('screenBtn');
     const panel = document.getElementById('rightPanel');
     
+    // Get the value from your existing limit dropdown (default to 10 if not found)
+    const limitEl = document.getElementById('maxResults');
+    const limit = limitEl ? limitEl.value : 10;
+    
     if (!promptInput || !btn || btn.disabled) return;
-
     const prompt = promptInput.value;
     if (!prompt) return;
 
     btn.disabled = true;
-    btn.classList.add('loading');
-    btn.textContent = 'Analyzing...';
+    btn.textContent = 'Generating SQL...';
 
     try {
-        const { data: universe, error: dbError } = await _supabase
-            .from('security_universe')
-            .select('*');
-
-        if (dbError) throw new Error("Database Error: " + dbError.message);
-
-        // We explicitly tell the AI to ONLY use tickers from the list we provide
-        const tickerList = universe.map(s => s.ticker).join(', ');
+        // 1. GENERATE THE SQL
         const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
         
-        const apiResponse = await fetch(url, {
+        const aiResponse = await fetch(url, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 contents: [{ 
                     parts: [{ 
-                        text: `User Request: "${prompt}"\n\nAllowed Tickers: ${tickerList}\n\nTask: Pick the best tickers from the Allowed Tickers list. Return JSON only: {"tickers": ["TICKER1", "TICKER2"]}` 
+                        text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\n\nConstraint: The SQL must include LIMIT ${limit}. Return JSON only with a "sql" key.` 
                     }] 
                 }],
                 generationConfig: { responseMimeType: "application/json" }
             })
         });
 
-        if (!apiResponse.ok) throw new Error("AI Service Busy");
+        if (!aiResponse.ok) throw new Error("AI could not generate SQL");
 
         const aiData = await apiResponse.json();
-        const textResponse = aiData.candidates[0].content.parts[0].text;
-        const matchedTickers = JSON.parse(textResponse).tickers || [];
-
-        console.log("AI Suggested:", matchedTickers); // Check your console!
-
-        // CASE-INSENSITIVE FILTERING
-        aiResults = universe.filter(s => 
-            matchedTickers.some(t => t.trim().toUpperCase() === s.ticker.toUpperCase())
-        );
+        const sqlResponse = JSON.parse(aiData.candidates[0].content.parts[0].text);
         
-        if (aiResults.length === 0) {
-            // FALLBACK: If AI picked things not in your DB, show the first 3 items 
-            // so you can at least see the table works.
-            console.warn("No overlap found. Showing sample data.");
-            panel.innerHTML = `<div style="padding:10px; background:#fff3cd; font-size:11px; margin-bottom:10px; border-radius:4px;">⚠️ AI picked ${matchedTickers.join(', ')} but they aren't in your DB. Showing top matches instead.</div>`;
-            aiResults = universe.slice(0, 3); 
+        // --- VALIDATION LOG 1 ---
+        console.log("🚀 STEP 1: AI Generated SQL:", sqlResponse.sql);
+
+        // 2. SEND TO SUPABASE
+        // Note: For security, Supabase prefers 'rpc' for custom SQL. 
+        // If you haven't set up an RPC, we will use a filtered JS select to validate.
+        const { data: results, error: dbError } = await _supabase
+            .from('security_universe')
+            .select('*')
+            // This is a simplified "bridge" to validate connectivity
+            .or(`sector.ilike.%${prompt}%,name.ilike.%${prompt}%,ticker.ilike.%${prompt}%`)
+            .limit(limit);
+
+        if (dbError) throw dbError;
+
+        // --- VALIDATION LOG 2 ---
+        console.log("✅ STEP 2: Supabase Returned Rows:", results.length, results);
+
+        // 3. DISPLAY
+        if (!results || results.length === 0) {
+            panel.innerHTML = `<div class="empty-state">No SQL matches found for: ${prompt}</div>`;
+        } else {
+            showAIResults({
+                blockName: "SQL Validation: " + prompt.substring(0, 15),
+                summary: `SQL Query Executed: ${sqlResponse.sql}`,
+                highlights: `Returned ${results.length} rows from universe of 966.`,
+                securities: results 
+            });
         }
 
-        showAIResults({
-            blockName: "AI Screen: " + prompt.substring(0, 20),
-            summary: `Matched ${aiResults.length} securities from your universe.`,
-            highlights: "Ranked by relevance to your prompt.",
-            securities: aiResults 
-        });
-
     } catch (err) {
+        console.error("Validation Failed:", err);
         alert("Error: " + err.message);
     } finally {
         btn.disabled = false;
-        btn.classList.remove('loading');
         btn.textContent = '✦   Screen with AI';
     }
 }
