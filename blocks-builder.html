@@ -979,8 +979,12 @@ async function runScreen() {
     const panel = document.getElementById('rightPanel');
     
     // Get the value from your existing limit chips (10, 20, or 30)
-    const activeLimitChip = document.querySelector('.filter-chip.selected');
-    const limitValue = activeLimitChip ? activeLimitChip.textContent : "10";
+    const limitChips = document.querySelectorAll('.filter-row:last-child .filter-chip.selected');
+let limitValue = limitChips.length > 0 ? limitChips[0].textContent : "10";
+
+// Force it to be a number just in case
+limitValue = parseInt(limitValue);
+if (isNaN(limitValue)) limitValue = 10;
 
     if (!promptInput || !btn || btn.disabled) return;
     const prompt = promptInput.value;
@@ -1273,16 +1277,16 @@ const TABLE_NAME = 'security_universe';
   
 console.log("Blocks Builder: Connected to live database.");
 const SQL_SYSTEM_PROMPT = `
-You are a Financial Data Expert. Your goal is to find the best matches in the 'security_universe' table.
+You are a Financial Data Expert. Your goal is to find matches in 'security_universe'.
 
 COLUMNS: ticker, name, category, type, yield, beta, ytd_return, strategy_text
 
-REASONING RULES:
-1. ONLY filter by 'type' or 'category' if the user explicitly mentions a sector or asset class. 
-2. Do NOT add "type ILIKE '%Equities%'" unless the user asks for "Stocks".
-3. DIVIDENDS: Use (yield > 1.0 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%Dividend%').
-4. LOW BETA: Use (beta < 1.0 AND beta > 0).
-5. THEMES: Use OR instead of AND between different thematic concepts to ensure results.
+STRICT RULES:
+1. DO NOT use the word 'Equities' in the SQL. Use 'Stock' or 'ETF' if needed.
+2. If the user asks for "Dividend Aristocrats", search: (yield > 1.5 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%dividend%').
+3. If the user asks for "Low Beta", search: (beta < 1.0 AND beta > 0).
+4. Combine multiple themes with OR to ensure we get results (e.g., Theme A OR Theme B).
+5. Always end with LIMIT [Number].
 6. Return ONLY JSON: {"sql": "SELECT * FROM security_universe WHERE ... LIMIT X"}
 `;
 </script>
