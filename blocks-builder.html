@@ -1047,29 +1047,37 @@ async function runScreen() {
             query_text: sqlCommand 
         });
 
-        // --- SMART FALLBACK ---
+        // --- IMPROVED SMART FALLBACK ---
         if (!dbError && (!results || results.length === 0)) {
-            console.log("Zero results found. Attempting a broader 'Fuzzy' fallback...");
+            console.log("Zero results for strict query. Attempting fuzzy fallback...");
             
-            // If the strict query failed, we try a simpler search based on the user's keywords
-            const fuzzySearch = prompt.split(' ')[0]; // Take the first word (e.g., "Dividend")
-            const fallbackQuery = `SELECT * FROM security_universe WHERE name ILIKE '%${fuzzySearch}%' OR category ILIKE '%${fuzzySearch}%' LIMIT ${limitValue}`;
+            // Take the first word of the prompt (e.g., "Dividend")
+            const firstWord = prompt.split(' ')[0].replace(/[^a-zA-Z]/g, ''); 
             
-            const fallback = await _supabase.rpc('exec_sql', { query_text: fallbackQuery });
-            results = fallback.data;
+            // Simpler fallback query: just search name or category for that first keyword
+            const fallbackQuery = `SELECT * FROM security_universe WHERE name ILIKE '%${firstWord}%' OR category ILIKE '%${firstWord}%' OR strategy_text ILIKE '%${firstWord}%' LIMIT ${limitValue}`;
+            
+            console.log("🚀 FALLBACK SQL:", fallbackQuery);
+            
+            const fallbackResponse = await _supabase.rpc('exec_sql', { query_text: fallbackQuery });
+            results = fallbackResponse.data;
         }
 
         if (dbError) throw dbError;
 
         // 7. RENDER
         if (!results || results.length === 0) {
-            panel.innerHTML = `<div class="empty-state">No matches found. Try a broader term like "Income" or "Growth".</div>`;
+            panel.innerHTML = `
+                <div class="empty-state">
+                    <div class="empty-title">No matches found</div>
+                    <div class="empty-sub">We couldn't find matches for "${prompt}". Try a simpler term like "Technology" or "Income".</div>
+                </div>`;
         } else {
             aiResults = results; 
             showAIResults({
-                blockName: "AI Screen: " + prompt,
-                summary: `Query: ${sqlCommand}`,
-                highlights: `Filtered 966 rows. ${results.length === 0 ? 'Showing fuzzy matches.' : 'Found direct matches.'}`,
+                blockName: "AI Screen: " + (prompt.length > 20 ? prompt.substring(0,20) : prompt),
+                summary: `Successfully executed: ${sqlCommand}`,
+                highlights: `Filtered 966 rows. ${results.length > 0 ? 'Found matches.' : 'No direct matches.'}`,
                 securities: results 
             });
         }
@@ -1265,19 +1273,17 @@ const TABLE_NAME = 'security_universe';
   
 console.log("Blocks Builder: Connected to live database.");
 const SQL_SYSTEM_PROMPT = `
-You are an expert Financial Analyst. Translate prompts into SQL for 'security_universe'.
+You are a Financial Data Expert. Your goal is to find the best matches in the 'security_universe' table.
 
 COLUMNS: ticker, name, category, type, yield, beta, ytd_return, strategy_text
 
 REASONING RULES:
-1. BE EXPANSIVE: Use OR instead of AND for thematic keywords to ensure we find matches.
-2. DIVIDENDS: If asked for 'Aristocrats' or 'Dividends', check (yield > 1.5 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%Dividend%').
-3. LOW BETA: Use (beta < 1.0 AND beta > 0).
-4. THEMES: Always check BOTH 'category' AND 'strategy_text'.
-5. LIMITS: Always include the LIMIT provided.
-
-EXAMPLE for "Dividend Aristocrats":
-SELECT * FROM security_universe WHERE (yield > 1.5 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%Dividend%') LIMIT 10;
+1. ONLY filter by 'type' or 'category' if the user explicitly mentions a sector or asset class. 
+2. Do NOT add "type ILIKE '%Equities%'" unless the user asks for "Stocks".
+3. DIVIDENDS: Use (yield > 1.0 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%Dividend%').
+4. LOW BETA: Use (beta < 1.0 AND beta > 0).
+5. THEMES: Use OR instead of AND between different thematic concepts to ensure results.
+6. Return ONLY JSON: {"sql": "SELECT * FROM security_universe WHERE ... LIMIT X"}
 `;
 </script>
 </body>
