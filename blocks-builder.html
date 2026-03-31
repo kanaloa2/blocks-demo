@@ -14,6 +14,28 @@
 <title>Blocks — Block Builder</title>
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700&family=DM+Sans:ital,wght@0,300;0,400;0,500;0,700;1,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  .add-row-btn.selected {
+    background: #7C3AED !important; /* Brand Purple */
+    color: white !important;
+    border-color: #7C3AED !important;
+}
+.save-block-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    filter: grayscale(1);
+}
+  .results-header { display: flex; justify-content: space-between; align-items: flex-end; margin: 20px 0 10px; }
+.results-info h3 { margin: 0; font-size: 16px; color: var(--text1); }
+.results-info p { margin: 0; font-size: 12px; color: var(--text3); }
+.header-actions { display: flex; gap: 10px; align-items: center; }
+
+.add-row-btn.selected { background: #7C3AED; color: white; border-color: #7C3AED; }
+.save-btn:disabled { background: #E5E7EB; color: #9CA3AF; cursor: not-allowed; border: none; }
+
+.block-name-container { display: flex; align-items: center; gap: 8px; margin-bottom: 15px; }
+.block-name-input { font-family: 'Syne'; font-weight: 600; font-size: 20px; border: none; background: transparent; color: var(--text1); width: auto; min-width: 200px; }
+.block-name-input:focus { outline: none; border-bottom: 1px solid var(--teal); }
+  
   html, body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -1192,31 +1214,57 @@ async function runScreen() {
     }
 }
   
+let selectedSecurities = []; // State to track selections
+
 function showAIResults(data) {
     const panel = document.getElementById('rightPanel');
     
-    // Create the "Block" header and the Purple Summary Card
+    // 1. Auto-generate a suggested name based on the user's prompt
+    const userPrompt = document.getElementById('promptInput').value;
+    const words = userPrompt.split(' ').slice(0, 3).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
+    const suggestedName = words.length > 0 ? words.join(' ') + " Block" : "New Strategy Block";
+
+    // The HTML for the title area:
+<div class="block-name-container" style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+    <input type="text" id="editableBlockName" class="block-main-title" 
+           value="${suggestedName}" 
+           style="border:none; background:transparent; font-family:'Syne'; font-size:24px; font-weight:600; color:var(--text1); outline:none;">
+    <span style="cursor:pointer; opacity:0.3;" onclick="document.getElementById('editableBlockName').focus()">✎</span>
+</div>
+
     panel.innerHTML = `
         <div class="ai-block-header">
-            <div class="block-title-row">
-                <h2 class="block-main-title">${data.blockName}</h2>
-                <span class="count-badge">0 of ${data.securities.length} selected</span>
+            <div class="block-name-container" style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
+                <input type="text" id="editableBlockName" class="block-main-title" 
+                       value="${suggestedName}" 
+                       style="border:none; background:transparent; font-family:'Syne'; font-size:24px; font-weight:600; color:var(--text1); outline:none; width:auto;">
+                <span style="cursor:pointer; font-size:14px; opacity:0.5;">✎</span>
             </div>
             
             <div class="ai-summary-card">
                 <div class="ai-sparkle-icon">✦</div>
                 <div class="ai-summary-text">
-                    ${data.summary} <span class="highlight-text">${data.highlights}</span>
+                    ${data.summary} <span class="highlight-text">${data.highlights || ''}</span>
                 </div>
             </div>
 
             <div class="results-controls">
-                <h3 class="results-sub-title">Screening Results</h3>
+                <div class="results-info">
+                    <h3 class="results-sub-title">Screening Results</h3>
+                    <p id="selectionCount" style="margin:0; font-size:12px; color:var(--text3);">
+                        ${data.securities.length} securities · sorted by AI score
+                    </p>
+                </div>
                 <div class="controls-right">
                     <select class="ai-sort-select">
                         <option>Sort by: AI Score</option>
+                        <option>Sort by: Yield</option>
                     </select>
-                    <button class="save-block-btn" disabled>Save Block</button>
+                    <button id="saveBlockBtn" class="save-block-btn" disabled 
+                            style="${localStorage.getItem('isDemoMode') === 'true' ? 'display:none;' : ''}"
+                            onclick="saveBlockToDB()">
+                        Save Block
+                    </button>
                 </div>
             </div>
         </div>
@@ -1307,12 +1355,15 @@ function renderRows(data) {
     if (!body) return;
 
     body.innerHTML = data.map((s, i) => {
-        // Logic to determine if we show a "Dividend Aristocrat" tag
+        // Logic to determine if we show a "Dividend Aristocrat" tag (Preserved)
         const isAristocrat = s.yield > 2.5 || (s.strategy_text && s.strategy_text.toLowerCase().includes('aristocrat'));
-        const score = s.score || Math.floor(Math.random() * (98 - 85) + 85); // Fallback for demo
+        const score = s.score || Math.floor(Math.random() * (98 - 85) + 85); 
+        
+        // Check if this ticker is already selected
+        const isSelected = selectedSecurities.includes(s.ticker);
         
         return `
-        <tr class="result-row" style="animation-delay:${i * 0.05}s">
+        <tr class="result-row ${isSelected ? 'selected-row' : ''}" style="animation-delay:${i * 0.05}s">
             <td>
                 <div class="ticker-cell">
                     <div class="sec-icon-box">${(s.ticker || '??').slice(0,3)}</div>
@@ -1334,7 +1385,7 @@ function renderRows(data) {
             <td class="stat-cell">${s.beta || '1.0'}</td>
             <td class="stat-cell muted">${s.pe || '18.4x'}</td>
             <td class="stat-cell ${parseFloat(s.ytd_return) >= 0 ? 'up' : 'down'}">
-                ${parseFloat(s.ytd_return) >= 0 ? '++' : ''}${s.ytd_return || '0'}%
+                ${parseFloat(s.ytd_return) >= 0 ? '+' : ''}${s.ytd_return || '0'}%
             </td>
             <td>
                 <div class="rationale-wrap">
@@ -1343,11 +1394,47 @@ function renderRows(data) {
                 </div>
             </td>
             <td>
-                <button class="add-row-btn" onclick="toggleAdd('${s.ticker}')">+</button>
+                <button class="add-row-btn ${isSelected ? 'selected' : ''}" 
+                        onclick="toggleAdd('${s.ticker}', this)">
+                    ${isSelected ? '✓' : '+'}
+                </button>
             </td>
         </tr>
         `;
     }).join('');
+}
+
+function toggleAdd(ticker, btn) {
+    const index = selectedSecurities.indexOf(ticker);
+    
+    if (index === -1) {
+        // Add to block
+        selectedSecurities.push(ticker);
+        btn.innerHTML = '✓';
+        btn.classList.add('selected');
+    } else {
+        // Remove from block
+        selectedSecurities.splice(index, 1);
+        btn.innerHTML = '+';
+        btn.classList.remove('selected');
+    }
+
+    // Update the "X of Y selected" label in the header
+    const infoLabel = document.querySelector('.results-info p');
+    const totalRows = document.querySelectorAll('#resultsBody tr').length;
+    if (infoLabel) {
+        if (selectedSecurities.length > 0) {
+            infoLabel.innerText = `${selectedSecurities.length} of ${totalRows} selected · sorted by AI score`;
+        } else {
+            infoLabel.innerText = `${totalRows} securities · sorted by AI score`;
+        }
+    }
+
+    // Enable Save Button if at least 1 item is selected
+    const saveBtn = document.getElementById('saveBlockBtn');
+    if (saveBtn) {
+        saveBtn.disabled = selectedSecurities.length === 0;
+    }
 }
 
 function resortResults(key) {
@@ -1357,6 +1444,39 @@ function resortResults(key) {
   else if (key === 'beta') data.sort((a, b) => parseFloat(a.beta) - parseFloat(b.beta));
   else if (key === 'ytd') data.sort((a, b) => parseFloat(b.ytd) - parseFloat(a.ytd));
   renderRows(data);
+}
+
+  async function saveBlockToDB() {
+    const btn = document.getElementById('saveBlockBtn');
+    const blockName = document.getElementById('editableBlockName').value;
+    
+    // Check for user (Shared _supabase from app.js)
+    const { data: { user } } = await _supabase.auth.getUser();
+    
+    if (!user) {
+        alert("Please log in to save your blocks.");
+        return;
+    }
+
+    btn.textContent = 'Saving...';
+
+    const { error } = await _supabase
+        .from('blocks')
+        .insert([{ 
+            user_id: user.id, 
+            name: blockName, 
+            securities: selectedSecurities,
+            created_at: new Date()
+        }]);
+
+    if (!error) {
+        btn.textContent = '✓ Saved!';
+        btn.style.background = '#0F6E56';
+        setTimeout(() => window.location.href = 'assembly.html', 1000);
+    } else {
+        console.error("Save Error:", error);
+        btn.textContent = 'Error Saving';
+    }
 }
 
 function saveBlock() {
