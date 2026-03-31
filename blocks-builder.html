@@ -1117,6 +1117,13 @@ async function runScreen() {
         }
 
         const sqlData = await sqlResponse.json();
+      // --- ADD THIS SAFETY CHECK ---
+      if (!sqlData || !sqlData.candidates || sqlData.candidates.length === 0) {
+        console.error("Gemini 503/Error:", sqlData);
+        alert("The AI engine is currently busy. Please wait 5 seconds and try again.");
+        return; // Stops the crash
+      }
+      // -----------------------------
         const parsedSql = JSON.parse(sqlData.candidates[0].content.parts[0].text);
         const sqlCommand = parsedSql.sql;
 
