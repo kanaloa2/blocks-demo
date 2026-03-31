@@ -1224,13 +1224,7 @@ function showAIResults(data) {
     const words = userPrompt.split(' ').slice(0, 3).map(w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
     const suggestedName = words.length > 0 ? words.join(' ') + " Block" : "New Strategy Block";
 
-    // The HTML for the title area:
-<div class="block-name-container" style="display:flex; align-items:center; gap:10px; margin-bottom:15px;">
-    <input type="text" id="editableBlockName" class="block-main-title" 
-           value="${suggestedName}" 
-           style="border:none; background:transparent; font-family:'Syne'; font-size:24px; font-weight:600; color:var(--text1); outline:none;">
-    <span style="cursor:pointer; opacity:0.3;" onclick="document.getElementById('editableBlockName').focus()">✎</span>
-</div>
+
 
     panel.innerHTML = `
         <div class="ai-block-header">
