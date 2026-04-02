@@ -1125,7 +1125,10 @@ async function runScreen() {
                 contents: [{ 
                     parts: [{ text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\nREQUIRED LIMIT: ${limitValue}` }] 
                 }],
-                generationConfig: { responseMimeType: "application/json" }
+                generationConfig: { 
+    responseMimeType: "application/json",
+    maxOutputTokens: 300 // SQL is rarely more than 300 tokens; this speeds up the response time
+}
             })
         });
 
