@@ -1095,13 +1095,13 @@ function getFilters() {
   const maxResults = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['10','20','30'].includes(c.textContent)).map(c => c.textContent)[0] || '10';
   return { assetClass, marketCap, geography, minYield, maxBeta, maxResults };
 }
-const API_KEY = 'AIzaSyCuH5Knch4jajliKp__-Yv_jQtW8poTmyA';
+
 async function runScreen() {
     const promptInput = document.getElementById('promptInput');
     const btn = document.getElementById('screenBtn');
     const panel = document.getElementById('rightPanel');
     
-    // 1. Get Limit from UI (Ensuring it's a number)
+    // 1. Get Limit from UI
     const limitChips = document.querySelectorAll('.filter-row:last-child .filter-chip.selected');
     let limitValue = limitChips.length > 0 ? limitChips[0].textContent : "10";
     limitValue = parseInt(limitValue) || 10;
@@ -1110,45 +1110,32 @@ async function runScreen() {
     const prompt = promptInput.value;
     if (!prompt) return;
 
+    // UI Loading State
     btn.disabled = true;
     btn.classList.add('loading');
     btn.textContent = '✦ Analyzing Universe...';
 
     try {
-        // --- STAGE 1: GENERATE THE SQL ---
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key=${API_KEY}`;
-        
-        const sqlResponse = await fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                contents: [{ 
-                    parts: [{ text: `${SQL_SYSTEM_PROMPT}\n\nUser Request: "${prompt}"\nREQUIRED LIMIT: ${limitValue}` }] 
-                }],
-                generationConfig: { 
-    responseMimeType: "application/json",
-    maxOutputTokens: 300 // SQL is rarely more than 300 tokens; this speeds up the response time
-}
-            })
+        // --- STAGE 1: SECURE AI CALL (Via Supabase Edge Function) ---
+        // We send the prompt to our "Life Preserver" function which hides the key
+        const { data: aiResponse, error: aiError } = await _supabase.functions.invoke('gemini-proxy', {
+            body: { 
+                prompt: prompt,
+                systemPrompt: `${SQL_SYSTEM_PROMPT}\n\nREQUIRED LIMIT: ${limitValue}` 
+            }
         });
 
-        if (sqlResponse.status === 429) {
-            alert("Rate limit hit. Please wait 30s.");
-            return;
+        if (aiError) throw new Error("AI Proxy Error: " + aiError.message);
+        
+        // Safety check for Gemini response structure
+        if (!aiResponse || !aiResponse.candidates) {
+            throw new Error("The AI engine is currently busy. Please try again in 5s.");
         }
 
-        const sqlData = await sqlResponse.json();
-      // --- ADD THIS SAFETY CHECK ---
-      if (!sqlData || !sqlData.candidates || sqlData.candidates.length === 0) {
-        console.error("Gemini 503/Error:", sqlData);
-        alert("The AI engine is currently busy. Please wait 5 seconds and try again.");
-        return; // Stops the crash
-      }
-      // -----------------------------
-        const parsedSql = JSON.parse(sqlData.candidates[0].content.parts[0].text);
-        const sqlCommand = parsedSql.sql;
+        const parsedData = JSON.parse(aiResponse.candidates[0].content.parts[0].text);
+        const sqlCommand = parsedData.sql;
 
-        console.log("🚀 STAGE 1 (SQL):", sqlCommand);
+        console.log("🚀 SECURE STAGE 1 (SQL):", sqlCommand);
 
         // --- STAGE 2: EXECUTE ON SUPABASE ---
         let { data: results, error: dbError } = await _supabase.rpc('exec_sql', { 
@@ -1165,33 +1152,21 @@ async function runScreen() {
 
         if (dbError) throw dbError;
 
-        // --- STAGE 3: GENERATE THE HUMAN NARRATIVE (PURPLE CARD) ---
-        // This is what makes it look like the original demo!
-        let narrativeSummary = `Found ${results.length} candidates matching your criteria.`;
+        // --- STAGE 3: GENERATE NARRATIVE ---
+        // For the demo, we'll generate a quick clean narrative
+        let narrativeSummary = `Analysis complete. Found ${results.length} securities matching "${prompt}".`;
         
         try {
-            const narrativeResponse = await fetch(url, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    contents: [{ 
-                        parts: [{ 
-                            text: `You are a high-end investment analyst. 
-                            The user asked for: "${prompt}"
-                            We found: ${results.length} securities in the database.
-                            
-                            Write a 2-sentence summary for the results card.
-                            DO NOT mention SQL, databases, or code.
-                            Example: "Found 10 candidates matching your criteria for defensive income. Ranked by AI score weighing dividend reliability and historical volatility."
-                            Current results include tickers like: ${results.slice(0,3).map(r => r.ticker).join(', ')}.`
-                        }] 
-                    }]
-                })
+            // Optional: Second secure call for the "High-end analyst" voice
+            const { data: navResponse } = await _supabase.functions.invoke('gemini-proxy', {
+                body: { 
+                    prompt: `Summarize these results for: "${prompt}". Found ${results.length} items. Keep it to 2 sentences.`,
+                    systemPrompt: "You are a high-end investment analyst. Do not mention code or databases."
+                }
             });
-            const narrativeData = await narrativeResponse.json();
-            narrativeSummary = narrativeData.candidates[0].content.parts[0].text;
+            narrativeSummary = navResponse.candidates[0].content.parts[0].text;
         } catch (e) {
-            console.warn("Narrative generation failed, using default.");
+            console.warn("Narrative failed, using default.");
         }
 
         // --- STAGE 4: RENDER TO UI ---
@@ -1200,7 +1175,6 @@ async function runScreen() {
         } else {
             aiResults = results; // Set global state
             showAIResults({
-                blockName: "AI Screen: " + (prompt.length > 25 ? prompt.substring(0, 25) + "..." : prompt),
                 summary: narrativeSummary,
                 highlights: "Review and add to your portfolio block below.",
                 securities: results 
@@ -1209,7 +1183,7 @@ async function runScreen() {
 
     } catch (err) {
         console.error("Full System Error:", err);
-        alert("Error: " + err.message);
+        alert(err.message);
     } finally {
         btn.disabled = false;
         btn.classList.remove('loading');
