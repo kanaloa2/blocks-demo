@@ -1118,7 +1118,7 @@ async function runScreen() {
     try {
         // --- STAGE 1: SECURE AI CALL (Via Supabase Edge Function) ---
         // We send the prompt to our "Life Preserver" function which hides the key
-        const { data: aiResponse, error: aiError } = await _supabase.functions.invoke('gemini-proxy', {
+        const { data: aiResponse, error: aiError } = await _supabase.functions.invoke('bright-responder', {
             body: { 
                 prompt: prompt,
                 systemPrompt: `${SQL_SYSTEM_PROMPT}\n\nREQUIRED LIMIT: ${limitValue}` 
