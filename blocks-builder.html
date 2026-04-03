@@ -1158,7 +1158,7 @@ async function runScreen() {
         
         try {
             // Optional: Second secure call for the "High-end analyst" voice
-            const { data: navResponse } = await _supabase.functions.invoke('gemini-proxy', {
+            const { data: navResponse } = await _supabase.functions.invoke('bright-responder', {
                 body: { 
                     prompt: `Summarize these results for: "${prompt}". Found ${results.length} items. Keep it to 2 sentences.`,
                     systemPrompt: "You are a high-end investment analyst. Do not mention code or databases."
