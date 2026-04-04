@@ -994,18 +994,19 @@ body {
 </div>
 
 <script>
-  const SQL_SYSTEM_PROMPT = `
-You are a Financial Data Expert. Your goal is to find matches in 'security_universe'.
+const SQL_SYSTEM_PROMPT = `
+You are a Financial Data Expert. Your goal is to find matches in the 'security_universe' table.
 
-COLUMNS: ticker, name, category, type, yield, beta, ytd_return, strategy_text
+AVAILABLE COLUMNS: 
+- ticker, name, category, asset_class, sponsor, yield, beta, ytd_return, ret_3y, ret_5y, ret_10y, inception_date, strategy_text
 
 STRICT RULES:
-1. DO NOT use the word 'Equities' in the SQL. Use 'Stock' or 'ETF' if needed.
-2. If the user asks for "Dividend Aristocrats", search: (yield > 1.5 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%dividend%').
-3. If the user asks for "Low Beta", search: (beta < 1.0 AND beta > 0).
-4. Combine multiple themes with OR to ensure we get results (e.g., Theme A OR Theme B).
-5. Always end with LIMIT [Number].
-6. Return ONLY JSON: {"sql": "SELECT * FROM security_universe WHERE ... LIMIT X"}
+1. MAP UI FILTERS: 
+   - If 'Equities' is selected, use: (asset_class ILIKE '%Equity%' OR type = 'Stock').
+   - If 'Fixed Income' is selected, use: (asset_class = 'Fixed Income').
+2. QUANTITATIVE LIMITS: Always apply the Yield and Beta constraints provided in the context.
+3. DIVIDEND ARISTOCRATS: If requested, search: (yield > 1.5 OR strategy_text ILIKE '%dividend%' OR name ILIKE '%dividend%').
+4. FORMAT: Return ONLY JSON: {"sql": "SELECT * FROM security_universe WHERE ... LIMIT X"}
 `;
 const SECURITIES = [
   {
@@ -1088,14 +1089,20 @@ function selectOne(el, group) {
 }
 
 function getFilters() {
-  const assetChips = [...document.querySelectorAll('.filter-row')][0];
-  const assetClass = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['Equities','Fixed Income','ETFs','REITs'].includes(c.textContent)).map(c => c.textContent).join(', ') || 'Equities';
-  const marketCap = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['Mega','Large','Mid','Small'].includes(c.textContent)).map(c => c.textContent).join(', ') || 'Large, Mid';
-  const geography = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['US','Developed Intl','Emerging'].includes(c.textContent)).map(c => c.textContent).join(', ') || 'US';
-  const minYield = document.getElementById('yieldRange')?.value || '2';
-  const maxBeta = document.getElementById('betaRange')?.value || '0.9';
-  const maxResults = [...document.querySelectorAll('.filter-chip.selected')].filter(c => ['10','20','30'].includes(c.textContent)).map(c => c.textContent)[0] || '10';
-  return { assetClass, marketCap, geography, minYield, maxBeta, maxResults };
+  const getSelected = (label) => {
+    const parent = Array.from(document.querySelectorAll('.filter-label'))
+      .find(el => el.textContent.trim() === label)?.parentElement;
+    return parent ? Array.from(parent.querySelectorAll('.filter-chip.selected')).map(c => c.textContent.trim()) : [];
+  };
+
+  return {
+    assetClasses: getSelected('Asset class'), // Returns ['Equities']
+    marketCaps: getSelected('Market cap'),   // Returns ['Large', 'Mid']
+    geographies: getSelected('Geography'),   // Returns ['US']
+    minYield: document.getElementById('yieldRange').value,
+    maxBeta: document.getElementById('betaRange').value,
+    maxResults: getSelected('Max results')[0] || "10"
+  };
 }
 
 async function runScreen() {
@@ -1118,12 +1125,26 @@ async function runScreen() {
     btn.textContent = '✦ Analyzing Universe...';
 
     try {
-        // --- STAGE 1: SECURE AI CALL (Via Supabase Edge Function) ---
-        // We send the prompt to our "Life Preserver" function which hides the key
+        const ui = getFilters(); // Get consolidated filter state
+
+        // Create a combined prompt that forces Gemini to respect the UI
+        const combinedPrompt = `
+          USER SEARCH: ${prompt}
+          
+          MANDATORY UI CONSTRAINTS:
+          - Asset Classes: ${ui.assetClasses.join(', ')}
+          - Market Caps: ${ui.marketCaps.join(', ')}
+          - Geographies: ${ui.geographies.join(', ')}
+          - Min Yield: ${ui.minYield}%
+          - Max Beta: ${ui.maxBeta}
+          - Max Results: ${ui.maxResults}
+        `;
+
+        // --- STAGE 1: SECURE AI CALL ---
         const { data: aiResponse, error: aiError } = await _supabase.functions.invoke('bright-responder', {
             body: { 
-                prompt: prompt,
-                systemPrompt: `${SQL_SYSTEM_PROMPT}\n\nREQUIRED LIMIT: ${limitValue}` 
+                prompt: combinedPrompt, // Send the combined prompt here
+                systemPrompt: SQL_SYSTEM_PROMPT 
             }
         });
 
