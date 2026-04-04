@@ -1153,21 +1153,24 @@ async function runScreen() {
         if (dbError) throw dbError;
 
         // --- STAGE 3: GENERATE NARRATIVE ---
-        // For the demo, we'll generate a quick clean narrative
-        let narrativeSummary = `Analysis complete. Found ${results.length} securities matching "${prompt}".`;
-        
-        try {
-            // Optional: Second secure call for the "High-end analyst" voice
-            const { data: navResponse } = await _supabase.functions.invoke('bright-responder', {
-                body: { 
-                    prompt: `Summarize these results for: "${prompt}". Found ${results.length} items. Keep it to 2 sentences.`,
-                    systemPrompt: "You are a high-end investment analyst. Do not mention code or databases."
-                }
-            });
-            narrativeSummary = navResponse.candidates[0].content.parts[0].text;
-        } catch (e) {
-            console.warn("Narrative failed, using default.");
+try {
+    const { data: navResponse } = await _supabase.functions.invoke('bright-responder', {
+        body: { 
+            prompt: `Summarize these results for: "${prompt}". Found ${results.length} items. Tickers: ${results.slice(0,3).map(r => r.ticker).join(', ')}.`,
+            systemPrompt: "You are a high-end investment analyst. Return a JSON object with a single key 'summary' containing a 2-sentence insight. Do not mention code."
         }
+    });
+
+    // PARSE THE NARRATIVE HERE:
+    const rawNarrative = navResponse.candidates[0].content.parts[0].text;
+    const parsedNarrative = JSON.parse(rawNarrative);
+    narrativeSummary = parsedNarrative.summary; // This pulls just the text!
+
+} catch (e) {
+    console.warn("Narrative parsing failed, using raw or default.", e);
+    // Fallback in case Gemini sends plain text instead of JSON
+    narrativeSummary = navResponse?.candidates[0]?.content?.parts[0]?.text || narrativeSummary;
+}
 
         // --- STAGE 4: RENDER TO UI ---
         if (!results || results.length === 0) {
