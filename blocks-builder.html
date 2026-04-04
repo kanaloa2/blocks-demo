@@ -557,10 +557,12 @@ body {
   white-space: nowrap;
 }
 
-.results-table td {
-  padding: 11px 14px;
-  border-bottom: 0.5px solid var(--border);
-  vertical-align: middle;
+.results-table td:first-child {
+    min-width: 80px; /* Give it at least 80px */
+    font-weight: 700;
+    color: var(--text1);
+    white-space: nowrap; /* Prevents the ticker from wrapping to a second line */
+    overflow: visible;   /* Ensures no clipping */
 }
 
 .results-table tr:last-child td { border-bottom: none; }
