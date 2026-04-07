@@ -1392,10 +1392,8 @@ function renderRows(data) {
             </td>
             <td class="stat-cell yield-text">${s.yield || '0.0'}%</td>
             <td class="stat-cell">${s.beta || '1.0'}</td>
-            <td class="stat-cell muted">${s.std_1yr || '18.4x'}</td>
-            <td class="stat-cell ${parseFloat(s.rtn_1yr) >= 0 ? 'up' : 'down'}">
-                ${parseFloat(s.ytd_return) >= 0 ? '+' : ''}${s.rtn_1yr || '0'}%
-            </td>
+            <td class="stat-cell muted">${risk || '18.4x'}</td>
+            <td class="stat-cell ${return1y}</td>
             <td>
                 <div class="rationale-wrap">
                     ${isAristocrat ? '<span class="tag-aristocrat">Dividend Aristocrat</span>' : ''}
