@@ -1365,8 +1365,8 @@ function renderRows(data) {
         // Logic to determine if we show a "Dividend Aristocrat" tag (Preserved)
         const isAristocrat = s.yield > 2.5 || (s.strategy_text && s.strategy_text.toLowerCase().includes('aristocrat'));
         const score = s.score || Math.floor(Math.random() * (98 - 85) + 85); 
-        const risk = s.std_1yr ? s.std_1yr.toFixed(2) + '%' : '--';
-        const return1y = s.rtn_1y ? s.rtn_1y.toFixed(2) + '%' : '--';
+        const risk = s.std_1y ? s.std_1y.toFixed(2) + '%' : '--';
+        const return1y = s.ret_1y ? s.ret_1y.toFixed(2) + '%' : '--';
         
         // Check if this ticker is already selected
         const isSelected = selectedSecurities.includes(s.ticker);
