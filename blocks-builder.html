@@ -1280,8 +1280,8 @@ function showAIResults(data) {
                     <th>AI SCORE</th>
                     <th>DIV YIELD</th>
                     <th>BETA</th>
-                    <th>P/E</th>
-                    <th>YTD</th>
+                    <th>RISK</th>
+                    <th>RETURN</th>
                     <th>RATIONALE</th>
                     <th></th>
                 </tr>
@@ -1362,6 +1362,8 @@ function renderRows(data) {
         // Logic to determine if we show a "Dividend Aristocrat" tag (Preserved)
         const isAristocrat = s.yield > 2.5 || (s.strategy_text && s.strategy_text.toLowerCase().includes('aristocrat'));
         const score = s.score || Math.floor(Math.random() * (98 - 85) + 85); 
+        const risk = s.std_1yr ? s.std_1yr.toFixed(2) + '%' : '--';
+        const return1y = s.rtn_1y ? s.rtn_1y.toFixed(2) + '%' : '--';
         
         // Check if this ticker is already selected
         const isSelected = selectedSecurities.includes(s.ticker);
@@ -1387,9 +1389,9 @@ function renderRows(data) {
             </td>
             <td class="stat-cell yield-text">${s.yield || '0.0'}%</td>
             <td class="stat-cell">${s.beta || '1.0'}</td>
-            <td class="stat-cell muted">${s.pe || '18.4x'}</td>
-            <td class="stat-cell ${parseFloat(s.ytd_return) >= 0 ? 'up' : 'down'}">
-                ${parseFloat(s.ytd_return) >= 0 ? '+' : ''}${s.ytd_return || '0'}%
+            <td class="stat-cell muted">${s.std_1yr || '18.4x'}</td>
+            <td class="stat-cell ${parseFloat(s.rtn_1yr) >= 0 ? 'up' : 'down'}">
+                ${parseFloat(s.ytd_return) >= 0 ? '+' : ''}${s.rtn_1yr || '0'}%
             </td>
             <td>
                 <div class="rationale-wrap">
